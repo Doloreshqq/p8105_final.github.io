@@ -1,0 +1,110 @@
+---
+title: "Exploratory Data Analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+```
+
+```{r}
+# Load the dataset
+dass_raw = read.csv("./data/data.csv", sep = "\t")
+```
+
+## Data Establishment and Data Cleaning
+
+Based on codebook.txt, we select the variables we want... (explain how to check whether the survey is usable and what variables we need, explain each one)
+
+```{r}
+# kick out meaningless observation
+dass = dass_raw %>%
+  filter(VCL6 == 1 | VCL9 == 1 | VCL12 == 1)   
+
+dass = dass %>%
+  dplyr::select(matches('Q\\d+A'), country, education, urban, gender, engnat, age, hand, religion, orientation, race, voted, married, familysize, contains('TIPI')) %>%
+  na.omit()
+```
+
+( refactor the factor, mention these variable = 0 means missing value )
+
+```{r}
+# refactor the variables
+dass = dass %>%
+  mutate(
+    education = case_when(education == 1 ~ 'Less than high school', 
+                               education == 2 ~ 'High school', 
+                               education == 3 ~ 'University degree', 
+                               education == 4 ~ 'Graduate degree'),
+    urban = case_when(urban == 1 ~ 'Rural',
+                      urban == 2 ~ 'Suburban', 
+                      urban == 3 ~ 'Urban'),
+    gender = case_when(gender == 1 ~ 'Male',
+                       gender == 2 ~ 'Female',
+                       gender == 3 ~ 'Other'),
+    engnat = case_when(engnat == 1 ~ 'Yes',
+                       engnat == 2 ~ 'No'),
+    hand = case_when(hand == 1 ~ 'Right',
+                     hand == 2 ~ 'Left',
+                     hand == 3 ~ 'Both'),
+    religion = case_when(religion == 1 ~ 'Agnostic', 
+                         religion == 2 ~ 'Atheist', 
+                         religion == 3 ~ 'Buddhist', 
+                         religion == 4 ~ 'Christian (Catholic)', 
+                         religion == 5 ~ 'Christian (Mormon)', 
+                         religion == 6 ~ 'Christian (Protestant)', 
+                         religion == 7 ~ 'Christian (Other)', 
+                         religion == 8 ~ 'Hindu', 
+                         religion == 9 ~ 'Jewish', 
+                         religion == 10 ~ 'Muslim', 
+                         religion == 11 ~ 'Sikh', 
+                         religion == 12 ~ 'Other'),
+    orientation = case_when(orientation == 1 ~ 'Heterosexual', 
+                            orientation == 2 ~ 'Bisexual', 
+                            orientation == 3 ~ 'Homosexual', 
+                            orientation == 4 ~ 'Asexual', 
+                            orientation == 5 ~ 'Other'),
+    race = case_when(race == 10 ~ 'Asian', 
+                     race == 20 ~ 'Arab', 
+                     race == 30 ~ 'Black', 
+                     race == 40 ~ 'Indigenous Australian', 
+                     race == 50 ~ 'Native American', 
+                     race == 60 ~ 'White', 
+                     race == 70 ~ 'Other'),
+    voted = case_when(voted == 1 ~ 'Yes',
+                      voted == 2 ~ 'No'),
+    married = case_when(married == 1 ~ 'Never married', 
+                        married == 2 ~ 'Currently married', 
+                        married == 3 ~ 'Previously married')
+    ) %>%
+  na.omit()
+```
+
+(create a dataframe for self-recognition)
+
+```{r}
+# create a dataframe for self-recognition
+self_rec = dass %>%
+  dplyr::select(contains('TIPI'))
+
+dass = dass %>%
+  select(-contains('TIPI'))
+```
+
+Based on scoring .... create `depression`, `anxiety`, `stress` variable for each observation.
+
+(explain how)
+
+```{r}
+# create three different dataset
+dass = dass %>%
+  mutate(
+    depression = Q1A + Q2A + Q4A + Q6A + Q7A + Q8A + Q9A + Q11A + Q12A + Q14A + Q15A + Q18A + Q19A + Q20A + Q22A + Q23A + Q25A + Q27A + Q28A + Q29A + Q30A + Q32A + Q33A + Q35A + Q36A + Q39A + Q40A + Q41A,
+    anxiety = Q1A + Q3A + Q5A + Q6A + Q8A + Q10A + Q11A + Q12A + Q13A + Q14A + Q16A + Q17A + Q18A + Q21A + Q22A + Q24A + Q26A + Q27A + Q29A + Q31A + Q32A + Q33A + Q34A + Q35A + Q37A + Q38A + Q39A + Q42A,
+    stress = Q2A + Q3A + Q4A + Q5A + Q7A + Q9A + Q10A + Q13A + Q15A + Q16A + Q17A + Q19A + Q20A + Q21A + Q23A + Q24A + Q25A + Q26A + Q28A + Q30A + Q31A + Q34A + Q36A + Q37A + Q38A + Q40A + Q41A + Q42A
+    ) %>%
+  dplyr::select(-matches('Q\\d+A'))
+```
