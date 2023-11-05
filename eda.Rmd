@@ -96,15 +96,15 @@ dass = dass %>%
 
 Based on scoring .... create `depression`, `anxiety`, `stress` variable for each observation.
 
-(explain how)
+(explain how) -14 means scale to 0-3 scale from 1-4 scale
 
 ```{r}
 # create three different dataset
 dass = dass %>%
   mutate(
-    depression = Q1A + Q2A + Q4A + Q6A + Q7A + Q8A + Q9A + Q11A + Q12A + Q14A + Q15A + Q18A + Q19A + Q20A + Q22A + Q23A + Q25A + Q27A + Q28A + Q29A + Q30A + Q32A + Q33A + Q35A + Q36A + Q39A + Q40A + Q41A,
-    anxiety = Q1A + Q3A + Q5A + Q6A + Q8A + Q10A + Q11A + Q12A + Q13A + Q14A + Q16A + Q17A + Q18A + Q21A + Q22A + Q24A + Q26A + Q27A + Q29A + Q31A + Q32A + Q33A + Q34A + Q35A + Q37A + Q38A + Q39A + Q42A,
-    stress = Q2A + Q3A + Q4A + Q5A + Q7A + Q9A + Q10A + Q13A + Q15A + Q16A + Q17A + Q19A + Q20A + Q21A + Q23A + Q24A + Q25A + Q26A + Q28A + Q30A + Q31A + Q34A + Q36A + Q37A + Q38A + Q40A + Q41A + Q42A
+    depression = Q3A + Q5A + Q10A + Q13A + Q16A + Q17A + Q21A + Q24A + Q26A + Q31A + Q34A + Q37A + Q38A + Q42A - 14,
+    anxiety = Q2A + Q4A + Q7A + Q9A + Q15A + Q19A + Q20A + Q23A + Q25A + Q28A + Q30A + Q36A + Q40A + Q41A - 14,
+    stress = Q1A + Q6A + Q8A + Q11A + Q12A + Q14A + Q18A + Q22A + Q27A + Q29A + Q32A + Q33A + Q35A + Q39A - 14
     ) %>%
   dplyr::select(-matches('Q\\d+A'))
 ```
