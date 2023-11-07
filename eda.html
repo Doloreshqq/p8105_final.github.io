@@ -288,7 +288,8 @@ to check whether the survey is usable and what variables we need,
 explain each one)</p>
 <pre class="r"><code># kick out meaningless observation
 dass = dass_raw %&gt;%
-  filter(!(VCL6 == 1 | VCL9 == 1 | VCL12 == 1))   
+  filter(!(VCL6 == 1 | VCL9 == 1 | VCL12 == 1)) %&gt;%
+  filter(!country == &quot;None&quot;)
 
 dass = dass %&gt;%
   dplyr::select(matches(&#39;Q\\d+A&#39;), country, education, urban, gender, engnat, age, hand, religion, orientation, race, voted, married, familysize, contains(&#39;TIPI&#39;)) %&gt;%
@@ -365,82 +366,979 @@ dass_new = dass_new %&gt;%
     anxiety = Q2A + Q4A + Q7A + Q9A + Q15A + Q19A + Q20A + Q23A + Q25A + Q28A + Q30A + Q36A + Q40A + Q41A - 14,
     stress = Q1A + Q6A + Q8A + Q11A + Q12A + Q14A + Q18A + Q22A + Q27A + Q29A + Q32A + Q33A + Q35A + Q39A - 14
     ) %&gt;%
-  dplyr::select(-matches(&#39;Q\\d+A&#39;))</code></pre>
-<pre class="r"><code>dass_new %&gt;%
   mutate(education = factor(education, levels = c(&#39;Less than high school&#39;, &#39;High school&#39;, &#39;University degree&#39;, &#39;Graduate degree&#39;))) %&gt;%
-  ggplot(aes(x = education)) +
-  geom_bar()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
-<pre class="r"><code>dass %&gt;%
-  ggplot(aes(x = urban)) +
-  geom_bar()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
-<pre class="r"><code>dass_new %&gt;%
-  ggplot(aes(x = gender)) +
-  geom_bar()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
-<pre class="r"><code>dass_new %&gt;%
-  ggplot(aes(x = engnat)) +
-  geom_bar()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
-<pre class="r"><code>dass_new %&gt;%
-  ggplot(aes(x = hand)) +
-  geom_bar()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
-<pre class="r"><code>dass_new %&gt;%
-  ggplot(aes(x = religion)) +
-  geom_bar()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
-<pre class="r"><code>dass_new %&gt;%
-  ggplot(aes(x = orientation)) +
-  geom_bar()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
-<pre class="r"><code>dass_new %&gt;%
-  ggplot(aes(x = race)) +
-  geom_bar()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
-<pre class="r"><code>dass_new %&gt;%
-  ggplot(aes(x = voted)) +
-  geom_bar()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
-<pre class="r"><code>dass_new %&gt;%
-  ggplot(aes(x = married)) +
-  geom_bar()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+  mutate(married = factor(married, levels = c(&quot;Previously married&quot;, &quot;Currently married&quot;, &quot;Never married&quot;))) %&gt;%
+  mutate(engnat = factor(engnat, levels = c(&quot;Yes&quot;,&quot;No&quot;)),
+         voted = factor(voted,levels = c(&quot;Yes&quot;,&quot;No&quot;))) %&gt;%
+  dplyr::select(-matches(&#39;Q\\d+A&#39;))
+
+# create das level variables
+dass_new = dass_new %&gt;%
+  mutate(depression_level = case_when(
+    depression &gt;= 0 &amp; depression &lt;= 9 ~ &#39;Normal&#39;,
+    depression &gt;= 10 &amp; depression &lt;= 13 ~ &#39;Mild&#39;,
+    depression &gt;= 14 &amp; depression &lt;= 20 ~ &#39;Moderate&#39;,
+    depression &gt;= 21 &amp; depression &lt;= 27 ~ &#39;Severe&#39;,
+    depression &gt;= 28 ~ &#39;Extremely severe&#39;
+  )) %&gt;%
+  mutate(anxiety_level = case_when(
+    anxiety &gt;= 0 &amp; anxiety &lt;= 7 ~ &#39;Normal&#39;,
+    anxiety &gt;= 8 &amp; anxiety &lt;= 9 ~ &#39;Mild&#39;,
+    anxiety &gt;= 10 &amp; anxiety &lt;= 14 ~ &#39;Moderate&#39;,
+    anxiety &gt;= 15 &amp; anxiety &lt;= 19 ~ &#39;Severe&#39;,
+    anxiety &gt;= 20 ~ &#39;Extremely severe&#39;
+  )) %&gt;%
+  mutate(stress_level = case_when(
+    stress &gt;= 0 &amp; stress &lt;= 14 ~ &#39;Normal&#39;,
+    stress &gt;= 15 &amp; stress &lt;= 18 ~ &#39;Mild&#39;,
+    stress &gt;= 19 &amp; stress &lt;= 25 ~ &#39;Moderate&#39;,
+    stress &gt;= 26 &amp; stress &lt;= 33 ~ &#39;Severe&#39;,
+    stress &gt;= 34 ~ &#39;Extremely severe&#39;
+  )) %&gt;%
+  mutate(depression_level = factor(depression_level, c(&quot;Normal&quot;,&quot;Mild&quot;,&quot;Moderate&quot;,&quot;Severe&quot;,&quot;Extremely severe&quot;))) %&gt;%
+  mutate(anxiety_level = factor(anxiety_level, c(&quot;Normal&quot;,&quot;Mild&quot;,&quot;Moderate&quot;,&quot;Severe&quot;,&quot;Extremely severe&quot;))) %&gt;%
+  mutate(stress_level = factor(stress_level, c(&quot;Normal&quot;,&quot;Mild&quot;,&quot;Moderate&quot;,&quot;Severe&quot;,&quot;Extremely severe&quot;))) %&gt;%
+  dplyr::select(-depression,-anxiety,-stress)</code></pre>
+</div>
+<div id="data-summary" class="section level2">
+<h2>Data Summary</h2>
 <pre class="r"><code>dass_new %&gt;%
   ggplot(aes(x = as.factor(familysize))) +
   geom_bar()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
-<pre class="r"><code>library(pheatmap)
-# Select the columns you need and create a data frame
-dass_heat &lt;- dass %&gt;%
-  mutate(
-    depression = Q3A + Q5A + Q10A + Q13A + Q16A + Q17A + Q21A + Q24A + Q26A + Q31A + Q34A + Q37A + Q38A + Q42A - 14,
-    anxiety = Q2A + Q4A + Q7A + Q9A + Q15A + Q19A + Q20A + Q23A + Q25A + Q28A + Q30A + Q36A + Q40A + Q41A - 14,
-    stress = Q1A + Q6A + Q8A + Q11A + Q12A + Q14A + Q18A + Q22A + Q27A + Q29A + Q32A + Q33A + Q35A + Q39A - 14
-    ) %&gt;%
-  dplyr::select(-matches(&#39;Q\\d+A&#39;)) %&gt;%
-  dplyr::select(-country)
+<p><img src="eda_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>library(gtsummary)</code></pre>
+<pre><code>## #StandWithUkraine</code></pre>
+<pre class="r"><code>library(gtsummary)
 
-# Calculate the correlation matrix
+dass_new %&gt;%
+  tbl_summary(type = list(
+    country ~ &quot;categorical&quot;, 
+    education ~ &quot;categorical&quot;, 
+    urban ~ &quot;categorical&quot;, 
+    gender ~ &quot;categorical&quot;,
+    engnat ~ &quot;categorical&quot;,
+    hand ~ &quot;categorical&quot;,
+    religion ~ &quot;categorical&quot;,
+    orientation ~ &quot;categorical&quot;,
+    race ~ &quot;categorical&quot;,
+    voted ~ &quot;categorical&quot;,
+    married ~ &quot;categorical&quot;,
+    age ~ &quot;continuous&quot;, 
+    familysize ~ &quot;continuous&quot;,
+    depression_level ~ &quot;categorical&quot;,
+    anxiety_level ~ &quot;categorical&quot;,
+    stress_level ~ &quot;categorical&quot;
+  ), 
+  statistic = list(all_continuous() ~ &quot;{mean} ({sd})&quot;), 
+  digits = all_continuous() ~ 1,
+  label = c(
+    country = &quot;Country&quot;,
+    education = &quot;Education level&quot;,
+    urban = &quot;Urban level&quot;,
+    gender = &quot;Gender&quot;,
+    engnat = &quot;English native or not&quot;,
+    hand = &quot;Hand to write with&quot;,
+    religion = &quot;Religion&quot;,
+    orientation = &#39;Sexual orientation&#39;,
+    race = &#39;Race&#39;,
+    voted = &#39;Voted past year&#39;,
+    married = &#39;Marriage status&#39;,
+    age = &quot;Age (Years)&quot;,
+    familysize = &quot;Family size&quot;,
+    depression_level = &quot;Depression level&quot;,
+    anxiety_level = &quot;Anxiety level&quot;,
+    stress_level = &quot;Stress level&quot;
+  )) %&gt;%
+  bold_labels() %&gt;%
+  as_gt()  # Display the table as a gt object</code></pre>
+<div id="kljuyrmkeu" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#kljuyrmkeu table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-r &lt;- cor(dass_heat,
-         method = &quot;pearson&quot;,
-         use = &quot;pairwise.complete.obs&quot;
-) 
+#kljuyrmkeu thead, #kljuyrmkeu tbody, #kljuyrmkeu tfoot, #kljuyrmkeu tr, #kljuyrmkeu td, #kljuyrmkeu th {
+  border-style: none;
+}
 
-pheatmap(r, 
-         show_colnames = TRUE,   
-         show_rownames=TRUE,    
-         fontsize=5,             
-         color = colorRampPalette(c(&#39;#0000ff&#39;,&#39;#ffffff&#39;,&#39;#ff0000&#39;))(100), 
-         annotation_legend=TRUE, 
-         border_color=NA,        
-         scale=&quot;none&quot;,            
-         cluster_rows = T,
-         cluster_cols = T     
-)</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+#kljuyrmkeu p {
+  margin: 0;
+  padding: 0;
+}
+
+#kljuyrmkeu .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#kljuyrmkeu .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#kljuyrmkeu .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#kljuyrmkeu .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#kljuyrmkeu .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kljuyrmkeu .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kljuyrmkeu .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kljuyrmkeu .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#kljuyrmkeu .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#kljuyrmkeu .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#kljuyrmkeu .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#kljuyrmkeu .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#kljuyrmkeu .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#kljuyrmkeu .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#kljuyrmkeu .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#kljuyrmkeu .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#kljuyrmkeu .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#kljuyrmkeu .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#kljuyrmkeu .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kljuyrmkeu .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#kljuyrmkeu .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#kljuyrmkeu .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#kljuyrmkeu .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kljuyrmkeu .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#kljuyrmkeu .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#kljuyrmkeu .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kljuyrmkeu .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kljuyrmkeu .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#kljuyrmkeu .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kljuyrmkeu .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#kljuyrmkeu .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kljuyrmkeu .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kljuyrmkeu .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kljuyrmkeu .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kljuyrmkeu .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kljuyrmkeu .gt_left {
+  text-align: left;
+}
+
+#kljuyrmkeu .gt_center {
+  text-align: center;
+}
+
+#kljuyrmkeu .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#kljuyrmkeu .gt_font_normal {
+  font-weight: normal;
+}
+
+#kljuyrmkeu .gt_font_bold {
+  font-weight: bold;
+}
+
+#kljuyrmkeu .gt_font_italic {
+  font-style: italic;
+}
+
+#kljuyrmkeu .gt_super {
+  font-size: 65%;
+}
+
+#kljuyrmkeu .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#kljuyrmkeu .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#kljuyrmkeu .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#kljuyrmkeu .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#kljuyrmkeu .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#kljuyrmkeu .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#kljuyrmkeu .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Characteristic&lt;/strong&gt;"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;N = 30,443&lt;/strong&gt;&lt;span class=&quot;gt_footnote_marks&quot; style=&quot;white-space:nowrap;font-style:italic;font-weight:normal;&quot;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/span&gt;"><strong>N = 30,443</strong><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Country</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    AE</td>
+<td headers="stat_0" class="gt_row gt_center">47 (0.2%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    AF</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    AL</td>
+<td headers="stat_0" class="gt_row gt_center">10 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    AM</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    AO</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    AR</td>
+<td headers="stat_0" class="gt_row gt_center">43 (0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    AT</td>
+<td headers="stat_0" class="gt_row gt_center">34 (0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    AU</td>
+<td headers="stat_0" class="gt_row gt_center">449 (1.5%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    AZ</td>
+<td headers="stat_0" class="gt_row gt_center">3 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    BA</td>
+<td headers="stat_0" class="gt_row gt_center">16 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    BB</td>
+<td headers="stat_0" class="gt_row gt_center">3 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    BD</td>
+<td headers="stat_0" class="gt_row gt_center">15 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    BE</td>
+<td headers="stat_0" class="gt_row gt_center">25 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    BG</td>
+<td headers="stat_0" class="gt_row gt_center">26 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    BH</td>
+<td headers="stat_0" class="gt_row gt_center">4 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    BN</td>
+<td headers="stat_0" class="gt_row gt_center">131 (0.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    BO</td>
+<td headers="stat_0" class="gt_row gt_center">2 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    BR</td>
+<td headers="stat_0" class="gt_row gt_center">133 (0.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    BS</td>
+<td headers="stat_0" class="gt_row gt_center">5 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    BW</td>
+<td headers="stat_0" class="gt_row gt_center">2 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    BY</td>
+<td headers="stat_0" class="gt_row gt_center">3 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    BZ</td>
+<td headers="stat_0" class="gt_row gt_center">3 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    CA</td>
+<td headers="stat_0" class="gt_row gt_center">745 (2.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    CH</td>
+<td headers="stat_0" class="gt_row gt_center">40 (0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    CL</td>
+<td headers="stat_0" class="gt_row gt_center">26 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    CN</td>
+<td headers="stat_0" class="gt_row gt_center">9 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    CO</td>
+<td headers="stat_0" class="gt_row gt_center">18 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    CR</td>
+<td headers="stat_0" class="gt_row gt_center">7 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    CW</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    CY</td>
+<td headers="stat_0" class="gt_row gt_center">6 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    CZ</td>
+<td headers="stat_0" class="gt_row gt_center">42 (0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    DE</td>
+<td headers="stat_0" class="gt_row gt_center">248 (0.8%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    DK</td>
+<td headers="stat_0" class="gt_row gt_center">42 (0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    DO</td>
+<td headers="stat_0" class="gt_row gt_center">7 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    DZ</td>
+<td headers="stat_0" class="gt_row gt_center">5 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    EC</td>
+<td headers="stat_0" class="gt_row gt_center">6 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    EE</td>
+<td headers="stat_0" class="gt_row gt_center">16 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    EG</td>
+<td headers="stat_0" class="gt_row gt_center">58 (0.2%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    ES</td>
+<td headers="stat_0" class="gt_row gt_center">72 (0.2%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    ET</td>
+<td headers="stat_0" class="gt_row gt_center">2 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    FI</td>
+<td headers="stat_0" class="gt_row gt_center">65 (0.2%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    FO</td>
+<td headers="stat_0" class="gt_row gt_center">2 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    FR</td>
+<td headers="stat_0" class="gt_row gt_center">147 (0.5%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    GB</td>
+<td headers="stat_0" class="gt_row gt_center">876 (2.9%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    GE</td>
+<td headers="stat_0" class="gt_row gt_center">7 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    GG</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    GH</td>
+<td headers="stat_0" class="gt_row gt_center">4 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    GR</td>
+<td headers="stat_0" class="gt_row gt_center">49 (0.2%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    GT</td>
+<td headers="stat_0" class="gt_row gt_center">6 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    GU</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    GY</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    HK</td>
+<td headers="stat_0" class="gt_row gt_center">46 (0.2%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    HN</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    HR</td>
+<td headers="stat_0" class="gt_row gt_center">47 (0.2%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    HU</td>
+<td headers="stat_0" class="gt_row gt_center">40 (0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    ID</td>
+<td headers="stat_0" class="gt_row gt_center">743 (2.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    IE</td>
+<td headers="stat_0" class="gt_row gt_center">54 (0.2%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    IL</td>
+<td headers="stat_0" class="gt_row gt_center">21 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    IM</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    IN</td>
+<td headers="stat_0" class="gt_row gt_center">373 (1.2%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    IQ</td>
+<td headers="stat_0" class="gt_row gt_center">3 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    IR</td>
+<td headers="stat_0" class="gt_row gt_center">6 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    IS</td>
+<td headers="stat_0" class="gt_row gt_center">11 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    IT</td>
+<td headers="stat_0" class="gt_row gt_center">101 (0.3%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    JE</td>
+<td headers="stat_0" class="gt_row gt_center">2 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    JM</td>
+<td headers="stat_0" class="gt_row gt_center">37 (0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    JO</td>
+<td headers="stat_0" class="gt_row gt_center">16 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    JP</td>
+<td headers="stat_0" class="gt_row gt_center">78 (0.3%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    KE</td>
+<td headers="stat_0" class="gt_row gt_center">2 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    KH</td>
+<td headers="stat_0" class="gt_row gt_center">3 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    KR</td>
+<td headers="stat_0" class="gt_row gt_center">29 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    KW</td>
+<td headers="stat_0" class="gt_row gt_center">11 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    KZ</td>
+<td headers="stat_0" class="gt_row gt_center">2 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    LB</td>
+<td headers="stat_0" class="gt_row gt_center">10 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    LK</td>
+<td headers="stat_0" class="gt_row gt_center">11 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    LT</td>
+<td headers="stat_0" class="gt_row gt_center">18 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    LU</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    LV</td>
+<td headers="stat_0" class="gt_row gt_center">4 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    MA</td>
+<td headers="stat_0" class="gt_row gt_center">15 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    MD</td>
+<td headers="stat_0" class="gt_row gt_center">2 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    ME</td>
+<td headers="stat_0" class="gt_row gt_center">3 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    MK</td>
+<td headers="stat_0" class="gt_row gt_center">10 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    MO</td>
+<td headers="stat_0" class="gt_row gt_center">2 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    MT</td>
+<td headers="stat_0" class="gt_row gt_center">2 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    MU</td>
+<td headers="stat_0" class="gt_row gt_center">4 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    MV</td>
+<td headers="stat_0" class="gt_row gt_center">4 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    MX</td>
+<td headers="stat_0" class="gt_row gt_center">118 (0.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    MY</td>
+<td headers="stat_0" class="gt_row gt_center">16,776 (55%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    MZ</td>
+<td headers="stat_0" class="gt_row gt_center">4 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    NG</td>
+<td headers="stat_0" class="gt_row gt_center">14 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    NI</td>
+<td headers="stat_0" class="gt_row gt_center">4 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    NL</td>
+<td headers="stat_0" class="gt_row gt_center">87 (0.3%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    NO</td>
+<td headers="stat_0" class="gt_row gt_center">40 (0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    NONE</td>
+<td headers="stat_0" class="gt_row gt_center">408 (1.3%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    NP</td>
+<td headers="stat_0" class="gt_row gt_center">5 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    NZ</td>
+<td headers="stat_0" class="gt_row gt_center">166 (0.5%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    OM</td>
+<td headers="stat_0" class="gt_row gt_center">3 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    PA</td>
+<td headers="stat_0" class="gt_row gt_center">7 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    PE</td>
+<td headers="stat_0" class="gt_row gt_center">16 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    PH</td>
+<td headers="stat_0" class="gt_row gt_center">574 (1.9%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    PK</td>
+<td headers="stat_0" class="gt_row gt_center">55 (0.2%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    PL</td>
+<td headers="stat_0" class="gt_row gt_center">131 (0.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    PR</td>
+<td headers="stat_0" class="gt_row gt_center">3 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    PS</td>
+<td headers="stat_0" class="gt_row gt_center">2 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    PT</td>
+<td headers="stat_0" class="gt_row gt_center">42 (0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    PY</td>
+<td headers="stat_0" class="gt_row gt_center">2 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    QA</td>
+<td headers="stat_0" class="gt_row gt_center">8 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    RE</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    RO</td>
+<td headers="stat_0" class="gt_row gt_center">113 (0.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    RS</td>
+<td headers="stat_0" class="gt_row gt_center">54 (0.2%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    RU</td>
+<td headers="stat_0" class="gt_row gt_center">50 (0.2%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    SA</td>
+<td headers="stat_0" class="gt_row gt_center">44 (0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    SC</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    SD</td>
+<td headers="stat_0" class="gt_row gt_center">4 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    SE</td>
+<td headers="stat_0" class="gt_row gt_center">60 (0.2%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    SG</td>
+<td headers="stat_0" class="gt_row gt_center">234 (0.8%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    SI</td>
+<td headers="stat_0" class="gt_row gt_center">11 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    SK</td>
+<td headers="stat_0" class="gt_row gt_center">20 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    SN</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    SR</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    SV</td>
+<td headers="stat_0" class="gt_row gt_center">8 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    SY</td>
+<td headers="stat_0" class="gt_row gt_center">3 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    TG</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    TH</td>
+<td headers="stat_0" class="gt_row gt_center">22 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    TJ</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    TN</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    TR</td>
+<td headers="stat_0" class="gt_row gt_center">71 (0.2%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    TT</td>
+<td headers="stat_0" class="gt_row gt_center">7 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    TW</td>
+<td headers="stat_0" class="gt_row gt_center">14 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    TZ</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    UA</td>
+<td headers="stat_0" class="gt_row gt_center">19 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    US</td>
+<td headers="stat_0" class="gt_row gt_center">5,943 (20%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    UY</td>
+<td headers="stat_0" class="gt_row gt_center">6 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    UZ</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    VE</td>
+<td headers="stat_0" class="gt_row gt_center">13 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    VN</td>
+<td headers="stat_0" class="gt_row gt_center">30 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    VU</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    XK</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    ZA</td>
+<td headers="stat_0" class="gt_row gt_center">61 (0.2%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    ZW</td>
+<td headers="stat_0" class="gt_row gt_center">1 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Education level</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Less than high school</td>
+<td headers="stat_0" class="gt_row gt_center">3,013 (9.9%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    High school</td>
+<td headers="stat_0" class="gt_row gt_center">11,421 (38%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    University degree</td>
+<td headers="stat_0" class="gt_row gt_center">12,011 (39%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Graduate degree</td>
+<td headers="stat_0" class="gt_row gt_center">3,998 (13%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Urban level</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Rural</td>
+<td headers="stat_0" class="gt_row gt_center">6,288 (21%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Suburban</td>
+<td headers="stat_0" class="gt_row gt_center">10,341 (34%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Urban</td>
+<td headers="stat_0" class="gt_row gt_center">13,814 (45%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Gender</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Female</td>
+<td headers="stat_0" class="gt_row gt_center">23,216 (76%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Male</td>
+<td headers="stat_0" class="gt_row gt_center">6,808 (22%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Other</td>
+<td headers="stat_0" class="gt_row gt_center">419 (1.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">English native or not</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Yes</td>
+<td headers="stat_0" class="gt_row gt_center">10,535 (35%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    No</td>
+<td headers="stat_0" class="gt_row gt_center">19,908 (65%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Age (Years)</td>
+<td headers="stat_0" class="gt_row gt_center">23.7 (24.1)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Hand to write with</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Both</td>
+<td headers="stat_0" class="gt_row gt_center">410 (1.3%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Left</td>
+<td headers="stat_0" class="gt_row gt_center">3,173 (10%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Right</td>
+<td headers="stat_0" class="gt_row gt_center">26,860 (88%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Religion</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Agnostic</td>
+<td headers="stat_0" class="gt_row gt_center">2,429 (8.0%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Atheist</td>
+<td headers="stat_0" class="gt_row gt_center">2,944 (9.7%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Buddhist</td>
+<td headers="stat_0" class="gt_row gt_center">422 (1.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Christian (Catholic)</td>
+<td headers="stat_0" class="gt_row gt_center">2,380 (7.8%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Christian (Mormon)</td>
+<td headers="stat_0" class="gt_row gt_center">84 (0.3%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Christian (Other)</td>
+<td headers="stat_0" class="gt_row gt_center">1,710 (5.6%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Christian (Protestant)</td>
+<td headers="stat_0" class="gt_row gt_center">1,188 (3.9%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Hindu</td>
+<td headers="stat_0" class="gt_row gt_center">549 (1.8%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Jewish</td>
+<td headers="stat_0" class="gt_row gt_center">100 (0.3%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Muslim</td>
+<td headers="stat_0" class="gt_row gt_center">17,251 (57%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Other</td>
+<td headers="stat_0" class="gt_row gt_center">1,342 (4.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Sikh</td>
+<td headers="stat_0" class="gt_row gt_center">44 (0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Sexual orientation</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Asexual</td>
+<td headers="stat_0" class="gt_row gt_center">1,653 (5.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Bisexual</td>
+<td headers="stat_0" class="gt_row gt_center">3,934 (13%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Heterosexual</td>
+<td headers="stat_0" class="gt_row gt_center">20,375 (67%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Homosexual</td>
+<td headers="stat_0" class="gt_row gt_center">1,561 (5.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Other</td>
+<td headers="stat_0" class="gt_row gt_center">2,920 (9.6%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Race</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Arab</td>
+<td headers="stat_0" class="gt_row gt_center">255 (0.8%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Asian</td>
+<td headers="stat_0" class="gt_row gt_center">18,104 (59%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Black</td>
+<td headers="stat_0" class="gt_row gt_center">436 (1.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Indigenous Australian</td>
+<td headers="stat_0" class="gt_row gt_center">12 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Native American</td>
+<td headers="stat_0" class="gt_row gt_center">157 (0.5%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Other</td>
+<td headers="stat_0" class="gt_row gt_center">3,631 (12%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    White</td>
+<td headers="stat_0" class="gt_row gt_center">7,848 (26%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Voted past year</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Yes</td>
+<td headers="stat_0" class="gt_row gt_center">8,549 (28%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    No</td>
+<td headers="stat_0" class="gt_row gt_center">21,894 (72%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Marriage status</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Previously married</td>
+<td headers="stat_0" class="gt_row gt_center">779 (2.6%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Currently married</td>
+<td headers="stat_0" class="gt_row gt_center">3,329 (11%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Never married</td>
+<td headers="stat_0" class="gt_row gt_center">26,335 (87%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Family size</td>
+<td headers="stat_0" class="gt_row gt_center">3.5 (2.1)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Depression level</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Normal</td>
+<td headers="stat_0" class="gt_row gt_center">6,861 (23%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Mild</td>
+<td headers="stat_0" class="gt_row gt_center">2,938 (9.7%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Moderate</td>
+<td headers="stat_0" class="gt_row gt_center">5,445 (18%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Severe</td>
+<td headers="stat_0" class="gt_row gt_center">4,974 (16%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Extremely severe</td>
+<td headers="stat_0" class="gt_row gt_center">10,225 (34%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Anxiety level</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Normal</td>
+<td headers="stat_0" class="gt_row gt_center">7,637 (25%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Mild</td>
+<td headers="stat_0" class="gt_row gt_center">2,155 (7.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Moderate</td>
+<td headers="stat_0" class="gt_row gt_center">5,549 (18%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Severe</td>
+<td headers="stat_0" class="gt_row gt_center">4,641 (15%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Extremely severe</td>
+<td headers="stat_0" class="gt_row gt_center">10,461 (34%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Stress level</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Normal</td>
+<td headers="stat_0" class="gt_row gt_center">9,170 (30%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Mild</td>
+<td headers="stat_0" class="gt_row gt_center">3,874 (13%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Moderate</td>
+<td headers="stat_0" class="gt_row gt_center">6,686 (22%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Severe</td>
+<td headers="stat_0" class="gt_row gt_center">6,494 (21%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Extremely severe</td>
+<td headers="stat_0" class="gt_row gt_center">4,219 (14%)</td></tr>
+  </tbody>
+  
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="2"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> n (%); Mean (SD)</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
 </div>
 
 
