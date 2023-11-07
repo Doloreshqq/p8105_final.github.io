@@ -26,7 +26,7 @@ dass = dass_raw %>%
   filter(!country == "None")
 
 dass = dass %>%
-  dplyr::select(matches('Q\\d+A'), country, education, urban, gender, engnat, age, hand, religion, orientation, race, voted, married, familysize, contains('TIPI')) %>%
+  dplyr::select(matches('Q\\d+A'), country, education, urban, gender, age, religion, orientation, race, married, familysize, contains('TIPI')) %>%
   na.omit()
 ```
 
@@ -46,11 +46,6 @@ dass_new = dass %>%
     gender = case_when(gender == 1 ~ 'Male',
                        gender == 2 ~ 'Female',
                        gender == 3 ~ 'Other'),
-    engnat = case_when(engnat == 1 ~ 'Yes',
-                       engnat == 2 ~ 'No'),
-    hand = case_when(hand == 1 ~ 'Right',
-                     hand == 2 ~ 'Left',
-                     hand == 3 ~ 'Both'),
     religion = case_when(religion == 1 ~ 'Agnostic', 
                          religion == 2 ~ 'Atheist', 
                          religion == 3 ~ 'Buddhist', 
@@ -75,8 +70,6 @@ dass_new = dass %>%
                      race == 50 ~ 'Native American', 
                      race == 60 ~ 'White', 
                      race == 70 ~ 'Other'),
-    voted = case_when(voted == 1 ~ 'Yes',
-                      voted == 2 ~ 'No'),
     married = case_when(married == 1 ~ 'Never married', 
                         married == 2 ~ 'Currently married', 
                         married == 3 ~ 'Previously married')
@@ -112,8 +105,6 @@ dass_new = dass_new %>%
     ) %>%
   mutate(education = factor(education, levels = c('Less than high school', 'High school', 'University degree', 'Graduate degree'))) %>%
   mutate(married = factor(married, levels = c("Previously married", "Currently married", "Never married"))) %>%
-  mutate(engnat = factor(engnat, levels = c("Yes","No")),
-         voted = factor(voted,levels = c("Yes","No"))) %>%
   dplyr::select(-matches('Q\\d+A'))
 
 # create das level variables
@@ -164,12 +155,9 @@ dass_new %>%
     education ~ "categorical", 
     urban ~ "categorical", 
     gender ~ "categorical",
-    engnat ~ "categorical",
-    hand ~ "categorical",
     religion ~ "categorical",
     orientation ~ "categorical",
     race ~ "categorical",
-    voted ~ "categorical",
     married ~ "categorical",
     age ~ "continuous", 
     familysize ~ "continuous",
@@ -184,12 +172,9 @@ dass_new %>%
     education = "Education level",
     urban = "Urban level",
     gender = "Gender",
-    engnat = "English native or not",
-    hand = "Hand to write with",
     religion = "Religion",
     orientation = 'Sexual orientation',
     race = 'Race',
-    voted = 'Voted past year',
     married = 'Marriage status',
     age = "Age (Years)",
     familysize = "Family size",

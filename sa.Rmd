@@ -37,6 +37,28 @@ pheatmap(r,
 ```
 
 ```{r}
+
+PCA = prcomp(dass_heat1, center = T, scale. = T)
+
+PCA
+
+summary(PCA)
+```
+
+```{r}
+screeplot(PCA, type = 'line')
+```
+
+```{r}
+library(factoextra)
+fviz_pca_var(PCA, axes = c(1, 2), col.var = "contrib", gradient.cols = c("blue", "red"), repel = TRUE)
+
+fviz_pca_var(PCA, axes = c(2, 3), col.var = "contrib", gradient.cols = c("blue", "red"), 
+            repel = TRUE)
+
+```
+
+```{r}
 dass_heat2 <- dass %>%
   mutate(
     depression = Q3A + Q5A + Q10A + Q13A + Q16A + Q17A + Q21A + Q24A + Q26A + Q31A + Q34A + Q37A + Q38A + Q42A - 14,
