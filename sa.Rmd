@@ -1,7 +1,5 @@
 ---
 title: "Statistical Analysis"
-author: "Qin Huang"
-date: "2023-11-07"
 output: html_document
 ---
 
