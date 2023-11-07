@@ -1,0 +1,192 @@
+---
+title: "Data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+```
+
+## Data Source
+
+(where DASS comes from, code.txt, data.csv, scoring table)
+
+```{r}
+# Load the dataset
+dass_raw = read.csv("./data/data.csv", sep = "\t")
+```
+
+## Data Establishment and Data Cleaning
+
+Based on codebook.txt, we select the variables we want... (explain how to check whether the survey is usable and what variables we need, explain each one)
+
+```{r}
+# kick out meaningless observation
+dass = dass_raw %>%
+  filter(!(VCL6 == 1 | VCL9 == 1 | VCL12 == 1)) %>%
+  filter(!country == "NONE")
+
+dass = dass %>%
+  dplyr::select(matches('Q\\d+A'), country, education, urban, gender, age, religion, orientation, race, married, familysize, contains('TIPI')) %>%
+  na.omit()
+```
+
+( refactor the factor, mention these variable = 0 means missing value )
+
+```{r}
+# refactor the variables
+dass_new = dass %>%
+  mutate(
+    education = case_when(education == 1 ~ 'Less than high school', 
+                               education == 2 ~ 'High school', 
+                               education == 3 ~ 'University degree', 
+                               education == 4 ~ 'Graduate degree'),
+    urban = case_when(urban == 1 ~ 'Rural',
+                      urban == 2 ~ 'Suburban', 
+                      urban == 3 ~ 'Urban'),
+    gender = case_when(gender == 1 ~ 'Male',
+                       gender == 2 ~ 'Female',
+                       gender == 3 ~ 'Other'),
+    religion = case_when(religion == 1 ~ 'Agnostic', 
+                         religion == 2 ~ 'Atheist', 
+                         religion == 3 ~ 'Buddhist', 
+                         religion == 4 ~ 'Christian (Catholic)', 
+                         religion == 5 ~ 'Christian (Mormon)', 
+                         religion == 6 ~ 'Christian (Protestant)', 
+                         religion == 7 ~ 'Christian (Other)', 
+                         religion == 8 ~ 'Hindu', 
+                         religion == 9 ~ 'Jewish', 
+                         religion == 10 ~ 'Muslim', 
+                         religion == 11 ~ 'Sikh', 
+                         religion == 12 ~ 'Other'),
+    orientation = case_when(orientation == 1 ~ 'Heterosexual', 
+                            orientation == 2 ~ 'Bisexual', 
+                            orientation == 3 ~ 'Homosexual', 
+                            orientation == 4 ~ 'Asexual', 
+                            orientation == 5 ~ 'Other'),
+    race = case_when(race == 10 ~ 'Asian', 
+                     race == 20 ~ 'Arab', 
+                     race == 30 ~ 'Black', 
+                     race == 40 ~ 'Indigenous Australian', 
+                     race == 50 ~ 'Native American', 
+                     race == 60 ~ 'White', 
+                     race == 70 ~ 'Other'),
+    married = case_when(married == 1 ~ 'Never married', 
+                        married == 2 ~ 'Currently married', 
+                        married == 3 ~ 'Previously married')
+    ) %>%
+  na.omit()
+```
+
+(create a dataframe for self-recognition)
+
+```{r}
+# create a dataframe for self-recognition
+self_rec = dass_new %>%
+  dplyr::select(contains('TIPI'))
+
+dass = dass %>%
+  select(-contains('TIPI'))
+
+dass_new = dass_new %>%
+  select(-contains('TIPI'))
+```
+
+Based on scoring .... create `depression`, `anxiety`, `stress` variable for each observation.
+
+(explain how) -14 means scale to 0-3 scale from 1-4 scale
+
+```{r}
+# create three different dataset
+dass_new = dass_new %>%
+  mutate(
+    depression = Q3A + Q5A + Q10A + Q13A + Q16A + Q17A + Q21A + Q24A + Q26A + Q31A + Q34A + Q37A + Q38A + Q42A - 14,
+    anxiety = Q2A + Q4A + Q7A + Q9A + Q15A + Q19A + Q20A + Q23A + Q25A + Q28A + Q30A + Q36A + Q40A + Q41A - 14,
+    stress = Q1A + Q6A + Q8A + Q11A + Q12A + Q14A + Q18A + Q22A + Q27A + Q29A + Q32A + Q33A + Q35A + Q39A - 14
+    ) %>%
+  mutate(education = factor(education, levels = c('Less than high school', 'High school', 'University degree', 'Graduate degree'))) %>%
+  mutate(married = factor(married, levels = c("Previously married", "Currently married", "Never married"))) %>%
+  dplyr::select(-matches('Q\\d+A'))
+
+# create das level variables
+dass_new = dass_new %>%
+  mutate(depression_level = case_when(
+    depression >= 0 & depression <= 9 ~ 'Normal',
+    depression >= 10 & depression <= 13 ~ 'Mild',
+    depression >= 14 & depression <= 20 ~ 'Moderate',
+    depression >= 21 & depression <= 27 ~ 'Severe',
+    depression >= 28 ~ 'Extremely severe'
+  )) %>%
+  mutate(anxiety_level = case_when(
+    anxiety >= 0 & anxiety <= 7 ~ 'Normal',
+    anxiety >= 8 & anxiety <= 9 ~ 'Mild',
+    anxiety >= 10 & anxiety <= 14 ~ 'Moderate',
+    anxiety >= 15 & anxiety <= 19 ~ 'Severe',
+    anxiety >= 20 ~ 'Extremely severe'
+  )) %>%
+  mutate(stress_level = case_when(
+    stress >= 0 & stress <= 14 ~ 'Normal',
+    stress >= 15 & stress <= 18 ~ 'Mild',
+    stress >= 19 & stress <= 25 ~ 'Moderate',
+    stress >= 26 & stress <= 33 ~ 'Severe',
+    stress >= 34 ~ 'Extremely severe'
+  )) %>%
+  mutate(depression_level = factor(depression_level, c("Normal","Mild","Moderate","Severe","Extremely severe"))) %>%
+  mutate(anxiety_level = factor(anxiety_level, c("Normal","Mild","Moderate","Severe","Extremely severe"))) %>%
+  mutate(stress_level = factor(stress_level, c("Normal","Mild","Moderate","Severe","Extremely severe"))) %>%
+  dplyr::select(-depression,-anxiety,-stress)
+```
+
+## Data Summary
+
+```{r}
+dass_new %>%
+  ggplot(aes(x = as.factor(familysize))) +
+  geom_bar()
+```
+
+```{r}
+library(gtsummary)
+
+library(gtsummary)
+
+dass_new %>%
+  tbl_summary(type = list(
+    country ~ "categorical", 
+    education ~ "categorical", 
+    urban ~ "categorical", 
+    gender ~ "categorical",
+    religion ~ "categorical",
+    orientation ~ "categorical",
+    race ~ "categorical",
+    married ~ "categorical",
+    age ~ "continuous", 
+    familysize ~ "continuous",
+    depression_level ~ "categorical",
+    anxiety_level ~ "categorical",
+    stress_level ~ "categorical"
+  ), 
+  statistic = list(all_continuous() ~ "{mean} ({sd})"), 
+  digits = all_continuous() ~ 1,
+  label = c(
+    country = "Country",
+    education = "Education level",
+    urban = "Urban level",
+    gender = "Gender",
+    religion = "Religion",
+    orientation = 'Sexual orientation',
+    race = 'Race',
+    married = 'Marriage status',
+    age = "Age (Years)",
+    familysize = "Family size",
+    depression_level = "Depression level",
+    anxiety_level = "Anxiety level",
+    stress_level = "Stress level"
+  )) %>%
+  bold_labels() %>%
+  as_gt()  # Display the table as a gt object
+
+```
