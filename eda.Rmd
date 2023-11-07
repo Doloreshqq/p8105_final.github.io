@@ -22,7 +22,7 @@ Based on codebook.txt, we select the variables we want... (explain how to check 
 ```{r}
 # kick out meaningless observation
 dass = dass_raw %>%
-  filter(VCL6 == 1 | VCL9 == 1 | VCL12 == 1)   
+  filter(!(VCL6 == 1 | VCL9 == 1 | VCL12 == 1))   
 
 dass = dass %>%
   dplyr::select(matches('Q\\d+A'), country, education, urban, gender, engnat, age, hand, religion, orientation, race, voted, married, familysize, contains('TIPI')) %>%
@@ -33,7 +33,7 @@ dass = dass %>%
 
 ```{r}
 # refactor the variables
-dass = dass %>%
+dass_new = dass %>%
   mutate(
     education = case_when(education == 1 ~ 'Less than high school', 
                                education == 2 ~ 'High school', 
@@ -87,10 +87,13 @@ dass = dass %>%
 
 ```{r}
 # create a dataframe for self-recognition
-self_rec = dass %>%
+self_rec = dass_new %>%
   dplyr::select(contains('TIPI'))
 
 dass = dass %>%
+  select(-contains('TIPI'))
+
+dass_new = dass_new %>%
   select(-contains('TIPI'))
 ```
 
@@ -100,11 +103,112 @@ Based on scoring .... create `depression`, `anxiety`, `stress` variable for each
 
 ```{r}
 # create three different dataset
-dass = dass %>%
+dass_new = dass_new %>%
   mutate(
     depression = Q3A + Q5A + Q10A + Q13A + Q16A + Q17A + Q21A + Q24A + Q26A + Q31A + Q34A + Q37A + Q38A + Q42A - 14,
     anxiety = Q2A + Q4A + Q7A + Q9A + Q15A + Q19A + Q20A + Q23A + Q25A + Q28A + Q30A + Q36A + Q40A + Q41A - 14,
     stress = Q1A + Q6A + Q8A + Q11A + Q12A + Q14A + Q18A + Q22A + Q27A + Q29A + Q32A + Q33A + Q35A + Q39A - 14
     ) %>%
   dplyr::select(-matches('Q\\d+A'))
+```
+
+```{r}
+dass_new %>%
+  mutate(education = factor(education, levels = c('Less than high school', 'High school', 'University degree', 'Graduate degree'))) %>%
+  ggplot(aes(x = education)) +
+  geom_bar()
+```
+
+```{r}
+dass %>%
+  ggplot(aes(x = urban)) +
+  geom_bar()
+```
+
+```{r}
+dass_new %>%
+  ggplot(aes(x = gender)) +
+  geom_bar()
+```
+
+```{r}
+dass_new %>%
+  ggplot(aes(x = engnat)) +
+  geom_bar()
+```
+
+```{r}
+dass_new %>%
+  ggplot(aes(x = hand)) +
+  geom_bar()
+```
+
+```{r}
+dass_new %>%
+  ggplot(aes(x = religion)) +
+  geom_bar()
+```
+
+```{r}
+dass_new %>%
+  ggplot(aes(x = orientation)) +
+  geom_bar()
+```
+
+```{r}
+dass_new %>%
+  ggplot(aes(x = race)) +
+  geom_bar()
+```
+
+```{r}
+dass_new %>%
+  ggplot(aes(x = voted)) +
+  geom_bar()
+```
+
+```{r}
+dass_new %>%
+  ggplot(aes(x = married)) +
+  geom_bar()
+```
+
+```{r}
+dass_new %>%
+  ggplot(aes(x = as.factor(familysize))) +
+  geom_bar()
+```
+
+```{r}
+library(pheatmap)
+# Select the columns you need and create a data frame
+dass_heat <- dass %>%
+  mutate(
+    depression = Q3A + Q5A + Q10A + Q13A + Q16A + Q17A + Q21A + Q24A + Q26A + Q31A + Q34A + Q37A + Q38A + Q42A - 14,
+    anxiety = Q2A + Q4A + Q7A + Q9A + Q15A + Q19A + Q20A + Q23A + Q25A + Q28A + Q30A + Q36A + Q40A + Q41A - 14,
+    stress = Q1A + Q6A + Q8A + Q11A + Q12A + Q14A + Q18A + Q22A + Q27A + Q29A + Q32A + Q33A + Q35A + Q39A - 14
+    ) %>%
+  dplyr::select(-matches('Q\\d+A')) %>%
+  dplyr::select(-country)
+
+# Calculate the correlation matrix
+
+r <- cor(dass_heat,
+         method = "pearson",
+         use = "pairwise.complete.obs"
+) 
+
+pheatmap(r, 
+         show_colnames = TRUE,   
+         show_rownames=TRUE,    
+         fontsize=5,             
+         color = colorRampPalette(c('#0000ff','#ffffff','#ff0000'))(100), 
+         annotation_legend=TRUE, 
+         border_color=NA,        
+         scale="none",            
+         cluster_rows = T,
+         cluster_cols = T     
+)
+
+
 ```

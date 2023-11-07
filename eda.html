@@ -288,7 +288,7 @@ to check whether the survey is usable and what variables we need,
 explain each one)</p>
 <pre class="r"><code># kick out meaningless observation
 dass = dass_raw %&gt;%
-  filter(VCL6 == 1 | VCL9 == 1 | VCL12 == 1)   
+  filter(!(VCL6 == 1 | VCL9 == 1 | VCL12 == 1))   
 
 dass = dass %&gt;%
   dplyr::select(matches(&#39;Q\\d+A&#39;), country, education, urban, gender, engnat, age, hand, religion, orientation, race, voted, married, familysize, contains(&#39;TIPI&#39;)) %&gt;%
@@ -296,7 +296,7 @@ dass = dass %&gt;%
 <p>( refactor the factor, mention these variable = 0 means missing value
 )</p>
 <pre class="r"><code># refactor the variables
-dass = dass %&gt;%
+dass_new = dass %&gt;%
   mutate(
     education = case_when(education == 1 ~ &#39;Less than high school&#39;, 
                                education == 2 ~ &#39;High school&#39;, 
@@ -346,23 +346,101 @@ dass = dass %&gt;%
   na.omit()</code></pre>
 <p>(create a dataframe for self-recognition)</p>
 <pre class="r"><code># create a dataframe for self-recognition
-self_rec = dass %&gt;%
+self_rec = dass_new %&gt;%
   dplyr::select(contains(&#39;TIPI&#39;))
 
 dass = dass %&gt;%
+  select(-contains(&#39;TIPI&#39;))
+
+dass_new = dass_new %&gt;%
   select(-contains(&#39;TIPI&#39;))</code></pre>
 <p>Based on scoring …. create <code>depression</code>,
 <code>anxiety</code>, <code>stress</code> variable for each
 observation.</p>
 <p>(explain how) -14 means scale to 0-3 scale from 1-4 scale</p>
 <pre class="r"><code># create three different dataset
-dass = dass %&gt;%
+dass_new = dass_new %&gt;%
   mutate(
     depression = Q3A + Q5A + Q10A + Q13A + Q16A + Q17A + Q21A + Q24A + Q26A + Q31A + Q34A + Q37A + Q38A + Q42A - 14,
     anxiety = Q2A + Q4A + Q7A + Q9A + Q15A + Q19A + Q20A + Q23A + Q25A + Q28A + Q30A + Q36A + Q40A + Q41A - 14,
     stress = Q1A + Q6A + Q8A + Q11A + Q12A + Q14A + Q18A + Q22A + Q27A + Q29A + Q32A + Q33A + Q35A + Q39A - 14
     ) %&gt;%
   dplyr::select(-matches(&#39;Q\\d+A&#39;))</code></pre>
+<pre class="r"><code>dass_new %&gt;%
+  mutate(education = factor(education, levels = c(&#39;Less than high school&#39;, &#39;High school&#39;, &#39;University degree&#39;, &#39;Graduate degree&#39;))) %&gt;%
+  ggplot(aes(x = education)) +
+  geom_bar()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>dass %&gt;%
+  ggplot(aes(x = urban)) +
+  geom_bar()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>dass_new %&gt;%
+  ggplot(aes(x = gender)) +
+  geom_bar()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>dass_new %&gt;%
+  ggplot(aes(x = engnat)) +
+  geom_bar()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>dass_new %&gt;%
+  ggplot(aes(x = hand)) +
+  geom_bar()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>dass_new %&gt;%
+  ggplot(aes(x = religion)) +
+  geom_bar()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code>dass_new %&gt;%
+  ggplot(aes(x = orientation)) +
+  geom_bar()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<pre class="r"><code>dass_new %&gt;%
+  ggplot(aes(x = race)) +
+  geom_bar()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<pre class="r"><code>dass_new %&gt;%
+  ggplot(aes(x = voted)) +
+  geom_bar()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<pre class="r"><code>dass_new %&gt;%
+  ggplot(aes(x = married)) +
+  geom_bar()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<pre class="r"><code>dass_new %&gt;%
+  ggplot(aes(x = as.factor(familysize))) +
+  geom_bar()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<pre class="r"><code>library(pheatmap)
+# Select the columns you need and create a data frame
+dass_heat &lt;- dass %&gt;%
+  mutate(
+    depression = Q3A + Q5A + Q10A + Q13A + Q16A + Q17A + Q21A + Q24A + Q26A + Q31A + Q34A + Q37A + Q38A + Q42A - 14,
+    anxiety = Q2A + Q4A + Q7A + Q9A + Q15A + Q19A + Q20A + Q23A + Q25A + Q28A + Q30A + Q36A + Q40A + Q41A - 14,
+    stress = Q1A + Q6A + Q8A + Q11A + Q12A + Q14A + Q18A + Q22A + Q27A + Q29A + Q32A + Q33A + Q35A + Q39A - 14
+    ) %&gt;%
+  dplyr::select(-matches(&#39;Q\\d+A&#39;)) %&gt;%
+  dplyr::select(-country)
+
+# Calculate the correlation matrix
+
+r &lt;- cor(dass_heat,
+         method = &quot;pearson&quot;,
+         use = &quot;pairwise.complete.obs&quot;
+) 
+
+pheatmap(r, 
+         show_colnames = TRUE,   
+         show_rownames=TRUE,    
+         fontsize=5,             
+         color = colorRampPalette(c(&#39;#0000ff&#39;,&#39;#ffffff&#39;,&#39;#ff0000&#39;))(100), 
+         annotation_legend=TRUE, 
+         border_color=NA,        
+         scale=&quot;none&quot;,            
+         cluster_rows = T,
+         cluster_cols = T     
+)</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
 </div>
 
 
