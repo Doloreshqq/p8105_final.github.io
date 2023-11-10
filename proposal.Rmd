@@ -3,10 +3,6 @@ title: "P8105 Final Project Proposal"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 ## **Project Title**
 
 Depression Factors Prediction based on DASS Responses
