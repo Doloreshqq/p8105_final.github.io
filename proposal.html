@@ -11,7 +11,7 @@
 
 
 
-<title>P8105 final</title>
+<title>P8105 Final Project Proposal</title>
 
 <script src="site_libs/header-attrs-2.24/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -29,9 +29,6 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
-<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
-<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
-<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -224,69 +221,6 @@ $(document).ready(function () {
 
 
 
-<style type="text/css">
-
-#TOC {
-  margin: 25px 0px 20px 0px;
-}
-@media (max-width: 768px) {
-#TOC {
-  position: relative;
-  width: 100%;
-}
-}
-
-@media print {
-.toc-content {
-  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
-  float: right;
-}
-}
-
-.toc-content {
-  padding-left: 30px;
-  padding-right: 40px;
-}
-
-div.main-container {
-  max-width: 1200px;
-}
-
-div.tocify {
-  width: 20%;
-  max-width: 260px;
-  max-height: 85%;
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-  div.tocify {
-    width: 25%;
-  }
-}
-
-@media (max-width: 767px) {
-  div.tocify {
-    width: 100%;
-    max-width: none;
-  }
-}
-
-.tocify ul, .tocify li {
-  line-height: 20px;
-}
-
-.tocify-subheader .tocify-item {
-  font-size: 0.90em;
-}
-
-.tocify .list-group-item {
-  border-radius: 0px;
-}
-
-
-</style>
-
-
 
 </head>
 
@@ -294,16 +228,6 @@ div.tocify {
 
 
 <div class="container-fluid main-container">
-
-
-<!-- setup 3col/9col grid for toc_float and main content  -->
-<div class="row">
-<div class="col-xs-12 col-sm-4 col-md-3">
-<div id="TOC" class="tocify">
-</div>
-</div>
-
-<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -324,6 +248,9 @@ div.tocify {
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
+  <a href="proposal.html">Proposal</a>
+</li>
+<li>
   <a href="data.html">Data</a>
 </li>
 <li>
@@ -353,17 +280,76 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">P8105 final</h1>
+<h1 class="title toc-ignore">P8105 Final Project Proposal</h1>
 
 </div>
 
 
-<p>This is the first page of the website.</p>
-
-
-
+<div id="project-title" class="section level2">
+<h2><strong>Project Title</strong></h2>
+<p>Depression Factors Prediction based on DASS Responses</p>
 </div>
+<div id="group-members" class="section level2">
+<h2><strong>Group Members</strong></h2>
+<p>Huanyu Chen (hc3451), Qin Huang (qh2284), Ou Sha (os2424), Lehan
+Zou(lz2950), Shaolei Ma (sm5592)</p>
 </div>
+<div id="motivation" class="section level2">
+<h2><strong>Motivation</strong></h2>
+<p>Observing that mental health issues appear at a younger and younger
+age, we would like to test if DASS can potentially provide a means to
+objectively evaluate the severity and the potential factors of
+depression among different population including races, ages, etc.</p>
+</div>
+<div id="final-products" class="section level2">
+<h2><strong>Final Products</strong></h2>
+<p>We currently plan to deliver a website containing the following
+parts: data overview (data source, data cleaning), exploratory data
+analysis, model building, as well as a user-interactive R Shiny
+dashboard.</p>
+</div>
+<div id="data-sources" class="section level2">
+<h2><strong>Data Sources</strong></h2>
+<p>Our group applied the dataset from Kaggle Depression, Anxiety, and
+Stress Scales Responses (link attached below) for this project. The
+DASS-42 is a self-report scale consisting of 42 items intended to gauge
+emotional states related to depression, anxiety, and stress. The primary
+benefit of utilizing the DASS in a clinical context is its ability to
+ascertain the specific location of emotional turmoil, contributing to a
+more comprehensive clinical assessment. Its core function is to evaluate
+the severity of the fundamental symptoms associated with depression,
+anxiety, and stress.</p>
+<p><a
+href="https://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses/data?select=codebook.txt"
+class="uri">https://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses/data?select=codebook.txt</a></p>
+</div>
+<div id="the-planned-analysis-visualizations-and-coding-challenges"
+class="section level2">
+<h2><strong>The Planned Analysis, Visualizations, and Coding
+Challenges</strong></h2>
+<p>First, we would like to filter, check validity, and eliminate
+incompetent data; then, we would score each person's depression levels.
+Our group plans to use box plots and/or scatter plots to show the
+distributions among different variables. We would apply chi-squared test
+to compare the distribution of different factors within depression
+levels. Based on the levels, we would also apply regression models to
+figure out the possible factors, including age, sex, location, etc,
+leading to depression. Understanding survey questions, as well as
+cleaning and tidying the dataset into a readable format is one of our
+current coding challenges.</p>
+</div>
+<div id="planned-timeline" class="section level2">
+<h2><strong>Planned Timeline</strong></h2>
+<p>Nov 10: Proposal (Final Draft)</p>
+<p>Nov 13: Basic Structure of the Project</p>
+<p>Nov 18: Data Analysis</p>
+<p>Nov. 25: Data Visualizations</p>
+<p>Dec. 2: Final Report (First Draft)</p>
+<p>Dec. 9: Final Report (Final Draft)</p>
+</div>
+
+
+
 
 </div>
 
@@ -396,35 +382,6 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
-<script>
-$(document).ready(function ()  {
-
-    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
-    $('.unlisted.unnumbered').addClass('toc-ignore')
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = true;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
