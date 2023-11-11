@@ -1,6 +1,6 @@
 ---
 title: "P8105 Final Project Proposal"
-output: html_document
+output: github_document
 ---
 
 ## **Project Title**
@@ -33,12 +33,8 @@ First, we would like to filter, check validity, and eliminate incompetent data; 
 
 Nov 10: Proposal (Final Draft)
 
-Nov 13: Basic Structure of the Project
+Nov 13-17: Basic Structure of the Project
 
-Nov 18: Data Analysis
+Nov 18-30: Data Analysis and Data Visualizations
 
-Nov. 25: Data Visualizations
-
-Dec. 2: Final Report (First Draft)
-
-Dec. 9: Final Report (Final Draft)
+Dec. 1-9: Final Report
