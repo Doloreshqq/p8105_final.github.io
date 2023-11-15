@@ -1,0 +1,61 @@
+P8105 Final Project Proposal
+================
+
+## **Project Title**
+
+Depression Factors Prediction based on DASS Responses
+
+## **Group Members**
+
+Huanyu Chen (hc3451), Qin Huang (qh2284), Ou Sha (os2424), Lehan
+Zou(lz2950), Shaolei Ma (sm5592)
+
+## **Motivation**
+
+Observing that mental health issues appear at a younger and younger age,
+we would like to test if DASS can potentially provide a means to
+objectively evaluate the severity and the potential factors of
+depression among different population including races, ages, etc.
+
+## **Final Products**
+
+We currently plan to deliver a website containing the following parts:
+data overview (data source, data cleaning), exploratory data analysis,
+model building, as well as a user-interactive R Shiny dashboard.
+
+## **Data Sources**
+
+Our group applied the dataset from Kaggle Depression, Anxiety, and
+Stress Scales Responses (link attached below) for this project. The
+DASS-42 is a self-report scale consisting of 42 items intended to gauge
+emotional states related to depression, anxiety, and stress. The primary
+benefit of utilizing the DASS in a clinical context is its ability to
+ascertain the specific location of emotional turmoil, contributing to a
+more comprehensive clinical assessment. Its core function is to evaluate
+the severity of the fundamental symptoms associated with depression,
+anxiety, and stress.
+
+[https://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses/](https://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses/data?select=codebook.txt)
+
+## **The Planned Analysis, Visualizations, and Coding Challenges**
+
+First, we would like to filter, check validity, and eliminate
+incompetent data; then, we would score each person’s depression levels.
+Our group plans to use box plots and/or scatter plots to show the
+distributions among different variables. We would apply chi-squared test
+to compare the distribution of different factors within depression
+levels. Based on the levels, we would also apply regression models to
+figure out the possible factors, including age, sex, location, etc,
+leading to depression. Understanding survey questions, as well as
+cleaning and tidying the dataset into a readable format is one of our
+current coding challenges.
+
+## **Planned Timeline**
+
+Nov 10: Proposal (Final Draft)
+
+Nov 13-17: Basic Structure of the Project
+
+Nov 18-30: Data Analysis and Data Visualizations
+
+Dec. 1-9: Final Report

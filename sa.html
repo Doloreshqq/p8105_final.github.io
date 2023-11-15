@@ -16,7 +16,7 @@
 <script src="site_libs/header-attrs-2.24/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -248,14 +248,13 @@ $(document).ready(function () {
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="data.html">Data</a>
-</li>
-<li>
   <a href="eda.html">Exploratory Data Analysis</a>
 </li>
 <li>
   <a href="sa.html">Statistical Analysis</a>
 </li>
+<li class="dropdown-header">Shiny App</li>
+<li class="dropdown-header">Report</li>
 <li>
   <a href="mailto:&lt;qh2284@cumc.columbia.edu&gt;">
     <span class="fa fa-envelope fa-lg"></span>
@@ -351,53 +350,6 @@ PCA</code></pre>
 <pre class="r"><code>fviz_pca_var(PCA, axes = c(2, 3), col.var = &quot;contrib&quot;, gradient.cols = c(&quot;blue&quot;, &quot;red&quot;), 
             repel = TRUE)</code></pre>
 <p><img src="sa_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
-<pre class="r"><code>dass_heat2 &lt;- dass %&gt;%
-  mutate(
-    depression = Q3A + Q5A + Q10A + Q13A + Q16A + Q17A + Q21A + Q24A + Q26A + Q31A + Q34A + Q37A + Q38A + Q42A - 14,
-    anxiety = Q2A + Q4A + Q7A + Q9A + Q15A + Q19A + Q20A + Q23A + Q25A + Q28A + Q30A + Q36A + Q40A + Q41A - 14,
-    stress = Q1A + Q6A + Q8A + Q11A + Q12A + Q14A + Q18A + Q22A + Q27A + Q29A + Q32A + Q33A + Q35A + Q39A - 14
-    ) %&gt;%
-  mutate(depression = case_when(
-    depression &gt;= 0 &amp; depression &lt;= 9 ~ 0,
-    depression &gt;= 10 &amp; depression &lt;= 13 ~ 1,
-    depression &gt;= 14 &amp; depression &lt;= 20 ~ 2,
-    depression &gt;= 21 &amp; depression &lt;= 27 ~ 3,
-    depression &gt;= 28 ~ 4
-  )) %&gt;%
-  mutate(anxiety = case_when(
-    anxiety &gt;= 0 &amp; anxiety &lt;= 7 ~ 0,
-    anxiety &gt;= 8 &amp; anxiety &lt;= 9 ~ 1,
-    anxiety &gt;= 10 &amp; anxiety &lt;= 14 ~ 2,
-    anxiety &gt;= 15 &amp; anxiety &lt;= 19 ~ 3,
-    anxiety &gt;= 20 ~ 4
-  )) %&gt;%
-  mutate(stress = case_when(
-    stress &gt;= 0 &amp; stress &lt;= 14 ~ 0,
-    stress &gt;= 15 &amp; stress &lt;= 18 ~ 1,
-    stress &gt;= 19 &amp; stress &lt;= 25 ~ 2,
-    stress &gt;= 26 &amp; stress &lt;= 33 ~ 3,
-    stress &gt;= 34 ~ 4
-  )) %&gt;%
-  dplyr::select(depression,anxiety,stress)
-
-r1 &lt;- cor(dass_heat2,
-         method = &quot;pearson&quot;,
-         use = &quot;pairwise.complete.obs&quot;
-) 
-
-pheatmap(r1, 
-         show_colnames = TRUE,   
-         show_rownames=TRUE,    
-         fontsize=5,             
-         color = colorRampPalette(c(&#39;#ffffff&#39;,&#39;#ff0000&#39;))(100), 
-         annotation_legend=TRUE, 
-         border_color=NA,        
-         scale=&quot;none&quot;,            
-         cluster_rows = F,
-         cluster_cols = F,
-         breaks = seq(0, 1, length.out = 90)
-)</code></pre>
-<p><img src="sa_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 
 
 
