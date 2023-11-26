@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Shaolei Ma" />
+
+<meta name="date" content="2023-11-26" />
+
+<title>Logistic Model</title>
+
+<script src="site_libs/header-attrs-2.24/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="eda.html">Exploratory Data Analysis</a>
+</li>
+<li>
+  <a href="sa.html">Statistical Analysis</a>
+</li>
+<li class="dropdown-header">Shiny App</li>
+<li class="dropdown-header">Report</li>
+<li>
+  <a href="mailto:&lt;qh2284@cumc.columbia.edu&gt;">
+    <span class="fa fa-envelope fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://github.com/Doloreshqq/p8105_final.github.io">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Logistic Model</h1>
+<h4 class="author">Shaolei Ma</h4>
+<h4 class="date">2023-11-26</h4>
+
+</div>
+
+
+<p>The goal is to fit a ordered logit model.</p>
+<div id="independent-variables" class="section level3">
+<h3>Independent Variables</h3>
+<p>First, test the distribution of independent variables.</p>
+<pre class="r"><code>dass_new = read_csv(&quot;data/dass_new.csv&quot;)</code></pre>
+<pre><code>## Rows: 30309 Columns: 10
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (9): country, education, urban, gender, religion, orientation, race, mar...
+## dbl (1): age
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>dass_new |&gt; 
+  mutate(
+    country = as.factor(country),
+    urban = as.factor(urban),
+    gender = as.factor(gender),
+    religion = as.factor(religion),
+    orientation = as.factor(orientation),
+    race = as.factor(race)
+  ) |&gt; 
+  summary()</code></pre>
+<pre><code>##     country       education              urban          gender     
+##  MY     :16932   Length:30309       Rural   : 6295   Female:23137  
+##  US     : 5989   Class :character   Suburban:10283   Male  : 6754  
+##  GB     :  891   Mode  :character   Urban   :13731   Other :  418  
+##  CA     :  752                                                     
+##  ID     :  746                                                     
+##  PH     :  581                                                     
+##  (Other): 4418                                                     
+##       age                        religion           orientation   
+##  Min.   :13.00   Muslim              :17204   Asexual     : 1649  
+##  1st Qu.:19.00   Atheist             : 2943   Bisexual    : 3921  
+##  Median :21.00   Agnostic            : 2406   Heterosexual:20259  
+##  Mean   :23.45   Christian (Catholic): 2359   Homosexual  : 1548  
+##  3rd Qu.:25.00   Christian (Other)   : 1699   Other       : 2932  
+##  Max.   :99.00   Other               : 1343                       
+##                  (Other)             : 2355                       
+##                     race         married          depression_level  
+##  Arab                 :  228   Length:30309       Length:30309      
+##  Asian                :18041   Class :character   Class :character  
+##  Black                :  432   Mode  :character   Mode  :character  
+##  Indigenous Australian:   12                                        
+##  Native American      :  159                                        
+##  Other                : 3621                                        
+##  White                : 7816</code></pre>
+<p>Some categories contain few samples. For the efficacy of the model,
+we regroup the independent variables following the standards below:</p>
+<ul>
+<li><code>country</code>: Group the country with less than 500 samples
+into “Other”</li>
+<li><code>race</code>: We follow <a
+href="https://www.govinfo.gov/content/pkg/FR-1997-10-30/pdf/97-28653.pdf">standards
+on race and ethnicity</a> to include only “Asian”, “Black”, “Native
+American”, “White”, and make other categories “Other”.</li>
+<li><code>religion</code>: We conclude “Christian (Catholic)”,
+“Christian (Mormon)”, “Christian (Other)”, “Christian (Protestant)” into
+“Christian”.</li>
+<li><code>orientation</code>: Set the “Heterosexual” to be the reference
+level.</li>
+</ul>
+<pre class="r"><code>dass_fit_df =
+  dass_new |&gt; 
+  mutate(
+    country = as.factor(ifelse(country %in% c(&quot;MY&quot;, &quot;US&quot;, &quot;GB&quot;, &quot;CA&quot;, &quot;ID&quot;, &quot;PH&quot;), country, &quot;Other&quot;)),
+    race = as.factor(ifelse(race %in% c(&quot;Arab&quot;, &quot;Indigenous Australian&quot;), &quot;Other&quot;, race)),
+    religion = as.factor(ifelse(substr(religion, 1, 9) == &quot;Christian&quot;, &quot;Christian&quot;, religion)),
+    urban = as.factor(urban),
+    gender = as.factor(gender),
+    orientation = relevel(as.factor(orientation), &quot;Heterosexual&quot;),
+    depression_level = factor(depression_level, levels = c(&quot;Normal&quot;, &quot;Mild&quot;, &quot;Moderate&quot;, &quot;Severe&quot;, &quot;Extremely severe&quot;))
+  )
+
+dass_fit_df |&gt; summary()</code></pre>
+<pre><code>##   country       education              urban          gender     
+##  CA   :  752   Length:30309       Rural   : 6295   Female:23137  
+##  GB   :  891   Class :character   Suburban:10283   Male  : 6754  
+##  ID   :  746   Mode  :character   Urban   :13731   Other :  418  
+##  MY   :16932                                                     
+##  Other: 4418                                                     
+##  PH   :  581                                                     
+##  US   : 5989                                                     
+##       age             religion           orientation                 race      
+##  Min.   :13.00   Muslim   :17204   Heterosexual:20259   Asian          :18041  
+##  1st Qu.:19.00   Christian: 5318   Asexual     : 1649   Black          :  432  
+##  Median :21.00   Atheist  : 2943   Bisexual    : 3921   Native American:  159  
+##  Mean   :23.45   Agnostic : 2406   Homosexual  : 1548   Other          : 3861  
+##  3rd Qu.:25.00   Other    : 1343   Other       : 2932   White          : 7816  
+##  Max.   :99.00   Hindu    :  531                                               
+##                  (Other)  :  564                                               
+##    married                  depression_level
+##  Length:30309       Normal          : 6832  
+##  Class :character   Mild            : 2921  
+##  Mode  :character   Moderate        : 5433  
+##                     Severe          : 4947  
+##                     Extremely severe:10176  
+##                                             
+## </code></pre>
+</div>
+<div id="model-fitting" class="section level3">
+<h3>Model Fitting</h3>
+<p>First fit a model without variables selection.</p>
+<pre class="r"><code>dass_fit = 
+  dass_fit_df |&gt; 
+  polr(depression_level ~ ., data = _)
+
+(fit_s = 
+  dass_fit |&gt; 
+  summary())</code></pre>
+<pre><code>## 
+## Re-fitting to get Hessian</code></pre>
+<pre><code>## Call:
+## polr(formula = depression_level ~ ., data = dass_fit_df)
+## 
+## Coefficients:
+##                                    Value Std. Error  t value
+## countryGB                       0.022839   0.091061  0.25081
+## countryID                      -0.105464   0.100026 -1.05437
+## countryMY                      -0.156523   0.079373 -1.97200
+## countryOther                   -0.045798   0.072813 -0.62899
+## countryPH                       0.115944   0.107064  1.08294
+## countryUS                      -0.148516   0.071130 -2.08796
+## educationHigh school            0.380094   0.036318 10.46581
+## educationLess than high school  0.530280   0.052303 10.13863
+## educationUniversity degree      0.153445   0.033835  4.53512
+## urbanSuburban                  -0.027284   0.029139 -0.93632
+## urbanUrban                      0.046331   0.027761  1.66892
+## genderMale                     -0.166471   0.025998 -6.40323
+## genderOther                     0.339709   0.096112  3.53451
+## age                            -0.007523   0.001868 -4.02676
+## religionAtheist                 0.072806   0.050830  1.43235
+## religionBuddhist               -0.397724   0.099877 -3.98214
+## religionChristian              -0.187628   0.046183 -4.06268
+## religionHindu                  -0.088464   0.092899 -0.95226
+## religionJewish                 -0.232071   0.186455 -1.24465
+## religionMuslim                 -0.167871   0.055974 -2.99908
+## religionOther                   0.005713   0.062698  0.09113
+## religionSikh                   -0.150691   0.273899 -0.55017
+## orientationAsexual              0.173086   0.046812  3.69748
+## orientationBisexual             0.374809   0.032818 11.42084
+## orientationHomosexual           0.286605   0.048017  5.96879
+## orientationOther                0.195966   0.036306  5.39764
+## raceBlack                      -0.009671   0.095956 -0.10078
+## raceNative American             0.227952   0.149869  1.52101
+## raceOther                       0.028021   0.034031  0.82339
+## raceWhite                       0.091785   0.044414  2.06657
+## marriedNever married            0.528618   0.040748 12.97296
+## marriedPreviously married       0.570172   0.073916  7.71382
+## 
+## Intercepts:
+##                         Value   Std. Error t value
+## Normal|Mild             -0.8790  0.1186    -7.4137
+## Mild|Moderate           -0.3736  0.1185    -3.1541
+## Moderate|Severe          0.4049  0.1184     3.4180
+## Severe|Extremely severe  1.1081  0.1186     9.3454
+## 
+## Residual Deviance: 91341.20 
+## AIC: 91413.20</code></pre>
+<p>The following is the significant variables:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">x</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">countryGB</td>
+<td align="right">0.0228392</td>
+</tr>
+<tr class="even">
+<td align="left">countryID</td>
+<td align="right">-0.1054643</td>
+</tr>
+<tr class="odd">
+<td align="left">countryOther</td>
+<td align="right">-0.0457982</td>
+</tr>
+<tr class="even">
+<td align="left">countryPH</td>
+<td align="right">0.1159440</td>
+</tr>
+<tr class="odd">
+<td align="left">urbanSuburban</td>
+<td align="right">-0.0272838</td>
+</tr>
+<tr class="even">
+<td align="left">urbanUrban</td>
+<td align="right">0.0463306</td>
+</tr>
+<tr class="odd">
+<td align="left">religionAtheist</td>
+<td align="right">0.0728057</td>
+</tr>
+<tr class="even">
+<td align="left">religionHindu</td>
+<td align="right">-0.0884639</td>
+</tr>
+<tr class="odd">
+<td align="left">religionJewish</td>
+<td align="right">-0.2320712</td>
+</tr>
+<tr class="even">
+<td align="left">religionOther</td>
+<td align="right">0.0057134</td>
+</tr>
+<tr class="odd">
+<td align="left">religionSikh</td>
+<td align="right">-0.1506905</td>
+</tr>
+<tr class="even">
+<td align="left">raceBlack</td>
+<td align="right">-0.0096707</td>
+</tr>
+<tr class="odd">
+<td align="left">raceNative American</td>
+<td align="right">0.2279525</td>
+</tr>
+<tr class="even">
+<td align="left">raceOther</td>
+<td align="right">0.0280208</td>
+</tr>
+</tbody>
+</table>
+<p>It could be observed that all dummy variables belonging to
+<code>education</code>, <code>gender</code>, <code>orientation</code>,
+<code>married</code> are not significant, and the continuous variable
+<code>sex</code> is not significant. We exclude these three variables
+and refit the model.</p>
+<pre class="r"><code>dass_fit2 = 
+  dass_fit_df |&gt; 
+  polr(depression_level ~ country + urban + religion + race, data = _)
+
+dass_fit2 |&gt; 
+  summary()</code></pre>
+<pre><code>## 
+## Re-fitting to get Hessian</code></pre>
+<pre><code>## Call:
+## polr(formula = depression_level ~ country + urban + religion + 
+##     race, data = dass_fit_df)
+## 
+## Coefficients:
+##                        Value Std. Error t value
+## countryGB           -0.03146    0.09041 -0.3480
+## countryID           -0.06963    0.09933 -0.7010
+## countryMY           -0.18559    0.07855 -2.3627
+## countryOther        -0.05800    0.07222 -0.8031
+## countryPH            0.16211    0.10606  1.5285
+## countryUS           -0.07699    0.07054 -1.0915
+## urbanSuburban       -0.03508    0.02886 -1.2153
+## urbanUrban           0.08169    0.02756  2.9642
+## religionAtheist      0.09234    0.05041  1.8319
+## religionBuddhist    -0.53826    0.09991 -5.3874
+## religionChristian   -0.30913    0.04533 -6.8193
+## religionHindu       -0.37337    0.09194 -4.0609
+## religionJewish      -0.24760    0.18298 -1.3532
+## religionMuslim      -0.28252    0.05518 -5.1198
+## religionOther       -0.02405    0.06208 -0.3874
+## religionSikh        -0.30544    0.27108 -1.1268
+## raceBlack            0.02710    0.09587  0.2826
+## raceNative American  0.29821    0.14758  2.0207
+## raceOther            0.03129    0.03383  0.9249
+## raceWhite            0.01770    0.04380  0.4041
+## 
+## Intercepts:
+##                         Value    Std. Error t value 
+## Normal|Mild              -1.5598   0.0855   -18.2333
+## Mild|Moderate            -1.0680   0.0853   -12.5211
+## Moderate|Severe          -0.3116   0.0851    -3.6612
+## Severe|Extremely severe   0.3737   0.0851     4.3923
+## 
+## Residual Deviance: 92487.05 
+## AIC: 92535.05</code></pre>
+<p>Test the parallel assumption.</p>
+<pre class="r"><code>car::poTest(dass_fit2)</code></pre>
+<pre><code>## 
+## Tests for Proportional Odds
+## polr(formula = depression_level ~ country + urban + religion + 
+##     race, data = dass_fit_df)
+## 
+##                       b[polr] b[&gt;Normal]  b[&gt;Mild] b[&gt;Moderate] b[&gt;Severe]
+## Overall                                                                   
+## countryGB            -0.03146   -0.02593  -0.07080     -0.07433    0.01079
+## countryID            -0.06963    0.03854  -0.09196     -0.09576   -0.09953
+## countryMY            -0.18559   -0.08874  -0.18608     -0.22906   -0.21533
+## countryOther         -0.05800   -0.10061  -0.09577     -0.05179   -0.03600
+## countryPH             0.16211    0.27984   0.28281      0.14022    0.07645
+## countryUS            -0.07699   -0.09958  -0.07731     -0.09408   -0.05844
+## urbanSuburban        -0.03508    0.00358   0.02169     -0.03634   -0.08619
+## urbanUrban            0.08169    0.11791   0.12044      0.08155    0.03820
+## religionAtheist       0.09234    0.06411   0.07253      0.03867    0.13252
+## religionBuddhist     -0.53826   -0.61986  -0.53109     -0.55401   -0.41320
+## religionChristian    -0.30913   -0.27193  -0.31549     -0.33500   -0.28976
+## religionHindu        -0.37337   -0.36939  -0.45497     -0.35892   -0.31329
+## religionJewish       -0.24760   -0.18764  -0.40027     -0.20320   -0.22486
+## religionMuslim       -0.28252   -0.23242  -0.22208     -0.29549   -0.31648
+## religionOther        -0.02405    0.00623  -0.04685     -0.05250   -0.00780
+## religionSikh         -0.30544   -0.23227  -0.13202     -0.32451   -0.40116
+## raceBlack             0.02710   -0.08384   0.01325      0.07861    0.04040
+## raceNative American   0.29821    0.52277   0.45432      0.37787    0.15322
+## raceOther             0.03129    0.02289   0.02355      0.04982    0.02449
+## raceWhite             0.01770    0.08295   0.05636      0.00876   -0.02848
+##                     Chisquare df Pr(&gt;Chisq)    
+## Overall                105.63 60    0.00025 ***
+## countryGB                1.55  3    0.67009    
+## countryID                2.28  3    0.51731    
+## countryMY                2.62  3    0.45366    
+## countryOther             0.56  3    0.90513    
+## countryPH                2.66  3    0.44748    
+## countryUS                0.53  3    0.91300    
+## urbanSuburban            9.89  3    0.01952 *  
+## urbanUrban               6.30  3    0.09795 .  
+## religionAtheist          5.28  3    0.15240    
+## religionBuddhist         4.66  3    0.19887    
+## religionChristian        2.74  3    0.43285    
+## religionHindu            3.06  3    0.38206    
+## religionJewish           3.12  3    0.37363    
+## religionMuslim           2.51  3    0.47271    
+## religionOther            1.62  3    0.65408    
+## religionSikh             0.83  3    0.84120    
+## raceBlack                2.89  3    0.40874    
+## raceNative American      3.37  3    0.33838    
+## raceOther                1.30  3    0.72962    
+## raceWhite                3.51  3    0.31884    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Because the overall p value &lt; 0.001, we reject the null hypothesis
+and conclude that the parallel assumption is not met.</p>
+<p>Therefore, we regroup the dependent variable into “Moderate or
+Below”, “Severe”, “Extremely severe” and refit the model.</p>
+<pre class="r"><code>dass_fit3 =
+  dass_fit_df |&gt; 
+  mutate(depression_level = factor(case_match(
+    depression_level,
+    &quot;Normal&quot; ~ &quot;Moderate or Below&quot;,
+    &quot;Mild&quot; ~ &quot;Moderate or Below&quot;,&quot;Moderate&quot; ~ &quot;Moderate or Below&quot;,
+    &quot;Severe&quot; ~ &quot;Severe&quot;,
+    &quot;Extremely severe&quot; ~ &quot;Extremely severe&quot;
+   ), level = c(&quot;Moderate or Below&quot;, &quot;Severe&quot;, &quot;Extremely severe&quot;))) |&gt; 
+  polr(depression_level ~ country + urban + religion + race, data = _)
+
+dass_fit3 |&gt;  summary()</code></pre>
+<pre><code>## 
+## Re-fitting to get Hessian</code></pre>
+<pre><code>## Call:
+## polr(formula = depression_level ~ country + urban + religion + 
+##     race, data = mutate(dass_fit_df, depression_level = factor(case_match(depression_level, 
+##     &quot;Normal&quot; ~ &quot;Moderate or Below&quot;, &quot;Mild&quot; ~ &quot;Moderate or Below&quot;, 
+##     &quot;Moderate&quot; ~ &quot;Moderate or Below&quot;, &quot;Severe&quot; ~ &quot;Severe&quot;, &quot;Extremely severe&quot; ~ 
+##         &quot;Extremely severe&quot;), level = c(&quot;Moderate or Below&quot;, &quot;Severe&quot;, 
+##     &quot;Extremely severe&quot;))))
+## 
+## Coefficients:
+##                        Value Std. Error t value
+## countryGB           -0.03660    0.09403 -0.3893
+## countryID           -0.09634    0.10432 -0.9235
+## countryMY           -0.22209    0.08193 -2.7108
+## countryOther        -0.04462    0.07496 -0.5953
+## countryPH            0.11330    0.11074  1.0232
+## countryUS           -0.07665    0.07335 -1.0450
+## urbanSuburban       -0.05650    0.03086 -1.8307
+## urbanUrban           0.06518    0.02936  2.2201
+## religionAtheist      0.08634    0.05200  1.6602
+## religionBuddhist    -0.50464    0.10704 -4.7146
+## religionChristian   -0.31481    0.04723 -6.6658
+## religionHindu       -0.33588    0.09653 -3.4795
+## religionJewish      -0.20686    0.19126 -1.0816
+## religionMuslim      -0.30041    0.05781 -5.1964
+## religionOther       -0.03222    0.06432 -0.5010
+## religionSikh        -0.35710    0.28876 -1.2367
+## raceBlack            0.06498    0.09923  0.6548
+## raceNative American  0.25457    0.15262  1.6680
+## raceOther            0.04027    0.03602  1.1181
+## raceWhite           -0.00544    0.04580 -0.1188
+## 
+## Intercepts:
+##                          Value   Std. Error t value
+## Moderate or Below|Severe -0.3607  0.0887    -4.0677
+## Severe|Extremely severe   0.3248  0.0887     3.6629
+## 
+## Residual Deviance: 60767.39 
+## AIC: 60811.39</code></pre>
+<pre class="r"><code>dass_fit3 |&gt; poTest()</code></pre>
+<pre><code>## 
+## Tests for Proportional Odds
+## polr(formula = depression_level ~ country + urban + religion + 
+##     race, data = mutate(dass_fit_df, depression_level = factor(case_match(depression_level, 
+##     &quot;Normal&quot; ~ &quot;Moderate or Below&quot;, &quot;Mild&quot; ~ &quot;Moderate or Below&quot;, 
+##     &quot;Moderate&quot; ~ &quot;Moderate or Below&quot;, &quot;Severe&quot; ~ &quot;Severe&quot;, &quot;Extremely severe&quot; ~ 
+##         &quot;Extremely severe&quot;), level = c(&quot;Moderate or Below&quot;, &quot;Severe&quot;, 
+##     &quot;Extremely severe&quot;))))
+## 
+##                      b[polr] b[&gt;Moderate or Below] b[&gt;Severe] Chisquare df
+## Overall                                                           27.54 20
+## countryGB           -0.03660              -0.07433    0.01079      1.28  1
+## countryID           -0.09634              -0.09576   -0.09953      0.00  1
+## countryMY           -0.22209              -0.22906   -0.21533      0.04  1
+## countryOther        -0.04462              -0.05179   -0.03600      0.07  1
+## countryPH            0.11330               0.14022    0.07645      0.48  1
+## countryUS           -0.07665              -0.09408   -0.05844      0.35  1
+## urbanSuburban       -0.05650              -0.03634   -0.08619      3.87  1
+## urbanUrban           0.06518               0.08155    0.03820      3.26  1
+## religionAtheist      0.08634               0.03867    0.13252      4.96  1
+## religionBuddhist    -0.50464              -0.55401   -0.41320      2.98  1
+## religionChristian   -0.31481              -0.33500   -0.28976      1.33  1
+## religionHindu       -0.33588              -0.35892   -0.31329      0.34  1
+## religionJewish      -0.20686              -0.20320   -0.22486      0.02  1
+## religionMuslim      -0.30041              -0.29549   -0.31648      0.19  1
+## religionOther       -0.03222              -0.05250   -0.00780      0.72  1
+## religionSikh        -0.35710              -0.32451   -0.40116      0.09  1
+## raceBlack            0.06498               0.07861    0.04040      0.22  1
+## raceNative American  0.25457               0.37787    0.15322      2.58  1
+## raceOther            0.04027               0.04982    0.02449      0.70  1
+## raceWhite           -0.00544               0.00876   -0.02848      1.00  1
+##                     Pr(&gt;Chisq)  
+## Overall                  0.121  
+## countryGB                0.258  
+## countryID                0.965  
+## countryMY                0.839  
+## countryOther             0.798  
+## countryPH                0.490  
+## countryUS                0.556  
+## urbanSuburban            0.049 *
+## urbanUrban               0.071 .
+## religionAtheist          0.026 *
+## religionBuddhist         0.084 .
+## religionChristian        0.248  
+## religionHindu            0.560  
+## religionJewish           0.895  
+## religionMuslim           0.659  
+## religionOther            0.396  
+## religionSikh             0.762  
+## raceBlack                0.638  
+## raceNative American      0.108  
+## raceOther                0.403  
+## raceWhite                0.317  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>The model meets the parallel assumption.</p>
+</div>
+<div id="future-work" class="section level3">
+<h3>Future Work</h3>
+<ul>
+<li>Re-selection of independent variables. (Significant, Regroup, AIC,
+PCA)</li>
+<li>Interpretation of OR.</li>
+</ul>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
