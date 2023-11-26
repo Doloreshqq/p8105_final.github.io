@@ -31,7 +31,7 @@ scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
 
-The goal is to fit a ordered logit model.
+The goal is to fit an ordered logit model.
 
 ### Independent Variables
 
@@ -129,7 +129,48 @@ dass_fit3 |>  summary()
 dass_fit3 |> poTest()
 ```
 
-The model meets the parallel assumption.
+Generally speaking, the model meets the parallel assumption (with an overall p = 0.121). But there exist several individual predictors that do not meet parallel assumption (e.g., `urbanSuburban` with p = 0.049 and `religionAtheist` with p = 0.026). Since the `country` variable itself contains information about region and area, we want to remove the group for urban and suburban and run the parallel assumption again.
+
+Utilizing PCA to test if `urban` variable can be deleted:
+```{r}
+selected_data <- dass_fit_df[, c("education", "urban", "age", "religion", "race")]
+scaled_encoded_data <- scale(model.matrix(~ . - 1, data = selected_data))
+pca_result <- prcomp(scaled_encoded_data, center = TRUE, scale. = TRUE)
+summary(pca_result)
+pca_result$rotation
+```
+
+`urban` has relatively low absolute loadings compared to other variables, suggesting that it contributes less to the derived components and might not be essential in capturing variance. Then we will go back to try parallel assumption after deleting the `urban` variable.
+
+```{r delete urban}
+dass_fit4 =
+  dass_fit_df |> 
+  mutate(depression_level = factor(case_match(
+    depression_level,
+    "Normal" ~ "Moderate or Below",
+    "Mild" ~ "Moderate or Below","Moderate" ~ "Moderate or Below",
+    "Severe" ~ "Severe",
+    "Extremely severe" ~ "Extremely severe"
+   ), level = c("Moderate or Below", "Severe", "Extremely severe"))) |> 
+  polr(depression_level ~ country + religion + race, data = _)
+
+dass_fit4 |>  summary()
+
+dass_fit4 |> poTest()
+```
+The model meets the parallel assumption now and has only 1 predictor that does not meet parallel assumption.
+
+At this stage, we would like to model the regression line for the selected variables.
+```{r}
+dass_fit_df$depression_level_numeric <- as.numeric(factor(
+  dass_fit_df$depression_level,
+  levels = c("Moderate or Below", "Severe", "Extremely severe"),
+  labels = c(1, 2, 3)
+))
+
+model <- lm(depression_level_numeric ~ country + religion + race - 1, data = dass_fit_df)
+summary(model)
+```
 
 ### Future Work
 
