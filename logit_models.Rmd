@@ -186,54 +186,22 @@ dass_fit_step |> summary()
 
 
 ## Graphs Based On Current Regression Models
-
-### Residuals vs Fitted Plot
 ```{r}
-# Obtain fitted values and residuals
-fitted_values <- predict(dass_fit_step, type = "probs")
-residuals <- resid(dass_fit_step, type = "pearson")
+library(pROC)
 
-# Create residuals vs. fitted values plot
-plot(fitted_values, residuals,
-     xlab = "Fitted values",
-     ylab = "Residuals",
-     main = "Residuals vs. Fitted Values Plot",
-     col = "blue",
-     pch = 20,
-     cex = 0.5)
+# Predicting probabilities for all classes
+predicted_probs <- predict(dass_fit_step, type = "probs")
+
+# Extracting the response variable
+response <- ifelse(dass_fit_df$depression_level == "Moderate or Below", 1,
+                   ifelse(dass_fit_df$depression_level == "Severe", 2, 3))
+
+# Calculating ROC curve for Severe (class 2)
+roc_obj <- roc(as.numeric(response == 2), predicted_probs[, "Severe"])
+
+# Plotting ROC curve
+plot(roc_obj, col = "blue", main = "ROC Curve for Severe Depression Level")
 ```
-
-### QQ Plot
-```{r}
-qqnorm(residuals, main = "Normal Q-Q Plot", col = "blue")
-qqline(residuals, col = "red")
-```
-
-### Scale-Location Plot
-```{r}
-std_residuals <- residuals / sqrt(1 - residuals^2)
-plot(fitted_values, abs(std_residuals),
-     xlab = "Fitted values",
-     ylab = "Absolute Standardized Residuals",
-     main = "Scale-Location Plot",
-     col = "blue",
-     pch = 20,
-     cex = 0.5)
-abline(h = 0, col = "red") 
-```
-
-### Residuals vs Leverage Plot
-```{r}
-library(car)
-residualPlots(dass_fit_step, type = "pearson")
-```
-
-### Cook's Distance Plot
-```{r}
-plot(cooks.distance(dass_fit_step), pch = 20, main = "Cook's Distance Plot", xlab = "Index", ylab = "Cook's Distance")
-abline(h = 4/length(residuals), col = "red")
-```
-
 
 ## Future Work
 
