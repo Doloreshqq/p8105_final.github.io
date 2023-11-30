@@ -286,6 +286,8 @@ ggplot(dass_new, aes(x=age)) +
     geom_histogram(binwidth=.5,
                   fill=&quot;#FF6666&quot;) </code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<div id="plot-depression-level-vs.-age-groups" class="section level1">
+<h1>Plot: depression level vs. age groups</h1>
 <pre class="r"><code>dass_new|&gt;
   # form age groups
   mutate(age = case_when(age &lt;= 18 ~ &quot;teenage&quot;, 
@@ -303,8 +305,35 @@ ggplot(dass_new, aes(x=age)) +
     names_to = &quot;Level&quot;,
     values_to = &quot;Count&quot;)|&gt;
   ggplot(aes(x = Level, y = Count, group = age, color = age)) +
-  geom_line()</code></pre>
+  geom_line()+
+  theme_minimal()</code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+<div id="plot-depression-level-vs.-race-groups" class="section level1">
+<h1>Plot: depression level vs. race groups</h1>
+<pre class="r"><code>dass_new|&gt;
+  mutate(race = case_when(race == &quot;Native American&quot; ~ &quot;Other&quot;,
+                          race==&quot;Arab&quot;~ &quot;Other&quot;, 
+                          race == &quot;Indigenous Australian&quot; ~ &quot;Other&quot;,
+                          race == &quot;Other&quot; ~ &quot;Other&quot;,
+                          race == &quot;Black&quot; ~ &quot;Black&quot;,
+                          race == &quot;White&quot; ~ &quot;White&quot;,
+                          race == &quot;Asian&quot; ~ &quot;Asian&quot;))|&gt;
+  group_by(race)|&gt;
+  summarise(Normal = sum(depression_level==&quot;Normal&quot;),
+            Mild = sum(depression_level==&quot;Mild&quot;),
+            Moderate = sum(depression_level==&quot;Moderate&quot;),
+            Severe = sum(depression_level==&quot;Severe&quot;),
+            Extremely_Severe = sum(depression_level==&quot;Extremely severe&quot;))|&gt;
+  pivot_longer(
+    Normal:Extremely_Severe,
+    names_to = &quot;Level&quot;,
+    values_to = &quot;Count&quot;)|&gt;
+  ggplot(aes(x = Level, y = Count, group = race, color = race)) +
+  geom_line()+
+  theme_minimal()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
 <div id="chi-squared-test-1" class="section level1">
 <h1>Chi-squared Test 1</h1>
 <p>From the plot above, we observed that the distribution of depression

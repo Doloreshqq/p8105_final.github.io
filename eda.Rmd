@@ -16,6 +16,8 @@ ggplot(dass_new, aes(x=age)) +
                   fill="#FF6666") 
 ```
 
+
+# Plot: depression level vs. age groups
 ```{r}
 dass_new|>
   # form age groups
@@ -34,7 +36,33 @@ dass_new|>
     names_to = "Level",
     values_to = "Count")|>
   ggplot(aes(x = Level, y = Count, group = age, color = age)) +
-  geom_line()
+  geom_line()+
+  theme_minimal()
+```
+
+# Plot: depression level vs. race groups
+```{r}
+dass_new|>
+  mutate(race = case_when(race == "Native American" ~ "Other",
+                          race=="Arab"~ "Other", 
+                          race == "Indigenous Australian" ~ "Other",
+                          race == "Other" ~ "Other",
+                          race == "Black" ~ "Black",
+                          race == "White" ~ "White",
+                          race == "Asian" ~ "Asian"))|>
+  group_by(race)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+            Mild = sum(depression_level=="Mild"),
+            Moderate = sum(depression_level=="Moderate"),
+            Severe = sum(depression_level=="Severe"),
+            Extremely_Severe = sum(depression_level=="Extremely severe"))|>
+  pivot_longer(
+    Normal:Extremely_Severe,
+    names_to = "Level",
+    values_to = "Count")|>
+  ggplot(aes(x = Level, y = Count, group = race, color = race)) +
+  geom_line()+
+  theme_minimal()
 ```
 
 
