@@ -85,5 +85,7 @@ For example, if selecting 'normal' level (also default level), the plot would sh
 
 For each country, we can calculate:
 
+\ \par
+
 percentage = number of responses at the selected level / number of total responses
 
