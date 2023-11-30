@@ -17,15 +17,30 @@ ggplot(dass_new, aes(x=age)) +
 ```
 
 ```{r}
-
-
+dass_new|>
+  # form age groups
+  mutate(age = case_when(age <= 18 ~ "teenage", 
+                         age <= 25 & age >18 ~ "young adult",
+                         age <= 50 & age >25 ~ "adult", 
+                         age >50 ~ "older"))|>
+  group_by(age)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+            Mild = sum(depression_level=="Mild"),
+            Moderate = sum(depression_level=="Moderate"),
+            Severe = sum(depression_level=="Severe"),
+            Extremely_Severe = sum(depression_level=="Extremely severe"))|>
+  pivot_longer(
+    Normal:Extremely_Severe,
+    names_to = "Level",
+    values_to = "Count")|>
+  ggplot(aes(x = Level, y = Count, group = age, color = age)) +
+  geom_line()
 ```
 
 
-
-
-
 # Chi-squared Test 1
+From the plot above, we observed that the distribution of depression level among different age groups follow a similar pattern. Thus, we would like to perform a chi-squared test to study if the distribution of depression levels among different age groups are the same.\
+
 $H_0$: The proportion in different depression levels among age groups are equal. \
 $H_1$: Not all proportions are equal.
 ```{r}
@@ -48,3 +63,6 @@ chisq.test(pull(dass_chi, age), pull(dass_chi, depression_level))|>
   broom::tidy()|>
   knitr::kable()
 ```
+
+The null hypothesis for the chi-squared test is that the distributions among different age groups and different depression levels are the same. Since the p-value is smaller than 0.05, the null hypothesis is rejected. We may conclude that age is associated with depression levels.
+

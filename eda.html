@@ -286,8 +286,32 @@ ggplot(dass_new, aes(x=age)) +
     geom_histogram(binwidth=.5,
                   fill=&quot;#FF6666&quot;) </code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code>dass_new|&gt;
+  # form age groups
+  mutate(age = case_when(age &lt;= 18 ~ &quot;teenage&quot;, 
+                         age &lt;= 25 &amp; age &gt;18 ~ &quot;young adult&quot;,
+                         age &lt;= 50 &amp; age &gt;25 ~ &quot;adult&quot;, 
+                         age &gt;50 ~ &quot;older&quot;))|&gt;
+  group_by(age)|&gt;
+  summarise(Normal = sum(depression_level==&quot;Normal&quot;),
+            Mild = sum(depression_level==&quot;Mild&quot;),
+            Moderate = sum(depression_level==&quot;Moderate&quot;),
+            Severe = sum(depression_level==&quot;Severe&quot;),
+            Extremely_Severe = sum(depression_level==&quot;Extremely severe&quot;))|&gt;
+  pivot_longer(
+    Normal:Extremely_Severe,
+    names_to = &quot;Level&quot;,
+    values_to = &quot;Count&quot;)|&gt;
+  ggplot(aes(x = Level, y = Count, group = age, color = age)) +
+  geom_line()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <div id="chi-squared-test-1" class="section level1">
 <h1>Chi-squared Test 1</h1>
+<p>From the plot above, we observed that the distribution of depression
+level among different age groups follow a similar pattern. Thus, we
+would like to perform a chi-squared test to study if the distribution of
+depression levels among different age groups are the same.<br />
+</p>
 <p><span class="math inline">\(H_0\)</span>: The proportion in different
 depression levels among age groups are equal.<br />
 <span class="math inline">\(H_1\)</span>: Not all proportions are
@@ -335,6 +359,11 @@ chisq.test(pull(dass_chi, age), pull(dass_chi, depression_level))|&gt;
 </tr>
 </tbody>
 </table>
+<p>The null hypothesis for the chi-squared test is that the
+distributions among different age groups and different depression levels
+are the same. Since the p-value is smaller than 0.05, the null
+hypothesis is rejected. We may conclude that age is associated with
+depression levels.</p>
 </div>
 
 
