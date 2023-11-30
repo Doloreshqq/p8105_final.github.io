@@ -3,3 +3,19 @@ title: "EDA"
 output: html_document
 ---
 
+```{r}
+library(ggplot2)
+dass_new = read.csv("./data/dass_new.csv")
+```
+
+```{r}
+# distribution histogram of age
+ggplot(dass_new, aes(x=age)) + 
+    geom_histogram(binwidth=.5,
+                  fill="#FF6666") 
+```
+
+```{r}
+
+
+```
