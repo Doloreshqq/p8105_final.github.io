@@ -11,7 +11,7 @@
 
 <meta name="author" content="Huanyu Chen, Shaolei Ma" />
 
-<meta name="date" content="2023-11-29" />
+<meta name="date" content="2023-11-30" />
 
 <title>Logistic Model</title>
 
@@ -280,7 +280,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Logistic Model</h1>
 <h4 class="author">Huanyu Chen, Shaolei Ma</h4>
-<h4 class="date">2023-11-29</h4>
+<h4 class="date">2023-11-30</h4>
 
 </div>
 
@@ -1129,6 +1129,17 @@ roc_obj &lt;- roc(as.numeric(response == 2), predicted_probs[, &quot;Severe&quot
 <pre class="r"><code># Plotting ROC curve
 plot(roc_obj, col = &quot;blue&quot;, main = &quot;ROC Curve for Severe Depression Level&quot;)</code></pre>
 <p><img src="logit_models_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
+<pre class="r"><code># Extract coefficients for countries
+country_coefficients &lt;- data.frame(
+  country = c(&quot;GB&quot;, &quot;ID&quot;, &quot;MY&quot;, &quot;Other&quot;, &quot;PH&quot;, &quot;US&quot;),
+  coefficient = c(0.026293, -0.149925, -0.195490, -0.057339, 0.051250, -0.148052)
+)
+
+# Plotting coefficients for countries
+ggplot(country_coefficients, aes(x = country, y = coefficient)) +
+  geom_bar(stat = &quot;identity&quot;, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+  labs(title = &quot;Effect of Countries on Depression Levels&quot;, x = &quot;Country&quot;, y = &quot;Coefficient&quot;)</code></pre>
+<p><img src="logit_models_files/figure-html/unnamed-chunk-12-1.png" width="90%" /></p>
 </div>
 <div id="future-work" class="section level2">
 <h2>Future Work</h2>

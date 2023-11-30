@@ -203,6 +203,19 @@ roc_obj <- roc(as.numeric(response == 2), predicted_probs[, "Severe"])
 plot(roc_obj, col = "blue", main = "ROC Curve for Severe Depression Level")
 ```
 
+```{r}
+# Extract coefficients for countries
+country_coefficients <- data.frame(
+  country = c("GB", "ID", "MY", "Other", "PH", "US"),
+  coefficient = c(0.026293, -0.149925, -0.195490, -0.057339, 0.051250, -0.148052)
+)
+
+# Plotting coefficients for countries
+ggplot(country_coefficients, aes(x = country, y = coefficient)) +
+  geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+  labs(title = "Effect of Countries on Depression Levels", x = "Country", y = "Coefficient")
+```
+
 ## Future Work
 
  * Re-selection of independent variables. (Significant, Regroup, AIC, PCA)
