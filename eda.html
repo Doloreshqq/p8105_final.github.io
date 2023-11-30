@@ -288,13 +288,17 @@ ggplot(dass_new, aes(x=age)) +
 <p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
 <div id="chi-squared-test-1" class="section level1">
 <h1>Chi-squared Test 1</h1>
-<p><span class="math inline">\(H_0\)</span>:<br />
-<span class="math inline">\(H_1\)</span>:</p>
+<p><span class="math inline">\(H_0\)</span>: The proportion in different
+depression levels among age groups are equal.<br />
+<span class="math inline">\(H_1\)</span>: Not all proportions are
+equal.</p>
 <pre class="r"><code>dass_chi &lt;- dass_new|&gt;
+  # form age groups
   mutate(age = case_when(age &lt;= 18 ~ &quot;teenage&quot;, 
                          age &lt;= 25 &amp; age &gt;18 ~ &quot;young adult&quot;,
                          age &lt;= 50 &amp; age &gt;25 ~ &quot;adult&quot;, 
                          age &gt;50 ~ &quot;older&quot;))
+# show result table to perform chi-squared test
 dass_chi|&gt;
   group_by(age)|&gt;
   summarise(Normal = sum(depression_level==&quot;Normal&quot;),
@@ -309,6 +313,28 @@ dass_chi|&gt;
 ## 2 older          240    64      116     75              192
 ## 3 teenage       1235   555     1256   1327             3105
 ## 4 young adult   3408  1593     2885   2611             5090</code></pre>
+<pre class="r"><code># perform chi-squared test
+chisq.test(pull(dass_chi, age), pull(dass_chi, depression_level))|&gt;
+  broom::tidy()|&gt;
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">parameter</th>
+<th align="left">method</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">651.3207</td>
+<td align="right">0</td>
+<td align="right">12</td>
+<td align="left">Pearson’s Chi-squared test</td>
+</tr>
+</tbody>
+</table>
 </div>
 
 

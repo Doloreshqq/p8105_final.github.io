@@ -26,14 +26,16 @@ ggplot(dass_new, aes(x=age)) +
 
 
 # Chi-squared Test 1
-$H_0$:  
-$H_1$: 
+$H_0$: The proportion in different depression levels among age groups are equal. \
+$H_1$: Not all proportions are equal.
 ```{r}
 dass_chi <- dass_new|>
+  # form age groups
   mutate(age = case_when(age <= 18 ~ "teenage", 
                          age <= 25 & age >18 ~ "young adult",
                          age <= 50 & age >25 ~ "adult", 
                          age >50 ~ "older"))
+# show result table to perform chi-squared test
 dass_chi|>
   group_by(age)|>
   summarise(Normal = sum(depression_level=="Normal"),
@@ -41,4 +43,8 @@ dass_chi|>
             Moderate = sum(depression_level=="Moderate"),
             Severe = sum(depression_level=="Severe"),
             Extremely_Severe = sum(depression_level=="Extremely severe"))
+# perform chi-squared test
+chisq.test(pull(dass_chi, age), pull(dass_chi, depression_level))|>
+  broom::tidy()|>
+  knitr::kable()
 ```
