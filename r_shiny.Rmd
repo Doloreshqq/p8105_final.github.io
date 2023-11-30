@@ -1,0 +1,89 @@
+---
+title: "Depression among the World"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    source_code: embed
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+
+library(plotly)
+library(countrycode)
+library(shiny)
+
+dass_df = read_csv("data/dass_new.csv")
+
+country_df =
+  dass_df |> 
+  count(country, depression_level) |> 
+  group_by(country) |> 
+  mutate(per =  n / sum(n),
+         code = ifelse(country == "XK", "XKX", countrycode(country, origin = "iso2c", destination = "iso3c")),
+         country = ifelse(country == "XK", "Kosovo", countrycode(country, origin = "iso2c", destination = "country.name"))
+  )
+
+```
+
+## Column {.sidebar}
+
+```{r}
+dlevel =
+  dass_df |>
+  distinct(depression_level) |>
+  pull()
+
+# selectInput widget
+selectInput(
+  inputId = "Depression Level", 
+  label = h3("Select Level"),
+  choices = dlevel,
+  selected = "Normal")
+```
+
+## Row {data-width="650"}
+
+```{r}
+renderPlotly({
+  # light grey boundaries
+l <- list(color = toRGB("grey"), width = 0.5)
+
+# specify map projection/options
+g <- list(
+  showframe = FALSE,
+  showcoastlines = FALSE,
+  projection = list(type = 'Mercator')
+)
+
+country_df |> 
+  filter(depression_level == input[["Depression Level"]]) |> 
+  plot_geo() |> 
+  add_trace(
+  z = ~per, color = ~per, colors = 'Blues',
+  text = ~ country, locations = ~ code, marker = list(line = l)
+  ) |> 
+  colorbar(title = "Percentage") |> 
+  layout(
+    title = str_c("Percentage of ",input[["Depression Level"]], " depression among each country"),
+    geo = g
+  )
+})
+```
+
+## Row {.tabset .tabset-fade}
+### Description
+This map shows how different depression levels spread among the world.
+
+\ \par
+
+For example, if selecting 'normal' level (also default level), the plot would show the percentage of responses with normal depression level for each country around the world.
+
+### Formula
+
+For each country, we can calculate:
+
+percentage = number of responses at the selected level / number of total responses
+
