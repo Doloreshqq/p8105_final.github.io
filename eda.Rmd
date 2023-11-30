@@ -17,7 +17,7 @@ ggplot(dass_new, aes(x=age)) +
 ```
 
 
-# Plot: depression level vs. age groups
+# Plot: Depression Level vs. Age groups
 ```{r}
 dass_new|>
   # form age groups
@@ -35,14 +35,20 @@ dass_new|>
     Normal:Extremely_Severe,
     names_to = "Level",
     values_to = "Count")|>
+  mutate(Level = factor(Level, levels = unique(Level)))|>
   ggplot(aes(x = Level, y = Count, group = age, color = age)) +
   geom_line()+
-  theme_minimal()
+  geom_point()+
+  theme_minimal()+
+  labs(x = "Depression level", 
+       y = "count of cases", 
+       title = "Depression level vs. age groups")
 ```
 
-# Plot: depression level vs. race groups
+# Plots: Depression Level vs. Race groups 
 ```{r}
 dass_new|>
+  # form new race groups
   mutate(race = case_when(race == "Native American" ~ "Other",
                           race=="Arab"~ "Other", 
                           race == "Indigenous Australian" ~ "Other",
@@ -60,14 +66,19 @@ dass_new|>
     Normal:Extremely_Severe,
     names_to = "Level",
     values_to = "Count")|>
+  mutate(Level = factor(Level, levels = unique(Level)))|>
   ggplot(aes(x = Level, y = Count, group = race, color = race)) +
+  geom_point()+
   geom_line()+
-  theme_minimal()
+  theme_minimal()+
+  labs(x = "Depression level", 
+       y = "count of cases", 
+       title = "Depression level vs. race groups")
 ```
 
 
 # Chi-squared Test 1
-From the plot above, we observed that the distribution of depression level among different age groups follow a similar pattern. Thus, we would like to perform a chi-squared test to study if the distribution of depression levels among different age groups are the same.\
+From the plot of depression level vs. age groups, we observed that the distribution of cases of different depression levels among different age groups follow a similar pattern. Thus, we would like to perform a chi-squared test to study if the distribution of depression levels among different age groups are the same.\
 
 $H_0$: The proportion in different depression levels among age groups are equal. \
 $H_1$: Not all proportions are equal.
@@ -94,3 +105,27 @@ chisq.test(pull(dass_chi, age), pull(dass_chi, depression_level))|>
 
 The null hypothesis for the chi-squared test is that the distributions among different age groups and different depression levels are the same. Since the p-value is smaller than 0.05, the null hypothesis is rejected. We may conclude that age is associated with depression levels.
 
+# Chi-squared Test 2
+Similarly, we observed that the distribution of cases of different depression levels among different race groups follow a similar pattern from the plot of depression level vs. race groups. Thus, we would like to perform a chi-squared test to study if the distribution of depression levels among different race groups are the same.\
+
+$H_0$: The proportion in different depression levels among race groups are equal. \
+$H_1$: Not all proportions are equal.
+```{r}
+dass_chi <- dass_new|>
+  # form new race groups
+  mutate(race = case_when(race == "Native American" ~ "Other",
+                          race=="Arab"~ "Other", 
+                          race == "Indigenous Australian" ~ "Other",
+                          race == "Other" ~ "Other",
+                          race == "Black" ~ "Black",
+                          race == "White" ~ "White",
+                          race == "Asian" ~ "Asian"))
+# show result table to perform chi-squared test
+dass_chi|>
+  group_by(race)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+            Mild = sum(depression_level=="Mild"),
+            Moderate = sum(depression_level=="Moderate"),
+            Severe = sum(depression_level=="Severe"),
+            Extremely_Severe = sum(depression_level=="Extremely severe"))
+```

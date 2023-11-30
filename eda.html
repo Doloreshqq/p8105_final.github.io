@@ -287,7 +287,7 @@ ggplot(dass_new, aes(x=age)) +
                   fill=&quot;#FF6666&quot;) </code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
 <div id="plot-depression-level-vs.-age-groups" class="section level1">
-<h1>Plot: depression level vs. age groups</h1>
+<h1>Plot: Depression Level vs. Age groups</h1>
 <pre class="r"><code>dass_new|&gt;
   # form age groups
   mutate(age = case_when(age &lt;= 18 ~ &quot;teenage&quot;, 
@@ -304,14 +304,20 @@ ggplot(dass_new, aes(x=age)) +
     Normal:Extremely_Severe,
     names_to = &quot;Level&quot;,
     values_to = &quot;Count&quot;)|&gt;
+  mutate(Level = factor(Level, levels = unique(Level)))|&gt;
   ggplot(aes(x = Level, y = Count, group = age, color = age)) +
   geom_line()+
-  theme_minimal()</code></pre>
+  geom_point()+
+  theme_minimal()+
+  labs(x = &quot;Depression level&quot;, 
+       y = &quot;count of cases&quot;, 
+       title = &quot;Depression level vs. age groups&quot;)</code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 </div>
-<div id="plot-depression-level-vs.-race-groups" class="section level1">
-<h1>Plot: depression level vs. race groups</h1>
+<div id="plots-depression-level-vs.-race-groups" class="section level1">
+<h1>Plots: Depression Level vs. Race groups</h1>
 <pre class="r"><code>dass_new|&gt;
+  # form new race groups
   mutate(race = case_when(race == &quot;Native American&quot; ~ &quot;Other&quot;,
                           race==&quot;Arab&quot;~ &quot;Other&quot;, 
                           race == &quot;Indigenous Australian&quot; ~ &quot;Other&quot;,
@@ -329,17 +335,23 @@ ggplot(dass_new, aes(x=age)) +
     Normal:Extremely_Severe,
     names_to = &quot;Level&quot;,
     values_to = &quot;Count&quot;)|&gt;
+  mutate(Level = factor(Level, levels = unique(Level)))|&gt;
   ggplot(aes(x = Level, y = Count, group = race, color = race)) +
+  geom_point()+
   geom_line()+
-  theme_minimal()</code></pre>
+  theme_minimal()+
+  labs(x = &quot;Depression level&quot;, 
+       y = &quot;count of cases&quot;, 
+       title = &quot;Depression level vs. race groups&quot;)</code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 </div>
 <div id="chi-squared-test-1" class="section level1">
 <h1>Chi-squared Test 1</h1>
-<p>From the plot above, we observed that the distribution of depression
-level among different age groups follow a similar pattern. Thus, we
-would like to perform a chi-squared test to study if the distribution of
-depression levels among different age groups are the same.<br />
+<p>From the plot of depression level vs. age groups, we observed that
+the distribution of cases of different depression levels among different
+age groups follow a similar pattern. Thus, we would like to perform a
+chi-squared test to study if the distribution of depression levels among
+different age groups are the same.<br />
 </p>
 <p><span class="math inline">\(H_0\)</span>: The proportion in different
 depression levels among age groups are equal.<br />
@@ -393,6 +405,43 @@ distributions among different age groups and different depression levels
 are the same. Since the p-value is smaller than 0.05, the null
 hypothesis is rejected. We may conclude that age is associated with
 depression levels.</p>
+</div>
+<div id="chi-squared-test-2" class="section level1">
+<h1>Chi-squared Test 2</h1>
+<p>Similarly, we observed that the distribution of cases of different
+depression levels among different race groups follow a similar pattern
+from the plot of depression level vs. race groups. Thus, we would like
+to perform a chi-squared test to study if the distribution of depression
+levels among different race groups are the same.<br />
+</p>
+<p><span class="math inline">\(H_0\)</span>: The proportion in different
+depression levels among race groups are equal.<br />
+<span class="math inline">\(H_1\)</span>: Not all proportions are
+equal.</p>
+<pre class="r"><code>dass_chi &lt;- dass_new|&gt;
+  # form new race groups
+  mutate(race = case_when(race == &quot;Native American&quot; ~ &quot;Other&quot;,
+                          race==&quot;Arab&quot;~ &quot;Other&quot;, 
+                          race == &quot;Indigenous Australian&quot; ~ &quot;Other&quot;,
+                          race == &quot;Other&quot; ~ &quot;Other&quot;,
+                          race == &quot;Black&quot; ~ &quot;Black&quot;,
+                          race == &quot;White&quot; ~ &quot;White&quot;,
+                          race == &quot;Asian&quot; ~ &quot;Asian&quot;))
+# show result table to perform chi-squared test
+dass_chi|&gt;
+  group_by(race)|&gt;
+  summarise(Normal = sum(depression_level==&quot;Normal&quot;),
+            Mild = sum(depression_level==&quot;Mild&quot;),
+            Moderate = sum(depression_level==&quot;Moderate&quot;),
+            Severe = sum(depression_level==&quot;Severe&quot;),
+            Extremely_Severe = sum(depression_level==&quot;Extremely severe&quot;))</code></pre>
+<pre><code>## # A tibble: 4 × 6
+##   race  Normal  Mild Moderate Severe Extremely_Severe
+##   &lt;chr&gt;  &lt;int&gt; &lt;int&gt;    &lt;int&gt;  &lt;int&gt;            &lt;int&gt;
+## 1 Asian   4254  1851     3368   2944             5624
+## 2 Black    105    30       64     71              162
+## 3 Other    893   378      682    679             1388
+## 4 White   1580   662     1319   1253             3002</code></pre>
 </div>
 
 
