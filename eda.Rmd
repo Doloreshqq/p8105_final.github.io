@@ -3,8 +3,9 @@ title: "EDA"
 output: html_document
 ---
 
-```{r}
+```{r, setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(ggplot2)
+library(tidyverse)
 dass_new = read.csv("./data/dass_new.csv")
 ```
 
@@ -18,4 +19,26 @@ ggplot(dass_new, aes(x=age)) +
 ```{r}
 
 
+```
+
+
+
+
+
+# Chi-squared Test 1
+$H_0$:  
+$H_1$: 
+```{r}
+dass_chi <- dass_new|>
+  mutate(age = case_when(age <= 18 ~ "teenage", 
+                         age <= 25 & age >18 ~ "young adult",
+                         age <= 50 & age >25 ~ "adult", 
+                         age >50 ~ "older"))
+dass_chi|>
+  group_by(age)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+            Mild = sum(depression_level=="Mild"),
+            Moderate = sum(depression_level=="Moderate"),
+            Severe = sum(depression_level=="Severe"),
+            Extremely_Severe = sum(depression_level=="Extremely severe"))
 ```

@@ -13,7 +13,7 @@
 
 <title>EDA</title>
 
-<script src="site_libs/header-attrs-2.18/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.24/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
@@ -32,8 +32,8 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -281,13 +281,35 @@ $(document).ready(function () {
 </div>
 
 
-<pre class="r"><code>library(ggplot2)
-dass_new = read.csv(&quot;./data/dass_new.csv&quot;)</code></pre>
 <pre class="r"><code># distribution histogram of age
 ggplot(dass_new, aes(x=age)) + 
     geom_histogram(binwidth=.5,
                   fill=&quot;#FF6666&quot;) </code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<div id="chi-squared-test-1" class="section level1">
+<h1>Chi-squared Test 1</h1>
+<p><span class="math inline">\(H_0\)</span>:<br />
+<span class="math inline">\(H_1\)</span>:</p>
+<pre class="r"><code>dass_chi &lt;- dass_new|&gt;
+  mutate(age = case_when(age &lt;= 18 ~ &quot;teenage&quot;, 
+                         age &lt;= 25 &amp; age &gt;18 ~ &quot;young adult&quot;,
+                         age &lt;= 50 &amp; age &gt;25 ~ &quot;adult&quot;, 
+                         age &gt;50 ~ &quot;older&quot;))
+dass_chi|&gt;
+  group_by(age)|&gt;
+  summarise(Normal = sum(depression_level==&quot;Normal&quot;),
+            Mild = sum(depression_level==&quot;Mild&quot;),
+            Moderate = sum(depression_level==&quot;Moderate&quot;),
+            Severe = sum(depression_level==&quot;Severe&quot;),
+            Extremely_Severe = sum(depression_level==&quot;Extremely severe&quot;))</code></pre>
+<pre><code>## # A tibble: 4 × 6
+##   age         Normal  Mild Moderate Severe Extremely_Severe
+##   &lt;chr&gt;        &lt;int&gt; &lt;int&gt;    &lt;int&gt;  &lt;int&gt;            &lt;int&gt;
+## 1 adult         1949   709     1176    934             1789
+## 2 older          240    64      116     75              192
+## 3 teenage       1235   555     1256   1327             3105
+## 4 young adult   3408  1593     2885   2611             5090</code></pre>
+</div>
 
 
 
