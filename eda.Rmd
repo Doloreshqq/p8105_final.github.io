@@ -1,11 +1,12 @@
 ---
-title: "EDA"
+title: "Exploratory Data Analysis"
 output: html_document
 ---
 
 ```{r, setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(ggplot2)
 library(tidyverse)
+library(ggridges)
 dass_new = read.csv("./data/dass_new.csv")
 ```
 
@@ -16,33 +17,19 @@ ggplot(dass_new, aes(x=age)) +
                   fill="#FF6666") 
 ```
 
-
-# Plot: Depression Level vs. Age groups
+# Plot: Depression Level vs. Age vs. Race
 ```{r}
 dass_new|>
-  # form age groups
-  mutate(age = case_when(age <= 18 ~ "teenage", 
-                         age <= 25 & age >18 ~ "young adult",
-                         age <= 50 & age >25 ~ "adult", 
-                         age >50 ~ "older"))|>
-  group_by(age)|>
-  summarise(Normal = sum(depression_level=="Normal"),
-            Mild = sum(depression_level=="Mild"),
-            Moderate = sum(depression_level=="Moderate"),
-            Severe = sum(depression_level=="Severe"),
-            Extremely_Severe = sum(depression_level=="Extremely severe"))|>
-  pivot_longer(
-    Normal:Extremely_Severe,
-    names_to = "Level",
-    values_to = "Count")|>
-  mutate(Level = factor(Level, levels = unique(Level)))|>
-  ggplot(aes(x = Level, y = Count, group = age, color = age)) +
-  geom_line()+
-  geom_point()+
+  group_by(race)|>
+  mutate(depression_level = factor(depression_level, 
+                                   levels = c("Normal", "Mild","Moderate", 
+                                              "Severe", "Extremely severe")))|>
+  ggplot(aes(x = age, y = race, color=depression_level, fill=depression_level)) +
+  geom_density_ridges(scale = 1, alpha = 0.5)+
   theme_minimal()+
-  labs(x = "Depression level", 
-       y = "count of cases", 
-       title = "Depression level vs. age groups")
+  labs(x = "Age", 
+       y = "Race", 
+       title = "Depression level vs. Age vs. Race")
 ```
 
 # Plots: Depression Level vs. Race groups 
@@ -76,8 +63,37 @@ dass_new|>
        title = "Depression level vs. race groups")
 ```
 
+# Plot: Depression Level vs. Age groups
+```{r}
+dass_new|>
+  # form age groups
+  mutate(age = case_when(age <= 18 ~ "teenage", 
+                         age <= 25 & age >18 ~ "young adult",
+                         age <= 50 & age >25 ~ "adult", 
+                         age >50 ~ "older"))|>
+  group_by(age)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+            Mild = sum(depression_level=="Mild"),
+            Moderate = sum(depression_level=="Moderate"),
+            Severe = sum(depression_level=="Severe"),
+            Extremely_Severe = sum(depression_level=="Extremely severe"))|>
+  pivot_longer(
+    Normal:Extremely_Severe,
+    names_to = "Level",
+    values_to = "Count")|>
+  mutate(Level = factor(Level, levels = unique(Level)))|>
+  ggplot(aes(x = Level, y = Count, group = age, color = age)) +
+  geom_line()+
+  geom_point()+
+  theme_minimal()+
+  labs(x = "Depression level", 
+       y = "count of cases", 
+       title = "Depression level vs. age groups")
+```
 
-# Chi-squared Test 1
+
+
+# Chi-squared Test 1: Age & Depression Level
 From the plot of depression level vs. age groups, we observed that the distribution of cases of different depression levels among different age groups follow a similar pattern. Thus, we would like to perform a chi-squared test to study if the distribution of depression levels among different age groups are the same.\
 
 $H_0$: The proportion in different depression levels among age groups are equal. \
@@ -105,7 +121,8 @@ chisq.test(pull(dass_chi, age), pull(dass_chi, depression_level))|>
 
 The null hypothesis for the chi-squared test is that the distributions among different age groups and different depression levels are the same. Since the p-value is smaller than 0.05, the null hypothesis is rejected. We may conclude that age is associated with depression levels.
 
-# Chi-squared Test 2
+
+# Chi-squared Test 2: Race & Depression Level
 Similarly, we observed that the distribution of cases of different depression levels among different race groups follow a similar pattern from the plot of depression level vs. race groups. Thus, we would like to perform a chi-squared test to study if the distribution of depression levels among different race groups are the same.\
 
 $H_0$: The proportion in different depression levels among race groups are equal. \
@@ -128,4 +145,10 @@ dass_chi|>
             Moderate = sum(depression_level=="Moderate"),
             Severe = sum(depression_level=="Severe"),
             Extremely_Severe = sum(depression_level=="Extremely severe"))
+# perform chi-squared test
+chisq.test(pull(dass_chi, race), pull(dass_chi, depression_level))|>
+  broom::tidy()|>
+  knitr::kable()
 ```
+
+The null hypothesis for the chi-squared test is that the distributions among different race groups and different depression levels are the same. Since the p-value is smaller than 0.05, the null hypothesis is rejected. We may conclude that race is associated with depression levels.

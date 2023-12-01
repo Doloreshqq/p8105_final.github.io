@@ -11,7 +11,7 @@
 
 
 
-<title>EDA</title>
+<title>Exploratory Data Analysis</title>
 
 <script src="site_libs/header-attrs-2.24/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -276,7 +276,7 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">EDA</h1>
+<h1 class="title toc-ignore">Exploratory Data Analysis</h1>
 
 </div>
 
@@ -286,32 +286,20 @@ ggplot(dass_new, aes(x=age)) +
     geom_histogram(binwidth=.5,
                   fill=&quot;#FF6666&quot;) </code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
-<div id="plot-depression-level-vs.-age-groups" class="section level1">
-<h1>Plot: Depression Level vs. Age groups</h1>
+<div id="plot-depression-level-vs.-age-vs.-race" class="section level1">
+<h1>Plot: Depression Level vs. Age vs. Race</h1>
 <pre class="r"><code>dass_new|&gt;
-  # form age groups
-  mutate(age = case_when(age &lt;= 18 ~ &quot;teenage&quot;, 
-                         age &lt;= 25 &amp; age &gt;18 ~ &quot;young adult&quot;,
-                         age &lt;= 50 &amp; age &gt;25 ~ &quot;adult&quot;, 
-                         age &gt;50 ~ &quot;older&quot;))|&gt;
-  group_by(age)|&gt;
-  summarise(Normal = sum(depression_level==&quot;Normal&quot;),
-            Mild = sum(depression_level==&quot;Mild&quot;),
-            Moderate = sum(depression_level==&quot;Moderate&quot;),
-            Severe = sum(depression_level==&quot;Severe&quot;),
-            Extremely_Severe = sum(depression_level==&quot;Extremely severe&quot;))|&gt;
-  pivot_longer(
-    Normal:Extremely_Severe,
-    names_to = &quot;Level&quot;,
-    values_to = &quot;Count&quot;)|&gt;
-  mutate(Level = factor(Level, levels = unique(Level)))|&gt;
-  ggplot(aes(x = Level, y = Count, group = age, color = age)) +
-  geom_line()+
-  geom_point()+
+  group_by(race)|&gt;
+  mutate(depression_level = factor(depression_level, 
+                                   levels = c(&quot;Normal&quot;, &quot;Mild&quot;,&quot;Moderate&quot;, 
+                                              &quot;Severe&quot;, &quot;Extremely severe&quot;)))|&gt;
+  ggplot(aes(x = age, y = race, color=depression_level, fill=depression_level)) +
+  geom_density_ridges(scale = 1, alpha = 0.5)+
   theme_minimal()+
-  labs(x = &quot;Depression level&quot;, 
-       y = &quot;count of cases&quot;, 
-       title = &quot;Depression level vs. age groups&quot;)</code></pre>
+  labs(x = &quot;Age&quot;, 
+       y = &quot;Race&quot;, 
+       title = &quot;Depression level vs. Age vs. Race&quot;)</code></pre>
+<pre><code>## Picking joint bandwidth of 2.16</code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 </div>
 <div id="plots-depression-level-vs.-race-groups" class="section level1">
@@ -345,8 +333,37 @@ ggplot(dass_new, aes(x=age)) +
        title = &quot;Depression level vs. race groups&quot;)</code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 </div>
-<div id="chi-squared-test-1" class="section level1">
-<h1>Chi-squared Test 1</h1>
+<div id="plot-depression-level-vs.-age-groups" class="section level1">
+<h1>Plot: Depression Level vs. Age groups</h1>
+<pre class="r"><code>dass_new|&gt;
+  # form age groups
+  mutate(age = case_when(age &lt;= 18 ~ &quot;teenage&quot;, 
+                         age &lt;= 25 &amp; age &gt;18 ~ &quot;young adult&quot;,
+                         age &lt;= 50 &amp; age &gt;25 ~ &quot;adult&quot;, 
+                         age &gt;50 ~ &quot;older&quot;))|&gt;
+  group_by(age)|&gt;
+  summarise(Normal = sum(depression_level==&quot;Normal&quot;),
+            Mild = sum(depression_level==&quot;Mild&quot;),
+            Moderate = sum(depression_level==&quot;Moderate&quot;),
+            Severe = sum(depression_level==&quot;Severe&quot;),
+            Extremely_Severe = sum(depression_level==&quot;Extremely severe&quot;))|&gt;
+  pivot_longer(
+    Normal:Extremely_Severe,
+    names_to = &quot;Level&quot;,
+    values_to = &quot;Count&quot;)|&gt;
+  mutate(Level = factor(Level, levels = unique(Level)))|&gt;
+  ggplot(aes(x = Level, y = Count, group = age, color = age)) +
+  geom_line()+
+  geom_point()+
+  theme_minimal()+
+  labs(x = &quot;Depression level&quot;, 
+       y = &quot;count of cases&quot;, 
+       title = &quot;Depression level vs. age groups&quot;)</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="chi-squared-test-1-age-depression-level"
+class="section level1">
+<h1>Chi-squared Test 1: Age &amp; Depression Level</h1>
 <p>From the plot of depression level vs. age groups, we observed that
 the distribution of cases of different depression levels among different
 age groups follow a similar pattern. Thus, we would like to perform a
@@ -406,8 +423,9 @@ are the same. Since the p-value is smaller than 0.05, the null
 hypothesis is rejected. We may conclude that age is associated with
 depression levels.</p>
 </div>
-<div id="chi-squared-test-2" class="section level1">
-<h1>Chi-squared Test 2</h1>
+<div id="chi-squared-test-2-race-depression-level"
+class="section level1">
+<h1>Chi-squared Test 2: Race &amp; Depression Level</h1>
 <p>Similarly, we observed that the distribution of cases of different
 depression levels among different race groups follow a similar pattern
 from the plot of depression level vs. race groups. Thus, we would like
@@ -442,6 +460,33 @@ dass_chi|&gt;
 ## 2 Black    105    30       64     71              162
 ## 3 Other    893   378      682    679             1388
 ## 4 White   1580   662     1319   1253             3002</code></pre>
+<pre class="r"><code># perform chi-squared test
+chisq.test(pull(dass_chi, race), pull(dass_chi, depression_level))|&gt;
+  broom::tidy()|&gt;
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">parameter</th>
+<th align="left">method</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">154.3871</td>
+<td align="right">0</td>
+<td align="right">12</td>
+<td align="left">Pearson’s Chi-squared test</td>
+</tr>
+</tbody>
+</table>
+<p>The null hypothesis for the chi-squared test is that the
+distributions among different race groups and different depression
+levels are the same. Since the p-value is smaller than 0.05, the null
+hypothesis is rejected. We may conclude that race is associated with
+depression levels.</p>
 </div>
 
 
