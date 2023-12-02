@@ -3,12 +3,14 @@ output_dir: "."
 navbar:
   title: "Home"
   right:
+    - text: "Data"
+      href: data.html
     - text: "Exploratory Data Analysis"
       href: eda.html
     - text: "Statistical Analysis"
-      href: sa.html
+      href: logit_models.html
     - text: "Shiny App"
-      href: 
+      href: https://doloreshqq.shinyapps.io/r_shiny_for_p8105/
     - text: "Report"
       href: report.html
     - icon: fa-envelope fa-lg
@@ -18,3 +20,4 @@ navbar:
 output:
   html_document:
     theme: flatly
+    code_folding: hide
