@@ -217,7 +217,7 @@ ggplot(country_coefficients, aes(x = country, y = coefficient)) +
 ```
 
 
-```{r, warning = FALSE}
+```{r, fig.width=22, fig.height=53, message = FALSE}
 library(effects)
 
 # Create a data frame with the predictor values for visualization
@@ -229,7 +229,7 @@ predictor_data <- model.matrix(~ country + education + urban + gender
 effects <- allEffects(dass_fit_step, xlevels = list(predictor_data))
 
 # Plot the effects
-plot(effects, style = "level")
+plot(effects, style = "stacked")
 ```
 
 ## Future Work
