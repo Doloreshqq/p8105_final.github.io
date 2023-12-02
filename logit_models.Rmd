@@ -216,6 +216,22 @@ ggplot(country_coefficients, aes(x = country, y = coefficient)) +
   labs(title = "Effect of Countries on Depression Levels", x = "Country", y = "Coefficient")
 ```
 
+
+```{r, warning = FALSE}
+library(effects)
+
+# Create a data frame with the predictor values for visualization
+predictor_data <- model.matrix(~ country + education + urban + gender
+                               + age + religion + orientation + married,
+                               data = dass_fit_df)
+
+# Compute the effects
+effects <- allEffects(dass_fit_step, xlevels = list(predictor_data))
+
+# Plot the effects
+plot(effects, style = "level")
+```
+
 ## Future Work
 
  * Re-selection of independent variables. (Significant, Regroup, AIC, PCA)

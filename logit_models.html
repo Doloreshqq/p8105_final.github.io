@@ -11,7 +11,7 @@
 
 <meta name="author" content="Huanyu Chen, Shaolei Ma" />
 
-<meta name="date" content="2023-11-30" />
+<meta name="date" content="2023-12-02" />
 
 <title>Logistic Model</title>
 
@@ -256,7 +256,9 @@ $(document).ready(function () {
   <a href="sa.html">Statistical Analysis</a>
 </li>
 <li class="dropdown-header">Shiny App</li>
-<li class="dropdown-header">Report</li>
+<li>
+  <a href="report.html">Report</a>
+</li>
 <li>
   <a href="mailto:&lt;qh2284@cumc.columbia.edu&gt;">
     <span class="fa fa-envelope fa-lg"></span>
@@ -280,7 +282,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Logistic Model</h1>
 <h4 class="author">Huanyu Chen, Shaolei Ma</h4>
-<h4 class="date">2023-11-30</h4>
+<h4 class="date">2023-12-02</h4>
 
 </div>
 
@@ -1140,6 +1142,41 @@ ggplot(country_coefficients, aes(x = country, y = coefficient)) +
   geom_bar(stat = &quot;identity&quot;, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
   labs(title = &quot;Effect of Countries on Depression Levels&quot;, x = &quot;Country&quot;, y = &quot;Coefficient&quot;)</code></pre>
 <p><img src="logit_models_files/figure-html/unnamed-chunk-12-1.png" width="90%" /></p>
+<pre class="r"><code>library(effects)</code></pre>
+<pre><code>## lattice theme set by effectsTheme()
+## See ?effectsTheme for details.</code></pre>
+<pre class="r"><code># Create a data frame with the predictor values for visualization
+predictor_data &lt;- model.matrix(~ country + education + urban + gender
+                               + age + religion + orientation + married,
+                               data = dass_fit_df)
+
+# Compute the effects
+effects &lt;- allEffects(dass_fit_step, xlevels = list(predictor_data))</code></pre>
+<pre><code>## 
+## Re-fitting to get Hessian</code></pre>
+<pre><code>## 
+## Re-fitting to get Hessian
+## 
+## 
+## Re-fitting to get Hessian
+## 
+## 
+## Re-fitting to get Hessian
+## 
+## 
+## Re-fitting to get Hessian
+## 
+## 
+## Re-fitting to get Hessian
+## 
+## 
+## Re-fitting to get Hessian
+## 
+## 
+## Re-fitting to get Hessian</code></pre>
+<pre class="r"><code># Plot the effects
+plot(effects, style = &quot;level&quot;)</code></pre>
+<p><img src="logit_models_files/figure-html/unnamed-chunk-13-1.png" width="90%" /></p>
 </div>
 <div id="future-work" class="section level2">
 <h2>Future Work</h2>
