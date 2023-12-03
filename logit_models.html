@@ -310,7 +310,7 @@ $(document).ready(function () {
 <p>First, test the distribution of independent variables.</p>
 <pre class="r"><code>dass_new = read_csv(&quot;data/dass_new.csv&quot;)</code></pre>
 <pre><code>## Rows: 30309 Columns: 10
-## ── Column specification ───────────────────────────────────────────────────────────────
+## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
 ## chr (9): country, education, urban, gender, religion, orientation, race, mar...
 ## dbl (1): age
@@ -767,7 +767,7 @@ summary(pca_result)</code></pre>
 ## Proportion of Variance 0.05404 0.05398 0.05313 0.0528 0.05214 0.05196 0.04834
 ## Cumulative Proportion  0.62216 0.67614 0.72927 0.7821 0.83420 0.88616 0.93450
 ##                           PC15    PC16    PC17    PC18      PC19
-## Standard deviation     0.70025 0.58764 0.55051 0.32522 3.808e-13
+## Standard deviation     0.70025 0.58764 0.55051 0.32522 2.754e-13
 ## Proportion of Variance 0.02581 0.01817 0.01595 0.00557 0.000e+00
 ## Cumulative Proportion  0.96031 0.97848 0.99443 1.00000 1.000e+00</code></pre>
 <pre class="r"><code>pca_result$rotation</code></pre>
@@ -835,7 +835,7 @@ summary(pca_result)</code></pre>
 ## educationGraduate degree       -0.040026936  0.172947058 -0.0847673794
 ## educationHigh school            0.037753266 -0.068069339  0.0613221148
 ## educationLess than high school -0.024272744  0.080504059 -0.1240570810
-## educationUniversity degree      0.005086376 -0.101259707  0.0736017729
+## educationUniversity degree      0.005086377 -0.101259707  0.0736017729
 ## urbanSuburban                  -0.020994016 -0.014628988  0.0004433456
 ## urbanUrban                      0.013074315 -0.000100618 -0.0341405344
 ## age                             0.060969029  0.011734419  0.0335291757
@@ -849,7 +849,7 @@ summary(pca_result)</code></pre>
 ## religionSikh                    0.584461103  0.404658505  0.3378775614
 ## raceBlack                      -0.337933429  0.202310449 -0.3234462013
 ## raceNative American            -0.078945975 -0.064398027  0.6923121814
-## raceOther                       0.359013153 -0.171603422 -0.0643955976
+## raceOther                       0.359013153 -0.171603422 -0.0643955975
 ## raceWhite                       0.043834576 -0.004462711 -0.0231457991
 ##                                        PC13         PC14         PC15
 ## educationGraduate degree       -0.081636633  0.020606887 -0.348088586
@@ -896,21 +896,21 @@ summary(pca_result)</code></pre>
 ## educationHigh school            5.886811e-01
 ## educationLess than high school  3.629200e-01
 ## educationUniversity degree      5.942150e-01
-## urbanSuburban                   2.975830e-16
-## urbanUrban                      2.081035e-15
-## age                            -2.754745e-15
-## religionAtheist                -1.360195e-16
-## religionBuddhist                4.221867e-16
-## religionChristian               2.418834e-15
-## religionHindu                   6.032378e-16
-## religionJewish                  6.160516e-17
-## religionMuslim                  1.642327e-15
-## religionOther                   3.923388e-15
-## religionSikh                    2.391306e-16
-## raceBlack                      -2.334737e-16
-## raceNative American             4.770548e-17
-## raceOther                      -2.964878e-15
-## raceWhite                       4.000453e-15</code></pre>
+## urbanSuburban                  -9.020562e-17
+## urbanUrban                      2.553079e-15
+## age                            -2.498002e-15
+## religionAtheist                -6.938894e-17
+## religionBuddhist               -5.134781e-16
+## religionChristian               3.164136e-15
+## religionHindu                  -7.216450e-16
+## religionJewish                  1.008308e-16
+## religionMuslim                 -2.726985e-15
+## religionOther                   5.297845e-15
+## religionSikh                   -2.428613e-16
+## raceBlack                      -1.679212e-15
+## raceNative American            -1.058181e-15
+## raceOther                       2.081668e-17
+## raceWhite                      -2.928213e-15</code></pre>
 <p><code>urban</code> has relatively low absolute loadings compared to
 other variables, suggesting that it contributes less to the derived
 components and might not be essential in capturing variance. Then we
@@ -1128,6 +1128,7 @@ dass_fit_step |&gt; summary()</code></pre>
 class="section level2">
 <h2>Graphs Based On Current Regression Models</h2>
 <pre class="r"><code>library(pROC)</code></pre>
+<pre><code>## Warning: package &#39;pROC&#39; was built under R version 4.3.2</code></pre>
 <pre><code>## Type &#39;citation(&quot;pROC&quot;)&#39; for a citation.</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;pROC&#39;</code></pre>
@@ -1160,39 +1161,17 @@ ggplot(country_coefficients, aes(x = country, y = coefficient)) +
   labs(title = &quot;Effect of Countries on Depression Levels&quot;, x = &quot;Country&quot;, y = &quot;Coefficient&quot;)</code></pre>
 <p><img src="logit_models_files/figure-html/unnamed-chunk-12-1.png" width="90%" /></p>
 <pre class="r"><code>library(effects)</code></pre>
-<pre><code>## lattice theme set by effectsTheme()
-## See ?effectsTheme for details.</code></pre>
+<pre><code>## Warning: package &#39;effects&#39; was built under R version 4.3.2</code></pre>
 <pre class="r"><code># Create a data frame with the predictor values for visualization
 predictor_data &lt;- model.matrix(~ country + education + urban + gender
                                + age + religion + orientation + married,
                                data = dass_fit_df)
 
 # Compute the effects
-effects &lt;- allEffects(dass_fit_step, xlevels = list(predictor_data))</code></pre>
-<pre><code>## 
-## Re-fitting to get Hessian</code></pre>
-<pre><code>## 
-## Re-fitting to get Hessian
-## 
-## 
-## Re-fitting to get Hessian
-## 
-## 
-## Re-fitting to get Hessian
-## 
-## 
-## Re-fitting to get Hessian
-## 
-## 
-## Re-fitting to get Hessian
-## 
-## 
-## Re-fitting to get Hessian
-## 
-## 
-## Re-fitting to get Hessian</code></pre>
-<pre class="r"><code># Plot the effects
-plot(effects, style = &quot;level&quot;)</code></pre>
+effects &lt;- allEffects(dass_fit_step, xlevels = list(predictor_data))
+
+# Plot the effects
+plot(effects, style = &quot;stacked&quot;)</code></pre>
 <p><img src="logit_models_files/figure-html/unnamed-chunk-13-1.png" width="90%" /></p>
 </div>
 <div id="future-work" class="section level2">
