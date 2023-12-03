@@ -11,7 +11,7 @@
 
 <meta name="author" content="Huanyu Chen, Shaolei Ma" />
 
-<meta name="date" content="2023-12-02" />
+<meta name="date" content="2023-12-03" />
 
 <title>Logistic Model</title>
 
@@ -299,7 +299,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Logistic Model</h1>
 <h4 class="author">Huanyu Chen, Shaolei Ma</h4>
-<h4 class="date">2023-12-02</h4>
+<h4 class="date">2023-12-03</h4>
 
 </div>
 
@@ -308,100 +308,99 @@ $(document).ready(function () {
 <div id="independent-variables" class="section level2">
 <h2>Independent Variables</h2>
 <p>First, test the distribution of independent variables.</p>
-<pre class="r"><code>dass_new = read_csv(&quot;data/dass_new.csv&quot;)</code></pre>
-<pre><code>## Rows: 30309 Columns: 10
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr (9): country, education, urban, gender, religion, orientation, race, mar...
-## dbl (1): age
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>dass_new |&gt; 
-  mutate(
-    country = as.factor(country),
-    urban = as.factor(urban),
-    gender = as.factor(gender),
-    religion = as.factor(religion),
-    orientation = as.factor(orientation),
-    race = as.factor(race)
-  ) |&gt; 
+<pre class="r"><code>dass_new = read_csv(&quot;data/dass_new.csv&quot;)
+
+dass_new |&gt; 
+  dplyr::select(age, everything()) |&gt; 
+  mutate(across(country:depression_level, factor)) |&gt; 
   summary()</code></pre>
-<pre><code>##     country       education              urban          gender     
-##  MY     :16932   Length:30309       Rural   : 6295   Female:23137  
-##  US     : 5989   Class :character   Suburban:10283   Male  : 6754  
-##  GB     :  891   Mode  :character   Urban   :13731   Other :  418  
-##  CA     :  752                                                     
-##  ID     :  746                                                     
-##  PH     :  581                                                     
-##  (Other): 4418                                                     
-##       age                        religion           orientation   
-##  Min.   :13.00   Muslim              :17204   Asexual     : 1649  
-##  1st Qu.:19.00   Atheist             : 2943   Bisexual    : 3921  
-##  Median :21.00   Agnostic            : 2406   Heterosexual:20259  
-##  Mean   :23.45   Christian (Catholic): 2359   Homosexual  : 1548  
-##  3rd Qu.:25.00   Christian (Other)   : 1699   Other       : 2932  
-##  Max.   :99.00   Other               : 1343                       
-##                  (Other)             : 2355                       
-##                     race         married          depression_level  
-##  Arab                 :  228   Length:30309       Length:30309      
-##  Asian                :18041   Class :character   Class :character  
-##  Black                :  432   Mode  :character   Mode  :character  
-##  Indigenous Australian:   12                                        
-##  Native American      :  159                                        
-##  Other                : 3621                                        
-##  White                : 7816</code></pre>
+<pre><code>##       age           country                      education          urban      
+##  Min.   :13.00   MY     :16932   Graduate degree      : 3981   Rural   : 6295  
+##  1st Qu.:19.00   US     : 5989   High school          :11374   Suburban:10283  
+##  Median :21.00   GB     :  891   Less than high school: 2997   Urban   :13731  
+##  Mean   :23.45   CA     :  752   University degree    :11957                   
+##  3rd Qu.:25.00   ID     :  746                                                 
+##  Max.   :99.00   PH     :  581                                                 
+##                  (Other): 4418                                                 
+##     gender                      religion           orientation   
+##  Female:23137   Muslim              :17204   Asexual     : 1649  
+##  Male  : 6754   Atheist             : 2943   Bisexual    : 3921  
+##  Other :  418   Agnostic            : 2406   Heterosexual:20259  
+##                 Christian (Catholic): 2359   Homosexual  : 1548  
+##                 Christian (Other)   : 1699   Other       : 2932  
+##                 Other               : 1343                       
+##                 (Other)             : 2355                       
+##                     race                     married     
+##  Arab                 :  228   Currently married : 3331  
+##  Asian                :18041   Never married     :26207  
+##  Black                :  432   Previously married:  771  
+##  Indigenous Australian:   12                             
+##  Native American      :  159                             
+##  Other                : 3621                             
+##  White                : 7816                             
+##          depression_level
+##  Extremely severe:10176  
+##  Mild            : 2921  
+##  Moderate        : 5433  
+##  Normal          : 6832  
+##  Severe          : 4947  
+##                          
+## </code></pre>
 <p>Some categories contain few samples. For the efficacy of the model,
 we regroup the independent variables following the standards below:</p>
 <ul>
 <li><code>country</code>: Group the country with less than 500 samples
-into “Other”</li>
+into “Other”, and set “US” to be the reference level.</li>
+<li><code>education</code>: Order the variable by the length of
+education.</li>
 <li><code>race</code>: We follow <a
 href="https://www.govinfo.gov/content/pkg/FR-1997-10-30/pdf/97-28653.pdf">standards
 on race and ethnicity</a> to include only “Asian”, “Black”, “Native
-American”, “White”, and make other categories “Other”.</li>
+American”, “White”, and make other categories “Other”. We set “White” to
+be the reference level.</li>
 <li><code>religion</code>: We conclude “Christian (Catholic)”,
 “Christian (Mormon)”, “Christian (Other)”, “Christian (Protestant)” into
-“Christian”.</li>
+“Christian”, and set it as the reference level.</li>
 <li><code>orientation</code>: Set the “Heterosexual” to be the reference
 level.</li>
+<li><code>married</code>: Order the variable by marriage status.</li>
 </ul>
 <pre class="r"><code>dass_fit_df =
   dass_new |&gt; 
   mutate(
-    country = as.factor(ifelse(country %in% c(&quot;MY&quot;, &quot;US&quot;, &quot;GB&quot;, &quot;CA&quot;, &quot;ID&quot;, &quot;PH&quot;), country, &quot;Other&quot;)),
-    race = as.factor(ifelse(race %in% c(&quot;Arab&quot;, &quot;Indigenous Australian&quot;), &quot;Other&quot;, race)),
-    religion = as.factor(ifelse(substr(religion, 1, 9) == &quot;Christian&quot;, &quot;Christian&quot;, religion)),
-    urban = as.factor(urban),
-    gender = as.factor(gender),
+    country = relevel(as.factor(ifelse(country %in% c(&quot;MY&quot;, &quot;US&quot;, &quot;GB&quot;, &quot;CA&quot;, &quot;ID&quot;, &quot;PH&quot;), country, &quot;Other&quot;)), ref = &quot;US&quot;),
+    education = factor(education, levels = c(&quot;Less than high school&quot;, &quot;High school&quot;, &quot;University degree&quot;, &quot;Graduate degree&quot;)),
+    race = relevel(as.factor(ifelse(race %in% c(&quot;Arab&quot;, &quot;Indigenous Australian&quot;), &quot;Other&quot;, race)), ref = &quot;White&quot;),
+    religion = relevel(as.factor(ifelse(substr(religion, 1, 9) == &quot;Christian&quot;, &quot;Christian&quot;, religion)), &quot;Christian&quot;),
     orientation = relevel(as.factor(orientation), &quot;Heterosexual&quot;),
+    married = factor(married, levels = c(&quot;Never married&quot;, &quot;Currently married&quot;, &quot;Previously married&quot;)),
     depression_level = factor(depression_level, levels = c(&quot;Normal&quot;, &quot;Mild&quot;, &quot;Moderate&quot;, &quot;Severe&quot;, &quot;Extremely severe&quot;))
   )
 
 dass_fit_df |&gt; summary()</code></pre>
-<pre><code>##   country       education              urban          gender     
-##  CA   :  752   Length:30309       Rural   : 6295   Female:23137  
-##  GB   :  891   Class :character   Suburban:10283   Male  : 6754  
-##  ID   :  746   Mode  :character   Urban   :13731   Other :  418  
-##  MY   :16932                                                     
-##  Other: 4418                                                     
-##  PH   :  581                                                     
-##  US   : 5989                                                     
-##       age             religion           orientation                 race      
-##  Min.   :13.00   Muslim   :17204   Heterosexual:20259   Asian          :18041  
-##  1st Qu.:19.00   Christian: 5318   Asexual     : 1649   Black          :  432  
-##  Median :21.00   Atheist  : 2943   Bisexual    : 3921   Native American:  159  
-##  Mean   :23.45   Agnostic : 2406   Homosexual  : 1548   Other          : 3861  
-##  3rd Qu.:25.00   Other    : 1343   Other       : 2932   White          : 7816  
-##  Max.   :99.00   Hindu    :  531                                               
-##                  (Other)  :  564                                               
-##    married                  depression_level
-##  Length:30309       Normal          : 6832  
-##  Class :character   Mild            : 2921  
-##  Mode  :character   Moderate        : 5433  
-##                     Severe          : 4947  
-##                     Extremely severe:10176  
-##                                             
+<pre><code>##   country                      education        urban          
+##  US   : 5989   Less than high school: 2997   Length:30309      
+##  CA   :  752   High school          :11374   Class :character  
+##  GB   :  891   University degree    :11957   Mode  :character  
+##  ID   :  746   Graduate degree      : 3981                     
+##  MY   :16932                                                   
+##  Other: 4418                                                   
+##  PH   :  581                                                   
+##     gender               age             religion           orientation   
+##  Length:30309       Min.   :13.00   Muslim   :17204   Heterosexual:20259  
+##  Class :character   1st Qu.:19.00   Christian: 5318   Asexual     : 1649  
+##  Mode  :character   Median :21.00   Atheist  : 2943   Bisexual    : 3921  
+##                     Mean   :23.45   Agnostic : 2406   Homosexual  : 1548  
+##                     3rd Qu.:25.00   Other    : 1343   Other       : 2932  
+##                     Max.   :99.00   Hindu    :  531                       
+##                                     (Other)  :  564                       
+##               race                     married              depression_level
+##  White          : 7816   Never married     :26207   Normal          : 6832  
+##  Asian          :18041   Currently married : 3331   Mild            : 2921  
+##  Black          :  432   Previously married:  771   Moderate        : 5433  
+##  Native American:  159                              Severe          : 4947  
+##  Other          : 3861                              Extremely severe:10176  
+##                                                                             
 ## </code></pre>
 </div>
 <div id="model-fitting" class="section level2">
@@ -414,773 +413,253 @@ dass_fit_df |&gt; summary()</code></pre>
 (fit_s = 
   dass_fit |&gt; 
   summary())</code></pre>
-<pre><code>## 
-## Re-fitting to get Hessian</code></pre>
 <pre><code>## Call:
 ## polr(formula = depression_level ~ ., data = dass_fit_df)
 ## 
 ## Coefficients:
-##                                    Value Std. Error  t value
-## countryGB                       0.022839   0.091061  0.25081
-## countryID                      -0.105464   0.100026 -1.05437
-## countryMY                      -0.156523   0.079373 -1.97200
-## countryOther                   -0.045798   0.072813 -0.62899
-## countryPH                       0.115944   0.107064  1.08294
-## countryUS                      -0.148516   0.071130 -2.08796
-## educationHigh school            0.380094   0.036318 10.46581
-## educationLess than high school  0.530280   0.052303 10.13863
-## educationUniversity degree      0.153445   0.033835  4.53512
-## urbanSuburban                  -0.027284   0.029139 -0.93632
-## urbanUrban                      0.046331   0.027761  1.66892
-## genderMale                     -0.166471   0.025998 -6.40323
-## genderOther                     0.339709   0.096112  3.53451
-## age                            -0.007523   0.001868 -4.02676
-## religionAtheist                 0.072806   0.050830  1.43235
-## religionBuddhist               -0.397724   0.099877 -3.98214
-## religionChristian              -0.187628   0.046183 -4.06268
-## religionHindu                  -0.088464   0.092899 -0.95226
-## religionJewish                 -0.232071   0.186455 -1.24465
-## religionMuslim                 -0.167871   0.055974 -2.99908
-## religionOther                   0.005713   0.062698  0.09113
-## religionSikh                   -0.150691   0.273899 -0.55017
-## orientationAsexual              0.173086   0.046812  3.69748
-## orientationBisexual             0.374809   0.032818 11.42084
-## orientationHomosexual           0.286605   0.048017  5.96879
-## orientationOther                0.195966   0.036306  5.39764
-## raceBlack                      -0.009671   0.095956 -0.10078
-## raceNative American             0.227952   0.149869  1.52101
-## raceOther                       0.028021   0.034031  0.82339
-## raceWhite                       0.091785   0.044414  2.06657
-## marriedNever married            0.528618   0.040748 12.97296
-## marriedPreviously married       0.570172   0.073916  7.71382
-## 
-## Intercepts:
-##                         Value   Std. Error t value
-## Normal|Mild             -0.8790  0.1186    -7.4137
-## Mild|Moderate           -0.3736  0.1185    -3.1541
-## Moderate|Severe          0.4049  0.1184     3.4180
-## Severe|Extremely severe  1.1081  0.1186     9.3454
-## 
-## Residual Deviance: 91341.20 
-## AIC: 91413.20</code></pre>
-<p>The following is the significant variables:</p>
-<table>
-<thead>
-<tr class="header">
-<th align="left"></th>
-<th align="right">x</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">countryGB</td>
-<td align="right">0.0228392</td>
-</tr>
-<tr class="even">
-<td align="left">countryID</td>
-<td align="right">-0.1054643</td>
-</tr>
-<tr class="odd">
-<td align="left">countryOther</td>
-<td align="right">-0.0457982</td>
-</tr>
-<tr class="even">
-<td align="left">countryPH</td>
-<td align="right">0.1159440</td>
-</tr>
-<tr class="odd">
-<td align="left">urbanSuburban</td>
-<td align="right">-0.0272838</td>
-</tr>
-<tr class="even">
-<td align="left">urbanUrban</td>
-<td align="right">0.0463306</td>
-</tr>
-<tr class="odd">
-<td align="left">religionAtheist</td>
-<td align="right">0.0728057</td>
-</tr>
-<tr class="even">
-<td align="left">religionHindu</td>
-<td align="right">-0.0884639</td>
-</tr>
-<tr class="odd">
-<td align="left">religionJewish</td>
-<td align="right">-0.2320712</td>
-</tr>
-<tr class="even">
-<td align="left">religionOther</td>
-<td align="right">0.0057134</td>
-</tr>
-<tr class="odd">
-<td align="left">religionSikh</td>
-<td align="right">-0.1506905</td>
-</tr>
-<tr class="even">
-<td align="left">raceBlack</td>
-<td align="right">-0.0096707</td>
-</tr>
-<tr class="odd">
-<td align="left">raceNative American</td>
-<td align="right">0.2279525</td>
-</tr>
-<tr class="even">
-<td align="left">raceOther</td>
-<td align="right">0.0280208</td>
-</tr>
-</tbody>
-</table>
-<p>It could be observed that all dummy variables belonging to
-<code>education</code>, <code>gender</code>, <code>orientation</code>,
-<code>married</code> are not significant, and the continuous variable
-<code>sex</code> is not significant. We exclude these three variables
-and refit the model.</p>
-<pre class="r"><code>dass_fit2 = 
-  dass_fit_df |&gt; 
-  polr(depression_level ~ country + urban + religion + race, data = _)
-
-dass_fit2 |&gt; 
-  summary()</code></pre>
-<pre><code>## 
-## Re-fitting to get Hessian</code></pre>
-<pre><code>## Call:
-## polr(formula = depression_level ~ country + urban + religion + 
-##     race, data = dass_fit_df)
-## 
-## Coefficients:
-##                        Value Std. Error t value
-## countryGB           -0.03146    0.09041 -0.3480
-## countryID           -0.06963    0.09933 -0.7010
-## countryMY           -0.18559    0.07855 -2.3627
-## countryOther        -0.05800    0.07222 -0.8031
-## countryPH            0.16211    0.10606  1.5285
-## countryUS           -0.07699    0.07054 -1.0915
-## urbanSuburban       -0.03508    0.02886 -1.2153
-## urbanUrban           0.08169    0.02756  2.9642
-## religionAtheist      0.09234    0.05041  1.8319
-## religionBuddhist    -0.53826    0.09991 -5.3874
-## religionChristian   -0.30913    0.04533 -6.8193
-## religionHindu       -0.37337    0.09194 -4.0609
-## religionJewish      -0.24760    0.18298 -1.3532
-## religionMuslim      -0.28252    0.05518 -5.1198
-## religionOther       -0.02405    0.06208 -0.3874
-## religionSikh        -0.30544    0.27108 -1.1268
-## raceBlack            0.02710    0.09587  0.2826
-## raceNative American  0.29821    0.14758  2.0207
-## raceOther            0.03129    0.03383  0.9249
-## raceWhite            0.01770    0.04380  0.4041
+##                                Value Std. Error  t value
+## countryCA                   0.148517   0.071130   2.0880
+## countryGB                   0.171354   0.067062   2.5552
+## countryID                   0.043053   0.079163   0.5439
+## countryMY                  -0.008007   0.050543  -0.1584
+## countryOther                0.102717   0.039048   2.6305
+## countryPH                   0.264462   0.087392   3.0262
+## educationHigh school       -0.150185   0.040509  -3.7075
+## educationUniversity degree -0.376834   0.044291  -8.5082
+## educationGraduate degree   -0.530279   0.052303 -10.1386
+## urbanSuburban              -0.027283   0.029139  -0.9363
+## urbanUrban                  0.046331   0.027761   1.6689
+## genderMale                 -0.166471   0.025998  -6.4032
+## genderOther                 0.339713   0.096112   3.5346
+## age                        -0.007523   0.001868  -4.0267
+## religionAgnostic            0.187629   0.046183   4.0627
+## religionAtheist             0.260434   0.044725   5.8230
+## religionBuddhist           -0.210089   0.095058  -2.2101
+## religionHindu               0.099165   0.087998   1.1269
+## religionJewish             -0.044442   0.184671  -0.2407
+## religionMuslim              0.019758   0.045019   0.4389
+## religionOther               0.193342   0.056459   3.4245
+## religionSikh                0.036949   0.272258   0.1357
+## orientationAsexual          0.173086   0.046812   3.6975
+## orientationBisexual         0.374809   0.032818  11.4208
+## orientationHomosexual       0.286605   0.048017   5.9688
+## orientationOther            0.195966   0.036306   5.3976
+## raceAsian                  -0.091787   0.044414  -2.0666
+## raceBlack                  -0.101452   0.091268  -1.1116
+## raceNative American         0.136167   0.146638   0.9286
+## raceOther                  -0.063766   0.044043  -1.4478
+## marriedCurrently married   -0.528618   0.040748 -12.9730
+## marriedPreviously married   0.041553   0.075500   0.5504
 ## 
 ## Intercepts:
 ##                         Value    Std. Error t value 
-## Normal|Mild              -1.5598   0.0855   -18.2333
-## Mild|Moderate            -1.0680   0.0853   -12.5211
-## Moderate|Severe          -0.3116   0.0851    -3.6612
-## Severe|Extremely severe   0.3737   0.0851     4.3923
+## Normal|Mild              -1.6935   0.0604   -28.0233
+## Mild|Moderate            -1.1882   0.0600   -19.8029
+## Moderate|Severe          -0.4097   0.0597    -6.8678
+## Severe|Extremely severe   0.2936   0.0597     4.9209
 ## 
-## Residual Deviance: 92487.05 
-## AIC: 92535.05</code></pre>
+## Residual Deviance: 91341.20 
+## AIC: 91413.20</code></pre>
 <p>Test the parallel assumption.</p>
-<pre class="r"><code>car::poTest(dass_fit2)</code></pre>
+<pre class="r"><code>car::poTest(dass_fit)</code></pre>
 <pre><code>## 
 ## Tests for Proportional Odds
-## polr(formula = depression_level ~ country + urban + religion + 
+## polr(formula = depression_level ~ ., data = dass_fit_df)
+## 
+##                              b[polr] b[&gt;Normal]  b[&gt;Mild] b[&gt;Moderate]
+## Overall                                                               
+## countryCA                   1.49e-01   1.82e-01  1.54e-01     1.64e-01
+## countryGB                   1.71e-01   2.21e-01  1.44e-01     1.46e-01
+## countryID                   4.31e-02   1.63e-01  1.53e-02     4.50e-02
+## countryMY                  -8.01e-03   1.10e-01 -9.42e-03    -2.97e-02
+## countryOther                1.03e-01   9.00e-02  6.84e-02     1.29e-01
+## countryPH                   2.64e-01   3.82e-01  3.76e-01     2.69e-01
+## educationHigh school       -1.50e-01  -1.31e-01 -1.25e-01    -1.47e-01
+## educationUniversity degree -3.77e-01  -3.64e-01 -3.57e-01    -3.86e-01
+## educationGraduate degree   -5.30e-01  -5.59e-01 -5.32e-01    -5.07e-01
+## urbanSuburban              -2.73e-02   1.83e-02  3.45e-02    -2.71e-02
+## urbanUrban                  4.63e-02   7.74e-02  8.22e-02     4.57e-02
+## genderMale                 -1.66e-01  -2.18e-01 -1.89e-01    -1.45e-01
+## genderOther                 3.40e-01   6.00e-01  5.24e-01     3.05e-01
+## age                        -7.52e-03  -1.18e-02 -1.06e-02    -8.09e-03
+## religionAgnostic            1.88e-01   1.34e-01  1.90e-01     2.27e-01
+## religionAtheist             2.60e-01   1.76e-01  2.38e-01     2.37e-01
+## religionBuddhist           -2.10e-01  -3.18e-01 -1.88e-01    -2.02e-01
+## religionHindu               9.92e-02   9.13e-02  3.07e-02     1.28e-01
+## religionJewish             -4.44e-02  -1.28e-02 -1.91e-01     3.51e-02
+## religionMuslim              1.98e-02   2.02e-02  8.06e-02     3.27e-02
+## religionOther               1.93e-01   1.82e-01  1.80e-01     2.04e-01
+## religionSikh                3.69e-02   1.24e-01  2.65e-01     6.49e-02
+## orientationAsexual          1.73e-01   8.23e-02  1.37e-01     2.17e-01
+## orientationBisexual         3.75e-01   4.36e-01  4.06e-01     3.67e-01
+## orientationHomosexual       2.87e-01   3.52e-01  2.97e-01     2.59e-01
+## orientationOther            1.96e-01   2.10e-01  1.87e-01     2.07e-01
+## raceAsian                  -9.18e-02  -1.97e-01 -1.54e-01    -7.88e-02
+## raceBlack                  -1.01e-01  -3.18e-01 -1.74e-01    -3.18e-02
+## raceNative American         1.36e-01   2.45e-01  2.22e-01     2.19e-01
+## raceOther                  -6.38e-02  -1.77e-01 -1.33e-01    -3.46e-02
+## marriedCurrently married   -5.29e-01  -4.77e-01 -4.85e-01    -5.13e-01
+## marriedPreviously married   4.16e-02   4.13e-02  5.71e-02     1.10e-01
+##                            b[&gt;Severe] Chisquare df Pr(&gt;Chisq)    
+## Overall                                  168.29 96    7.3e-06 ***
+## countryCA                    1.14e-01      0.84  3      0.839    
+## countryGB                    1.77e-01      1.80  3      0.615    
+## countryID                    1.26e-02      4.70  3      0.195    
+## countryMY                   -5.16e-02      8.85  3      0.031 *  
+## countryOther                 1.05e-01      3.32  3      0.345    
+## countryPH                    1.76e-01      3.33  3      0.344    
+## educationHigh school        -1.86e-01      1.68  3      0.641    
+## educationUniversity degree  -4.25e-01      1.64  3      0.650    
+## educationGraduate degree    -5.42e-01      1.15  3      0.766    
+## urbanSuburban               -8.24e-02     10.81  3      0.013 *  
+## urbanUrban                   4.01e-03      5.40  3      0.145    
+## genderMale                  -1.50e-01      5.67  3      0.129    
+## genderOther                  2.99e-01      4.14  3      0.247    
+## age                         -2.29e-04     30.13  3    1.3e-06 ***
+## religionAgnostic             1.90e-01      3.47  3      0.325    
+## religionAtheist              2.99e-01      5.55  3      0.136    
+## religionBuddhist            -1.16e-01      4.70  3      0.195    
+## religionHindu                1.20e-01      2.20  3      0.532    
+## religionJewish              -3.46e-02      3.08  3      0.379    
+## religionMuslim              -2.39e-02      5.67  3      0.129    
+## religionOther                2.04e-01      0.20  3      0.978    
+## religionSikh                -7.04e-02      1.22  3      0.748    
+## orientationAsexual           2.06e-01      5.93  3      0.115    
+## orientationBisexual          3.62e-01      2.64  3      0.450    
+## orientationHomosexual        2.66e-01      2.27  3      0.519    
+## orientationOther             1.85e-01      1.13  3      0.770    
+## raceAsian                   -1.59e-02      8.57  3      0.036 *  
+## raceBlack                   -1.11e-02      8.62  3      0.035 *  
+## raceNative American          5.56e-02      1.39  3      0.709    
+## raceOther                    1.15e-04      9.10  3      0.028 *  
+## marriedCurrently married    -6.06e-01      6.76  3      0.080 .  
+## marriedPreviously married   -8.04e-02      8.10  3      0.044 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Because the overall <span class="math inline">\(p value &lt;
+0.001\)</span>, we reject the null hypothesis and conclude that the
+parallel assumption is not met.</p>
+<p>To meet the parallel assumption, we try the following two
+methods:</p>
+<ul>
+<li><strong>Select independent variables</strong>: Because we think
+<code>religion</code> and <code>race</code>, <code>married</code> and
+<code>orientation</code>, <code>country</code> and <code>urban</code>
+are strongly correlated with each other, and we care more about
+<code>race</code>, <code>orientation</code>, and <code>country</code>,
+first delete <code>religion</code>, <code>married</code>, and
+<code>urban</code>. We also delete <code>education</code> to meet the
+parallel assumption.</li>
+<li><strong>Regroup dependent variable</strong>: Regroup
+<code>depression_level</code> into “Moderate or Below”, “Severe”,
+“Extremely severe”.</li>
+</ul>
+<pre class="r"><code>dass_fit_df =
+  dass_fit_df |&gt; 
+  mutate(depression_level = factor(case_match(
+    depression_level,
+    &quot;Normal&quot; ~ &quot;Moderate or Below&quot;,
+    &quot;Mild&quot; ~ &quot;Moderate or Below&quot;,&quot;Moderate&quot; ~ &quot;Moderate or Below&quot;,
+    &quot;Severe&quot; ~ &quot;Severe&quot;,
+    &quot;Extremely severe&quot; ~ &quot;Extremely severe&quot;
+   ), level = c(&quot;Moderate or Below&quot;, &quot;Severe&quot;, &quot;Extremely severe&quot;)))
+
+dass_fit1 =
+  dass_fit_df |&gt; 
+  polr(depression_level ~ country + gender + age + orientation + race, data = _)
+
+dass_fit1 |&gt; poTest()</code></pre>
+<pre><code>## 
+## Tests for Proportional Odds
+## polr(formula = depression_level ~ country + gender + age + orientation + 
 ##     race, data = dass_fit_df)
 ## 
-##                       b[polr] b[&gt;Normal]  b[&gt;Mild] b[&gt;Moderate] b[&gt;Severe]
-## Overall                                                                   
-## countryGB            -0.03146   -0.02593  -0.07080     -0.07433    0.01079
-## countryID            -0.06963    0.03854  -0.09196     -0.09576   -0.09953
-## countryMY            -0.18559   -0.08874  -0.18608     -0.22906   -0.21533
-## countryOther         -0.05800   -0.10061  -0.09577     -0.05179   -0.03600
-## countryPH             0.16211    0.27984   0.28281      0.14022    0.07645
-## countryUS            -0.07699   -0.09958  -0.07731     -0.09408   -0.05844
-## urbanSuburban        -0.03508    0.00358   0.02169     -0.03634   -0.08619
-## urbanUrban            0.08169    0.11791   0.12044      0.08155    0.03820
-## religionAtheist       0.09234    0.06411   0.07253      0.03867    0.13252
-## religionBuddhist     -0.53826   -0.61986  -0.53109     -0.55401   -0.41320
-## religionChristian    -0.30913   -0.27193  -0.31549     -0.33500   -0.28976
-## religionHindu        -0.37337   -0.36939  -0.45497     -0.35892   -0.31329
-## religionJewish       -0.24760   -0.18764  -0.40027     -0.20320   -0.22486
-## religionMuslim       -0.28252   -0.23242  -0.22208     -0.29549   -0.31648
-## religionOther        -0.02405    0.00623  -0.04685     -0.05250   -0.00780
-## religionSikh         -0.30544   -0.23227  -0.13202     -0.32451   -0.40116
-## raceBlack             0.02710   -0.08384   0.01325      0.07861    0.04040
-## raceNative American   0.29821    0.52277   0.45432      0.37787    0.15322
-## raceOther             0.03129    0.02289   0.02355      0.04982    0.02449
-## raceWhite             0.01770    0.08295   0.05636      0.00876   -0.02848
-##                     Chisquare df Pr(&gt;Chisq)    
-## Overall                105.63 60    0.00025 ***
-## countryGB                1.55  3    0.67009    
-## countryID                2.28  3    0.51731    
-## countryMY                2.62  3    0.45366    
-## countryOther             0.56  3    0.90513    
-## countryPH                2.66  3    0.44748    
-## countryUS                0.53  3    0.91300    
-## urbanSuburban            9.89  3    0.01952 *  
-## urbanUrban               6.30  3    0.09795 .  
-## religionAtheist          5.28  3    0.15240    
-## religionBuddhist         4.66  3    0.19887    
-## religionChristian        2.74  3    0.43285    
-## religionHindu            3.06  3    0.38206    
-## religionJewish           3.12  3    0.37363    
-## religionMuslim           2.51  3    0.47271    
-## religionOther            1.62  3    0.65408    
-## religionSikh             0.83  3    0.84120    
-## raceBlack                2.89  3    0.40874    
-## raceNative American      3.37  3    0.33838    
-## raceOther                1.30  3    0.72962    
-## raceWhite                3.51  3    0.31884    
+##                        b[polr] b[&gt;Moderate or Below] b[&gt;Severe] Chisquare df
+## Overall                                                             26.43 17
+## countryCA              0.17607               0.19690    0.15297      0.50  1
+## countryGB              0.20429               0.19144    0.22882      0.46  1
+## countryID             -0.03701              -0.01653   -0.06773      0.57  1
+## countryMY             -0.18594              -0.16470   -0.22038      2.40  1
+## countryOther           0.10529               0.11040    0.09276      0.30  1
+## countryPH              0.13180               0.16664    0.09162      1.01  1
+## genderMale            -0.10458              -0.10721   -0.10290      0.04  1
+## genderOther            0.38262               0.38336    0.38755      0.00  1
+## age                   -0.02532              -0.02674   -0.02206     17.25  1
+## orientationAsexual     0.22638               0.23486    0.22828      0.03  1
+## orientationBisexual    0.40403               0.40507    0.40757      0.01  1
+## orientationHomosexual  0.29795               0.28623    0.30345      0.17  1
+## orientationOther       0.22051               0.23073    0.21375      0.27  1
+## raceAsian             -0.15662              -0.17315   -0.13328      1.31  1
+## raceBlack             -0.08899              -0.07969   -0.07401      0.01  1
+## raceNative American    0.10589               0.19327    0.02714      1.40  1
+## raceOther             -0.10281              -0.11014   -0.09253      0.24  1
+##                       Pr(&gt;Chisq)    
+## Overall                    0.067 .  
+## countryCA                  0.480    
+## countryGB                  0.496    
+## countryID                  0.451    
+## countryMY                  0.121    
+## countryOther               0.584    
+## countryPH                  0.316    
+## genderMale                 0.850    
+## genderOther                0.960    
+## age                      3.3e-05 ***
+## orientationAsexual         0.873    
+## orientationBisexual        0.929    
+## orientationHomosexual      0.678    
+## orientationOther           0.601    
+## raceAsian                  0.252    
+## raceBlack                  0.942    
+## raceNative American        0.236    
+## raceOther                  0.627    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>Because the overall p value &lt; 0.001, we reject the null hypothesis
-and conclude that the parallel assumption is not met.</p>
-<p>Therefore, we regroup the dependent variable into “Moderate or
-Below”, “Severe”, “Extremely severe” and refit the model.</p>
-<pre class="r"><code>dass_fit3 =
-  dass_fit_df |&gt; 
-  mutate(depression_level = factor(case_match(
-    depression_level,
-    &quot;Normal&quot; ~ &quot;Moderate or Below&quot;,
-    &quot;Mild&quot; ~ &quot;Moderate or Below&quot;,&quot;Moderate&quot; ~ &quot;Moderate or Below&quot;,
-    &quot;Severe&quot; ~ &quot;Severe&quot;,
-    &quot;Extremely severe&quot; ~ &quot;Extremely severe&quot;
-   ), level = c(&quot;Moderate or Below&quot;, &quot;Severe&quot;, &quot;Extremely severe&quot;))) |&gt; 
-  polr(depression_level ~ country + urban + religion + race, data = _)
-
-dass_fit3 |&gt;  summary()</code></pre>
-<pre><code>## 
-## Re-fitting to get Hessian</code></pre>
-<pre><code>## Call:
-## polr(formula = depression_level ~ country + urban + religion + 
-##     race, data = mutate(dass_fit_df, depression_level = factor(case_match(depression_level, 
-##     &quot;Normal&quot; ~ &quot;Moderate or Below&quot;, &quot;Mild&quot; ~ &quot;Moderate or Below&quot;, 
-##     &quot;Moderate&quot; ~ &quot;Moderate or Below&quot;, &quot;Severe&quot; ~ &quot;Severe&quot;, &quot;Extremely severe&quot; ~ 
-##         &quot;Extremely severe&quot;), level = c(&quot;Moderate or Below&quot;, &quot;Severe&quot;, 
-##     &quot;Extremely severe&quot;))))
-## 
-## Coefficients:
-##                        Value Std. Error t value
-## countryGB           -0.03660    0.09403 -0.3893
-## countryID           -0.09634    0.10432 -0.9235
-## countryMY           -0.22209    0.08193 -2.7108
-## countryOther        -0.04462    0.07496 -0.5953
-## countryPH            0.11330    0.11074  1.0232
-## countryUS           -0.07665    0.07335 -1.0450
-## urbanSuburban       -0.05650    0.03086 -1.8307
-## urbanUrban           0.06518    0.02936  2.2201
-## religionAtheist      0.08634    0.05200  1.6602
-## religionBuddhist    -0.50464    0.10704 -4.7146
-## religionChristian   -0.31481    0.04723 -6.6658
-## religionHindu       -0.33588    0.09653 -3.4795
-## religionJewish      -0.20686    0.19126 -1.0816
-## religionMuslim      -0.30041    0.05781 -5.1964
-## religionOther       -0.03222    0.06432 -0.5010
-## religionSikh        -0.35710    0.28876 -1.2367
-## raceBlack            0.06498    0.09923  0.6548
-## raceNative American  0.25457    0.15262  1.6680
-## raceOther            0.04027    0.03602  1.1181
-## raceWhite           -0.00544    0.04580 -0.1188
-## 
-## Intercepts:
-##                          Value   Std. Error t value
-## Moderate or Below|Severe -0.3607  0.0887    -4.0677
-## Severe|Extremely severe   0.3248  0.0887     3.6629
-## 
-## Residual Deviance: 60767.39 
-## AIC: 60811.39</code></pre>
-<pre class="r"><code>dass_fit3 |&gt; poTest()</code></pre>
-<pre><code>## 
-## Tests for Proportional Odds
-## polr(formula = depression_level ~ country + urban + religion + 
-##     race, data = mutate(dass_fit_df, depression_level = factor(case_match(depression_level, 
-##     &quot;Normal&quot; ~ &quot;Moderate or Below&quot;, &quot;Mild&quot; ~ &quot;Moderate or Below&quot;, 
-##     &quot;Moderate&quot; ~ &quot;Moderate or Below&quot;, &quot;Severe&quot; ~ &quot;Severe&quot;, &quot;Extremely severe&quot; ~ 
-##         &quot;Extremely severe&quot;), level = c(&quot;Moderate or Below&quot;, &quot;Severe&quot;, 
-##     &quot;Extremely severe&quot;))))
-## 
-##                      b[polr] b[&gt;Moderate or Below] b[&gt;Severe] Chisquare df
-## Overall                                                           27.54 20
-## countryGB           -0.03660              -0.07433    0.01079      1.28  1
-## countryID           -0.09634              -0.09576   -0.09953      0.00  1
-## countryMY           -0.22209              -0.22906   -0.21533      0.04  1
-## countryOther        -0.04462              -0.05179   -0.03600      0.07  1
-## countryPH            0.11330               0.14022    0.07645      0.48  1
-## countryUS           -0.07665              -0.09408   -0.05844      0.35  1
-## urbanSuburban       -0.05650              -0.03634   -0.08619      3.87  1
-## urbanUrban           0.06518               0.08155    0.03820      3.26  1
-## religionAtheist      0.08634               0.03867    0.13252      4.96  1
-## religionBuddhist    -0.50464              -0.55401   -0.41320      2.98  1
-## religionChristian   -0.31481              -0.33500   -0.28976      1.33  1
-## religionHindu       -0.33588              -0.35892   -0.31329      0.34  1
-## religionJewish      -0.20686              -0.20320   -0.22486      0.02  1
-## religionMuslim      -0.30041              -0.29549   -0.31648      0.19  1
-## religionOther       -0.03222              -0.05250   -0.00780      0.72  1
-## religionSikh        -0.35710              -0.32451   -0.40116      0.09  1
-## raceBlack            0.06498               0.07861    0.04040      0.22  1
-## raceNative American  0.25457               0.37787    0.15322      2.58  1
-## raceOther            0.04027               0.04982    0.02449      0.70  1
-## raceWhite           -0.00544               0.00876   -0.02848      1.00  1
-##                     Pr(&gt;Chisq)  
-## Overall                  0.121  
-## countryGB                0.258  
-## countryID                0.965  
-## countryMY                0.839  
-## countryOther             0.798  
-## countryPH                0.490  
-## countryUS                0.556  
-## urbanSuburban            0.049 *
-## urbanUrban               0.071 .
-## religionAtheist          0.026 *
-## religionBuddhist         0.084 .
-## religionChristian        0.248  
-## religionHindu            0.560  
-## religionJewish           0.895  
-## religionMuslim           0.659  
-## religionOther            0.396  
-## religionSikh             0.762  
-## raceBlack                0.638  
-## raceNative American      0.108  
-## raceOther                0.403  
-## raceWhite                0.317  
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>Generally speaking, the model meets the parallel assumption (with an
-overall p = 0.121). But there exist several individual predictors that
-do not meet parallel assumption (e.g., <code>urbanSuburban</code> with p
-= 0.049 and <code>religionAtheist</code> with p = 0.026). Since the
-<code>country</code> variable itself contains information about region
-and area, we want to remove the group for urban and suburban and run the
-parallel assumption again.</p>
-<p>Utilizing PCA to test if <code>urban</code> variable can be
-deleted:</p>
-<pre class="r"><code>selected_data &lt;- dass_fit_df[, c(&quot;education&quot;, &quot;urban&quot;, &quot;age&quot;, &quot;religion&quot;, &quot;race&quot;)]
-scaled_encoded_data &lt;- scale(model.matrix(~ . - 1, data = selected_data))
-pca_result &lt;- prcomp(scaled_encoded_data, center = TRUE, scale. = TRUE)
-summary(pca_result)</code></pre>
-<pre><code>## Importance of components:
-##                          PC1     PC2     PC3     PC4     PC5     PC6     PC7
-## Standard deviation     1.583 1.33414 1.25585 1.18544 1.11306 1.09676 1.04073
-## Proportion of Variance 0.132 0.09368 0.08301 0.07396 0.06521 0.06331 0.05701
-## Cumulative Proportion  0.132 0.22563 0.30863 0.38260 0.44780 0.51111 0.56812
-##                            PC8     PC9    PC10   PC11    PC12    PC13    PC14
-## Standard deviation     1.01330 1.01272 1.00470 1.0016 0.99527 0.99360 0.95833
-## Proportion of Variance 0.05404 0.05398 0.05313 0.0528 0.05214 0.05196 0.04834
-## Cumulative Proportion  0.62216 0.67614 0.72927 0.7821 0.83420 0.88616 0.93450
-##                           PC15    PC16    PC17    PC18      PC19
-## Standard deviation     0.70025 0.58764 0.55051 0.32522 2.754e-13
-## Proportion of Variance 0.02581 0.01817 0.01595 0.00557 0.000e+00
-## Cumulative Proportion  0.96031 0.97848 0.99443 1.00000 1.000e+00</code></pre>
-<pre class="r"><code>pca_result$rotation</code></pre>
-<pre><code>##                                          PC1          PC2          PC3
-## educationGraduate degree       -0.0138492620 -0.176781618  0.330434046
-## educationHigh school            0.1599055118  0.465783921 -0.333755895
-## educationLess than high school  0.2639246863  0.064978917 -0.072886974
-## educationUniversity degree     -0.3100382577 -0.378955326  0.146794810
-## urbanSuburban                   0.1020474706 -0.446461141 -0.499389837
-## urbanUrban                     -0.0795872776  0.465209450  0.491487403
-## age                             0.0444803909 -0.388262474  0.396692035
-## religionAtheist                 0.2839255472 -0.001881924 -0.023457189
-## religionBuddhist                0.0172002765  0.004329031  0.082949735
-## religionChristian               0.3180113127 -0.055841239  0.145422153
-## religionHindu                  -0.0009876423  0.006606010  0.168850033
-## religionJewish                  0.0552974081 -0.032748010 -0.008692955
-## religionMuslim                 -0.5557906167  0.045785119 -0.181514278
-## religionOther                   0.1464202102  0.022413016  0.072085145
-## religionSikh                    0.0019153492  0.007688779  0.039935152
-## raceBlack                       0.0746463039  0.039452342  0.019677192
-## raceNative American             0.0553749393  0.045081368 -0.008986844
-## raceOther                      -0.0889398812  0.100167803 -0.002259211
-## raceWhite                       0.5076791161 -0.130124275  0.082876361
-##                                         PC4          PC5          PC6
-## educationGraduate degree       -0.487845032  0.246818770 -0.403456784
-## educationHigh school           -0.393866580 -0.128619983  0.301157342
-## educationLess than high school  0.459949435  0.148594834 -0.506107195
-## educationUniversity degree      0.446440379 -0.133913851  0.289591291
-## urbanSuburban                  -0.128375306 -0.020284928 -0.124654789
-## urbanUrban                      0.150151018  0.035175042  0.079679601
-## age                            -0.316259727 -0.059033212  0.225200182
-## religionAtheist                 0.139086360  0.546820687  0.192095804
-## religionBuddhist               -0.025360324  0.015891645 -0.017283098
-## religionChristian               0.034599786 -0.592693004 -0.096653561
-## religionHindu                  -0.150097266  0.075296237 -0.239719547
-## religionJewish                  0.005640256  0.076304692 -0.015141248
-## religionMuslim                 -0.052795086  0.088855515 -0.005549942
-## religionOther                  -0.034331999 -0.015321465  0.071404234
-## religionSikh                   -0.021741301  0.029734158 -0.098751515
-## raceBlack                       0.014845791 -0.421772829 -0.154249853
-## raceNative American             0.066069153 -0.102952458 -0.181526500
-## raceOther                      -0.022892686 -0.006465726 -0.289744497
-## raceWhite                       0.060609239  0.133418632  0.272217507
-##                                         PC7          PC8          PC9
-## educationGraduate degree       -0.121821035 -0.204426369 -0.016554014
-## educationHigh school            0.006423277  0.073546629 -0.010186007
-## educationLess than high school -0.017732415 -0.091818649 -0.028027530
-## educationUniversity degree      0.088659423  0.124499792  0.038649886
-## urbanSuburban                   0.050174138  0.088250449 -0.001619651
-## urbanUrban                     -0.039731102 -0.043010536 -0.000935442
-## age                             0.067110948 -0.026528304  0.013754638
-## religionAtheist                -0.125885343  0.116533838  0.161814459
-## religionBuddhist                0.060461934  0.603718853 -0.697947678
-## religionChristian              -0.283026760  0.003446037  0.077889593
-## religionHindu                   0.028854205  0.380590425  0.104517532
-## religionJewish                  0.035277836 -0.297183542 -0.328602373
-## religionMuslim                 -0.096571614 -0.223098859 -0.009214158
-## religionOther                   0.841089601 -0.182304063  0.046016372
-## religionSikh                    0.039408216  0.156086262  0.137311170
-## raceBlack                       0.015228432 -0.026199563  0.118595363
-## raceNative American             0.188423972 -0.281378260 -0.433831582
-## raceOther                       0.333738642  0.337024233  0.366880093
-## raceWhite                      -0.035096698 -0.080475018  0.030538389
-##                                        PC10         PC11          PC12
-## educationGraduate degree       -0.040026936  0.172947058 -0.0847673794
-## educationHigh school            0.037753266 -0.068069339  0.0613221148
-## educationLess than high school -0.024272744  0.080504059 -0.1240570810
-## educationUniversity degree      0.005086377 -0.101259707  0.0736017729
-## urbanSuburban                  -0.020994016 -0.014628988  0.0004433456
-## urbanUrban                      0.013074315 -0.000100618 -0.0341405344
-## age                             0.060969029  0.011734419  0.0335291757
-## religionAtheist                -0.116191841  0.054185608  0.0838778778
-## religionBuddhist                0.007386096  0.232688511 -0.2137794909
-## religionChristian               0.165723619 -0.057887497  0.0699112009
-## religionHindu                  -0.331384518 -0.577540063  0.2315075519
-## religionJewish                  0.481214450 -0.540129266 -0.3696066981
-## religionMuslim                 -0.021499540  0.096068588 -0.0477830817
-## religionOther                  -0.127772191  0.122982308 -0.1143963988
-## religionSikh                    0.584461103  0.404658505  0.3378775614
-## raceBlack                      -0.337933429  0.202310449 -0.3234462013
-## raceNative American            -0.078945975 -0.064398027  0.6923121814
-## raceOther                       0.359013153 -0.171603422 -0.0643955975
-## raceWhite                       0.043834576 -0.004462711 -0.0231457991
-##                                        PC13         PC14         PC15
-## educationGraduate degree       -0.081636633  0.020606887 -0.348088586
-## educationHigh school            0.016801717  0.029650739  0.138516029
-## educationLess than high school -0.018712467 -0.189501155  0.469163981
-## educationUniversity degree      0.051204044  0.072122461 -0.183200166
-## urbanSuburban                   0.030453728  0.014510782 -0.034819857
-## urbanUrban                      0.009437702  0.018567274 -0.002743410
-## age                            -0.076616632  0.135224599  0.682614396
-## religionAtheist                -0.008547939  0.479145060 -0.125912785
-## religionBuddhist               -0.076421587  0.006019892 -0.012799886
-## religionChristian              -0.214762548 -0.126477547 -0.200733041
-## religionHindu                   0.385911983 -0.192415925  0.058353948
-## religionJewish                  0.276157737  0.205478911 -0.056195636
-## religionMuslim                 -0.021845543 -0.049546013  0.214147703
-## religionOther                   0.064148917 -0.221544634 -0.156523748
-## religionSikh                    0.563559627 -0.042952737  0.006052858
-## raceBlack                       0.402845688  0.556365147  0.054992495
-## raceNative American            -0.119392966  0.349963787  0.013932672
-## raceOther                      -0.454685786  0.328995188  0.044284535
-## raceWhite                      -0.022290227 -0.142296005  0.018396080
-##                                        PC16         PC17         PC18
-## educationGraduate degree        0.016069736  0.070020474  0.003036629
-## educationHigh school           -0.013600493 -0.035337354 -0.003504029
-## educationLess than high school -0.005754751 -0.104446943 -0.003285150
-## educationUniversity degree      0.005882493  0.050407379  0.003379150
-## urbanSuburban                  -0.696172144  0.097044922 -0.032420547
-## urbanUrban                     -0.692023383  0.144004416 -0.026718438
-## age                            -0.069721929 -0.172829221  0.021533053
-## religionAtheist                -0.032445692 -0.385269749 -0.299162064
-## religionBuddhist                0.031564307  0.009715286 -0.171219449
-## religionChristian              -0.043301187 -0.314916674 -0.432934704
-## religionHindu                   0.038394331  0.027193448 -0.201595185
-## religionJewish                  0.006653718 -0.086860064 -0.054963310
-## religionMuslim                  0.025445706  0.099241614 -0.717560655
-## religionOther                  -0.026772514 -0.223961583 -0.224626915
-## religionSikh                    0.010923171  0.006194786 -0.057621119
-## raceBlack                       0.066497642  0.182962499 -0.055688035
-## raceNative American             0.012736550  0.126013158 -0.037100323
-## raceOther                       0.058536188  0.224897743 -0.067356247
-## raceWhite                       0.127040458  0.710218224 -0.264828954
-##                                         PC19
-## educationGraduate degree        4.106727e-01
-## educationHigh school            5.886811e-01
-## educationLess than high school  3.629200e-01
-## educationUniversity degree      5.942150e-01
-## urbanSuburban                  -9.020562e-17
-## urbanUrban                      2.553079e-15
-## age                            -2.498002e-15
-## religionAtheist                -6.938894e-17
-## religionBuddhist               -5.134781e-16
-## religionChristian               3.164136e-15
-## religionHindu                  -7.216450e-16
-## religionJewish                  1.008308e-16
-## religionMuslim                 -2.726985e-15
-## religionOther                   5.297845e-15
-## religionSikh                   -2.428613e-16
-## raceBlack                      -1.679212e-15
-## raceNative American            -1.058181e-15
-## raceOther                       2.081668e-17
-## raceWhite                      -2.928213e-15</code></pre>
-<p><code>urban</code> has relatively low absolute loadings compared to
-other variables, suggesting that it contributes less to the derived
-components and might not be essential in capturing variance. Then we
-will go back to try parallel assumption after deleting the
-<code>urban</code> variable.</p>
-<pre class="r"><code>dass_fit4 =
-  dass_fit_df |&gt; 
-  mutate(depression_level = factor(case_match(
-    depression_level,
-    &quot;Normal&quot; ~ &quot;Moderate or Below&quot;,
-    &quot;Mild&quot; ~ &quot;Moderate or Below&quot;,&quot;Moderate&quot; ~ &quot;Moderate or Below&quot;,
-    &quot;Severe&quot; ~ &quot;Severe&quot;,
-    &quot;Extremely severe&quot; ~ &quot;Extremely severe&quot;
-   ), level = c(&quot;Moderate or Below&quot;, &quot;Severe&quot;, &quot;Extremely severe&quot;))) |&gt; 
-  polr(depression_level ~ country + religion + race, data = _)
-
-dass_fit4 |&gt;  summary()</code></pre>
-<pre><code>## 
-## Re-fitting to get Hessian</code></pre>
-<pre><code>## Call:
-## polr(formula = depression_level ~ country + religion + race, 
-##     data = mutate(dass_fit_df, depression_level = factor(case_match(depression_level, 
-##         &quot;Normal&quot; ~ &quot;Moderate or Below&quot;, &quot;Mild&quot; ~ &quot;Moderate or Below&quot;, 
-##         &quot;Moderate&quot; ~ &quot;Moderate or Below&quot;, &quot;Severe&quot; ~ &quot;Severe&quot;, 
-##         &quot;Extremely severe&quot; ~ &quot;Extremely severe&quot;), level = c(&quot;Moderate or Below&quot;, 
-##         &quot;Severe&quot;, &quot;Extremely severe&quot;))))
-## 
-## Coefficients:
-##                        Value Std. Error t value
-## countryGB           -0.03082    0.09400 -0.3279
-## countryID           -0.08591    0.10426 -0.8240
-## countryMY           -0.22549    0.08188 -2.7540
-## countryOther        -0.03515    0.07492 -0.4692
-## countryPH            0.12581    0.11066  1.1369
-## countryUS           -0.08975    0.07328 -1.2247
-## religionAtheist      0.09151    0.05198  1.7604
-## religionBuddhist    -0.49071    0.10696 -4.5876
-## religionChristian   -0.30773    0.04716 -6.5254
-## religionHindu       -0.32297    0.09645 -3.3488
-## religionJewish      -0.20934    0.19124 -1.0946
-## religionMuslim      -0.29519    0.05775 -5.1115
-## religionOther       -0.01759    0.06422 -0.2739
-## religionSikh        -0.34153    0.28845 -1.1840
-## raceBlack            0.06513    0.09918  0.6567
-## raceNative American  0.25846    0.15253  1.6945
-## raceOther            0.04279    0.03600  1.1887
-## raceWhite           -0.01590    0.04563 -0.3483
-## 
-## Intercepts:
-##                          Value   Std. Error t value
-## Moderate or Below|Severe -0.3701  0.0850    -4.3548
-## Severe|Extremely severe   0.3149  0.0850     3.7066
-## 
-## Residual Deviance: 60790.82 
-## AIC: 60830.82</code></pre>
-<pre class="r"><code>dass_fit4 |&gt; poTest()</code></pre>
-<pre><code>## 
-## Tests for Proportional Odds
-## polr(formula = depression_level ~ country + religion + race, 
-##     data = mutate(dass_fit_df, depression_level = factor(case_match(depression_level, 
-##         &quot;Normal&quot; ~ &quot;Moderate or Below&quot;, &quot;Mild&quot; ~ &quot;Moderate or Below&quot;, 
-##         &quot;Moderate&quot; ~ &quot;Moderate or Below&quot;, &quot;Severe&quot; ~ &quot;Severe&quot;, 
-##         &quot;Extremely severe&quot; ~ &quot;Extremely severe&quot;), level = c(&quot;Moderate or Below&quot;, 
-##         &quot;Severe&quot;, &quot;Extremely severe&quot;))))
-## 
-##                       b[polr] b[&gt;Moderate or Below] b[&gt;Severe] Chisquare df
-## Overall                                                            23.20 18
-## countryGB           -0.030823             -0.069507   0.015727      1.28  1
-## countryID           -0.085913             -0.086646  -0.089064      0.00  1
-## countryMY           -0.225489             -0.234624  -0.216297      0.07  1
-## countryOther        -0.035154             -0.043236  -0.027324      0.07  1
-## countryPH            0.125812              0.150325   0.091937      0.40  1
-## countryUS           -0.089750             -0.107252  -0.072212      0.34  1
-## religionAtheist      0.091510              0.043574   0.137909      5.02  1
-## religionBuddhist    -0.490705             -0.541507  -0.400292      3.00  1
-## religionChristian   -0.307726             -0.329274  -0.281052      1.52  1
-## religionHindu       -0.322975             -0.346518  -0.299033      0.37  1
-## religionJewish      -0.209340             -0.202130  -0.228912      0.03  1
-## religionMuslim      -0.295185             -0.292336  -0.310068      0.14  1
-## religionOther       -0.017593             -0.039712   0.007577      0.81  1
-## religionSikh        -0.341528             -0.309367  -0.384592      0.09  1
-## raceBlack            0.065130              0.079599   0.040750      0.23  1
-## raceNative American  0.258458              0.377497   0.160406      2.42  1
-## raceOther            0.042794              0.052419   0.027966      0.65  1
-## raceWhite           -0.015896             -0.003753  -0.035744      0.75  1
-##                     Pr(&gt;Chisq)  
-## Overall                  0.183  
-## countryGB                0.257  
-## countryID                0.978  
-## countryMY                0.786  
-## countryOther             0.797  
-## countryPH                0.527  
-## countryUS                0.562  
-## religionAtheist          0.025 *
-## religionBuddhist         0.083 .
-## religionChristian        0.218  
-## religionHindu            0.543  
-## religionJewish           0.870  
-## religionMuslim           0.709  
-## religionOther            0.368  
-## religionSikh             0.766  
-## raceBlack                0.632  
-## raceNative American      0.120  
-## raceOther                0.419  
-## raceWhite                0.387  
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>The model meets the parallel assumption now and has only 1 predictor
-that does not meet parallel assumption.</p>
-<p>At this stage, we would like to model the regression line for the
-selected variables.</p>
-<pre class="r"><code>dass_fit_df$depression_level_numeric &lt;- as.numeric(factor(
-  dass_fit_df$depression_level,
-  levels = c(&quot;Moderate or Below&quot;, &quot;Severe&quot;, &quot;Extremely severe&quot;),
-  labels = c(1, 2, 3)
-))
-
-model &lt;- lm(depression_level_numeric ~ country + religion + race - 1, data = dass_fit_df)
-summary(model)</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = depression_level_numeric ~ country + religion + 
-##     race - 1, data = dass_fit_df)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -0.7801 -0.6458  0.3052  0.3542  0.3974 
-## 
-## Coefficients:
-##                      Estimate Std. Error t value Pr(&gt;|t|)    
-## countryCA            2.705455   0.028101  96.277  &lt; 2e-16 ***
-## countryGB            2.735444   0.027724  98.668  &lt; 2e-16 ***
-## countryID            2.694361   0.029004  92.897  &lt; 2e-16 ***
-## countryMY            2.688766   0.019694 136.525  &lt; 2e-16 ***
-## countryOther         2.708910   0.018569 145.886  &lt; 2e-16 ***
-## countryPH            2.699285   0.029462  91.618  &lt; 2e-16 ***
-## countryUS            2.709860   0.019096 141.907  &lt; 2e-16 ***
-## religionAtheist      0.044602   0.016964   2.629  0.00857 ** 
-## religionBuddhist     0.005059   0.038134   0.133  0.89445    
-## religionChristian   -0.017347   0.015808  -1.097  0.27252    
-## religionHindu       -0.018723   0.033346  -0.561  0.57449    
-## religionJewish      -0.035985   0.065605  -0.549  0.58335    
-## religionMuslim      -0.042927   0.019476  -2.204  0.02753 *  
-## religionOther        0.014851   0.021173   0.701  0.48306    
-## religionSikh        -0.071164   0.101131  -0.704  0.48165    
-## raceBlack           -0.008792   0.033472  -0.263  0.79281    
-## raceNative American -0.043231   0.049085  -0.881  0.37848    
-## raceOther           -0.005018   0.012584  -0.399  0.69009    
-## raceWhite           -0.015097   0.015459  -0.977  0.32877    
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 0.4682 on 15104 degrees of freedom
-##   (15186 observations deleted due to missingness)
-## Multiple R-squared:  0.9703, Adjusted R-squared:  0.9702 
-## F-statistic: 2.594e+04 on 19 and 15104 DF,  p-value: &lt; 2.2e-16</code></pre>
-</div>
-<div id="other-variable-selection-methods" class="section level2">
-<h2>Other Variable Selection Methods</h2>
-<p>Use the model generated by stepwise regression / AIC
-optimization.</p>
-<pre class="r"><code>dass_fit_step = 
-  polr(formula = depression_level ~ country + education + urban + 
-    gender + age + religion + orientation + married, data = dass_fit_df)
-
-dass_fit_step |&gt; summary()</code></pre>
-<pre><code>## 
-## Re-fitting to get Hessian</code></pre>
-<pre><code>## Call:
-## polr(formula = depression_level ~ country + education + urban + 
-##     gender + age + religion + orientation + married, data = dass_fit_df)
-## 
-## Coefficients:
-##                                    Value Std. Error  t value
-## countryGB                       0.026293   0.090838  0.28945
-## countryID                      -0.149925   0.097848 -1.53222
-## countryMY                      -0.195490   0.077349 -2.52736
-## countryOther                   -0.057339   0.072628 -0.78950
-## countryPH                       0.051250   0.102526  0.49987
-## countryUS                      -0.148052   0.071015 -2.08481
-## educationHigh school            0.383238   0.036283 10.56239
-## educationLess than high school  0.536805   0.052227 10.27835
-## educationUniversity degree      0.154375   0.033827  4.56367
-## urbanSuburban                  -0.030841   0.029101 -1.05980
-## urbanUrban                      0.041000   0.027654  1.48257
-## genderMale                     -0.165880   0.025992 -6.38203
-## genderOther                     0.341261   0.096089  3.55149
-## age                            -0.007152   0.001857 -3.85105
-## religionAtheist                 0.077083   0.050775  1.51814
-## religionBuddhist               -0.434367   0.098221 -4.42234
-## religionChristian              -0.194524   0.046014 -4.22747
-## religionHindu                  -0.137246   0.089886 -1.52689
-## religionJewish                 -0.221032   0.186334 -1.18621
-## religionMuslim                 -0.199948   0.053842 -3.71364
-## religionOther                   0.002096   0.062601  0.03348
-## religionSikh                   -0.203598   0.272514 -0.74711
-## orientationAsexual              0.173537   0.046809  3.70738
-## orientationBisexual             0.376005   0.032800 11.46342
-## orientationHomosexual           0.286893   0.048017  5.97478
-## orientationOther                0.196562   0.036225  5.42617
-## marriedNever married            0.527682   0.040743 12.95161
-## marriedPreviously married       0.573186   0.073915  7.75470
-## 
-## Intercepts:
-##                         Value   Std. Error t value
-## Normal|Mild             -0.9464  0.1145    -8.2668
-## Mild|Moderate           -0.4412  0.1144    -3.8578
-## Moderate|Severe          0.3372  0.1143     2.9487
-## Severe|Extremely severe  1.0404  0.1145     9.0893
-## 
-## Residual Deviance: 91347.43 
-## AIC: 91411.43</code></pre>
+<p>The model meets the parallel assumption at <span
+class="math inline">\(\alpha=0.05\)</span> level (with an overall <span
+class="math inline">\(p = 0.067 &gt; 0.05\)</span>).</p>
 </div>
 <div id="graphs-based-on-current-regression-models"
 class="section level2">
 <h2>Graphs Based On Current Regression Models</h2>
-<pre class="r"><code>library(pROC)</code></pre>
-<pre><code>## Warning: package &#39;pROC&#39; was built under R version 4.3.2</code></pre>
-<pre><code>## Type &#39;citation(&quot;pROC&quot;)&#39; for a citation.</code></pre>
-<pre><code>## 
-## Attaching package: &#39;pROC&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     cov, smooth, var</code></pre>
-<pre class="r"><code># Predicting probabilities for all classes
-predicted_probs &lt;- predict(dass_fit_step, type = &quot;probs&quot;)
+<pre class="r"><code>library(pROC)
+
+# Predicting probabilities for all classes
+predicted_probs &lt;- predict(dass_fit1, type = &quot;probs&quot;)
 
 # Extracting the response variable
 response &lt;- ifelse(dass_fit_df$depression_level == &quot;Moderate or Below&quot;, 1,
                    ifelse(dass_fit_df$depression_level == &quot;Severe&quot;, 2, 3))
 
 # Calculating ROC curve for Severe (class 2)
-roc_obj &lt;- roc(as.numeric(response == 2), predicted_probs[, &quot;Severe&quot;])</code></pre>
-<pre><code>## Setting levels: control = 0, case = 1</code></pre>
-<pre><code>## Setting direction: controls &lt; cases</code></pre>
-<pre class="r"><code># Plotting ROC curve
+roc_obj &lt;- roc(as.numeric(response == 1), predicted_probs[, &quot;Moderate or Below&quot;])
+
+# Plotting ROC curve
 plot(roc_obj, col = &quot;blue&quot;, main = &quot;ROC Curve for Severe Depression Level&quot;)</code></pre>
-<p><img src="logit_models_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
+<p><img src="logit_models_files/figure-html/unnamed-chunk-6-1.png" width="90%" /></p>
 <pre class="r"><code># Extract coefficients for countries
+pos_country = str_starts(names(dass_fit1$coefficients), &quot;country&quot;)
+
 country_coefficients &lt;- data.frame(
-  country = c(&quot;GB&quot;, &quot;ID&quot;, &quot;MY&quot;, &quot;Other&quot;, &quot;PH&quot;, &quot;US&quot;),
-  coefficient = c(0.026293, -0.149925, -0.195490, -0.057339, 0.051250, -0.148052)
+  country = substr(names(dass_fit1$coefficients)[pos_country], 8, 20),
+  coefficient = dass_fit1$coefficients[pos_country]
 )
 
 # Plotting coefficients for countries
 ggplot(country_coefficients, aes(x = country, y = coefficient)) +
   geom_bar(stat = &quot;identity&quot;, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
   labs(title = &quot;Effect of Countries on Depression Levels&quot;, x = &quot;Country&quot;, y = &quot;Coefficient&quot;)</code></pre>
-<p><img src="logit_models_files/figure-html/unnamed-chunk-12-1.png" width="90%" /></p>
-<pre class="r"><code>library(effects)</code></pre>
-<pre><code>## Warning: package &#39;effects&#39; was built under R version 4.3.2</code></pre>
-<pre class="r"><code># Create a data frame with the predictor values for visualization
-predictor_data &lt;- model.matrix(~ country + education + urban + gender
-                               + age + religion + orientation + married,
-                               data = dass_fit_df)
+<p><img src="logit_models_files/figure-html/unnamed-chunk-7-1.png" width="90%" /></p>
+<pre class="r"><code>library(effects)
+
+# Create a data frame with the predictor values for visualization
+predictor_data &lt;- model.matrix(depression_level ~ country + gender + age + orientation + race, data = dass_fit_df)
 
 # Compute the effects
-effects &lt;- allEffects(dass_fit_step, xlevels = list(predictor_data))
+effects &lt;- allEffects(dass_fit1, xlevels = list(predictor_data))
 
 # Plot the effects
 plot(effects, style = &quot;stacked&quot;)</code></pre>
-<p><img src="logit_models_files/figure-html/unnamed-chunk-13-1.png" width="90%" /></p>
-</div>
-<div id="future-work" class="section level2">
-<h2>Future Work</h2>
-<ul>
-<li>Re-selection of independent variables. (Significant, Regroup, AIC,
-PCA)</li>
-<li>Interpretation of OR.</li>
-</ul>
+<p><img src="logit_models_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
 </div>
 
 
