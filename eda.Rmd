@@ -11,13 +11,14 @@ dass_new = read.csv("./data/dass_new.csv")
 ```
 Shiny app list here
 
+# Plot: "Distribution of Age"
 ```{r}
 # distribution histogram of age
 ggplot(dass_new, aes(x=age)) + 
     geom_histogram(binwidth=.5,
                    fill="steelblue") 
 ```
-
+# Plot: "Distribution of Race"
 ```{r}
 race_count = dass_new|>
   count(race)
@@ -28,7 +29,7 @@ ggplot(race_count, aes(x = reorder(race, -n), y = n)) +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-
+# Plot: "Distribution of Orientation"
 ```{r}
 orientation_count = dass_new|>
   count(orientation)
@@ -39,6 +40,8 @@ ggplot(orientation_count, aes(x = reorder(orientation, -n), y = n)) +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+
+
 
 # Plot: Depression Level vs. Age vs. Race
 ```{r}
