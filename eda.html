@@ -13,7 +13,7 @@
 
 <title>Exploratory Data Analysis</title>
 
-<script src="site_libs/header-attrs-2.18/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.24/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
@@ -29,12 +29,15 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -225,6 +228,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -232,6 +298,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -301,14 +377,18 @@ $(document).ready(function () {
 
 
 <p>Shiny app list here</p>
-<div id="plot-distribution-of-age" class="section level1">
-<h1>Plot: “Distribution of Age”</h1>
+<div id="plot" class="section level1">
+<h1>Plot:</h1>
+<div id="distribution-of-age" class="section level2">
+<h2>Distribution of Age</h2>
 <pre class="r"><code># distribution histogram of age
 ggplot(dass_new, aes(x=age)) + 
     geom_histogram(binwidth=.5,
                    fill=&quot;steelblue&quot;) </code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" />
-# Plot: “Distribution of Race”</p>
+<p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+</div>
+<div id="distribution-of-race" class="section level2">
+<h2>Distribution of Race</h2>
 <pre class="r"><code>race_count = dass_new|&gt;
   count(race)
 
@@ -317,8 +397,10 @@ ggplot(race_count, aes(x = reorder(race, -n), y = n)) +
   labs(title = &#39;Distribution of Race&#39;, x = &#39;Race&#39;, y = &#39;Count&#39;) +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-2-1.png" width="672" />
-# Plot: “Distribution of Orientation”</p>
+<p><img src="eda_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+<div id="distribution-of-orientation" class="section level2">
+<h2>Distribution of Orientation</h2>
 <pre class="r"><code>orientation_count = dass_new|&gt;
   count(orientation)
 
@@ -329,8 +411,47 @@ ggplot(orientation_count, aes(x = reorder(orientation, -n), y = n)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 </div>
-<div id="plot-depression-level-vs.-age-vs.-race" class="section level1">
-<h1>Plot: Depression Level vs. Age vs. Race</h1>
+<div id="age-distribution-for-each-gender" class="section level2">
+<h2>Age Distribution for Each Gender</h2>
+<pre class="r"><code>boxplot(age~gender,
+data=dass_new,
+main=&quot;Age Distribution for Each Gender&quot;,
+xlab=&quot;Gender&quot;,
+ylab=&quot;Age&quot;,
+col=&quot;pink&quot;,
+border=&quot;steelblue&quot;
+)</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="depression-level-vs.-orientation-vs.-gender"
+class="section level2">
+<h2>Depression Level vs. Orientation vs. Gender</h2>
+<pre class="r"><code>dass_new|&gt;
+  group_by(gender, orientation)|&gt;
+  summarise(Normal = sum(depression_level==&quot;Normal&quot;),
+          Mild = sum(depression_level==&quot;Mild&quot;),
+          Moderate = sum(depression_level==&quot;Moderate&quot;),
+          Severe = sum(depression_level==&quot;Severe&quot;),
+          Extremely_Severe = sum(depression_level==&quot;Extremely severe&quot;))|&gt;
+  pivot_longer(
+    Normal:Extremely_Severe,
+    names_to = &quot;Level&quot;,
+    values_to = &quot;count&quot;)|&gt;
+  mutate(Level = factor(Level, levels = unique(Level)))|&gt;
+  ggplot(aes(x = Level, y = count, fill= gender)) +
+  geom_col()+
+  theme_minimal()+
+  facet_grid(~orientation)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(x = &quot;Depression level&quot;, 
+       y = &quot;count of cases&quot;, 
+       title = &quot;Depression level vs. orientation vs. gender&quot;)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;gender&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="depression-level-vs.-age-vs.-race" class="section level2">
+<h2>Depression Level vs. Age vs. Race</h2>
 <pre class="r"><code>dass_new|&gt;
   group_by(race)|&gt;
   mutate(depression_level = factor(depression_level, 
@@ -343,10 +464,10 @@ ggplot(orientation_count, aes(x = reorder(orientation, -n), y = n)) +
        y = &quot;Race&quot;, 
        title = &quot;Depression level vs. Age vs. Race&quot;)</code></pre>
 <pre><code>## Picking joint bandwidth of 2.16</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="eda_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
-<div id="plots-depression-level-vs.-race-groups" class="section level1">
-<h1>Plots: Depression Level vs. Race groups</h1>
+<div id="depression-level-vs.-race-groups" class="section level2">
+<h2>Depression Level vs. Race groups</h2>
 <pre class="r"><code>dass_new|&gt;
   # form new race groups
   mutate(race = case_when(race == &quot;Native American&quot; ~ &quot;Other&quot;,
@@ -374,10 +495,10 @@ ggplot(orientation_count, aes(x = reorder(orientation, -n), y = n)) +
   labs(x = &quot;Depression level&quot;, 
        y = &quot;count of cases&quot;, 
        title = &quot;Depression level vs. race groups&quot;)</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="eda_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 </div>
-<div id="plot-depression-level-vs.-age-groups" class="section level1">
-<h1>Plot: Depression Level vs. Age groups</h1>
+<div id="depression-level-vs.-age-groups" class="section level2">
+<h2>Depression Level vs. Age groups</h2>
 <pre class="r"><code>dass_new|&gt;
   # form age groups
   mutate(age = case_when(age &lt;= 18 ~ &quot;teenage&quot;, 
@@ -402,11 +523,13 @@ ggplot(orientation_count, aes(x = reorder(orientation, -n), y = n)) +
   labs(x = &quot;Depression level&quot;, 
        y = &quot;count of cases&quot;, 
        title = &quot;Depression level vs. age groups&quot;)</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="eda_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 </div>
-<div id="chi-squared-test-1-age-depression-level"
-class="section level1">
-<h1>Chi-squared Test 1: Age &amp; Depression Level</h1>
+</div>
+<div id="chi-squared-test" class="section level1">
+<h1>Chi-squared Test</h1>
+<div id="age-depression-level" class="section level2">
+<h2>1: Age &amp; Depression Level</h2>
 <p>From the plot of depression level vs. age groups, we observed that
 the distribution of cases of different depression levels among different
 age groups follow a similar pattern. Thus, we would like to perform a
@@ -466,9 +589,8 @@ are the same. Since the p-value is smaller than 0.05, the null
 hypothesis is rejected. We may conclude that age is associated with
 depression levels.</p>
 </div>
-<div id="chi-squared-test-2-race-depression-level"
-class="section level1">
-<h1>Chi-squared Test 2: Race &amp; Depression Level</h1>
+<div id="race-depression-level" class="section level2">
+<h2>2: Race &amp; Depression Level</h2>
 <p>Similarly, we observed that the distribution of cases of different
 depression levels among different race groups follow a similar pattern
 from the plot of depression level vs. race groups. Thus, we would like
@@ -531,9 +653,12 @@ levels are the same. Since the p-value is smaller than 0.05, the null
 hypothesis is rejected. We may conclude that race is associated with
 depression levels.</p>
 </div>
+</div>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -571,6 +696,35 @@ $(document).ready(function () {
 });
 </script>
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
