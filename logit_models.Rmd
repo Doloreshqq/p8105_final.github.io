@@ -13,6 +13,8 @@ library(MASS)
 library(Hmisc)
 library(reshape2)
 library(car)
+library(pROC)
+library(effects)
 
 knitr::opts_chunk$set(
   fig.width = 8,
@@ -38,6 +40,7 @@ The goal is to fit an ordered logit model.
 ## Independent Variables
 
 First, test the distribution of independent variables.
+
 ```{r}
 dass_new = read_csv("data/dass_new.csv")
 
@@ -49,12 +52,12 @@ dass_new |>
 
 Some categories contain few samples. For the efficacy of the model, we regroup the independent variables following the standards below:
 
- * `country`: Group the country with less than 500 samples into "Other", and set "US" to be the reference level.
- * `education`: Order the variable by the length of education.
- * `race`: We follow [standards on race and ethnicity](https://www.govinfo.gov/content/pkg/FR-1997-10-30/pdf/97-28653.pdf) to include only "Asian", "Black", "Native American", "White", and make other categories "Other". We set "White" to be the reference level. 
- * `religion`: We conclude "Christian (Catholic)", "Christian (Mormon)", "Christian (Other)", "Christian (Protestant)" into "Christian", and set it as the reference level.
- * `orientation`: Set the "Heterosexual" to be the reference level.
- * `married`: Order the variable by marriage status.
+-   `country`: Group the country with less than 500 samples into "Other", and set "US" to be the reference level.
+-   `education`: Order the variable by the length of education.
+-   `race`: We follow [standards on race and ethnicity](https://www.govinfo.gov/content/pkg/FR-1997-10-30/pdf/97-28653.pdf) to include only "Asian", "Black", "Native American", "White", and make other categories "Other". We set "White" to be the reference level.
+-   `religion`: We conclude "Christian (Catholic)", "Christian (Mormon)", "Christian (Other)", "Christian (Protestant)" into "Christian", and set it as the reference level.
+-   `orientation`: Set the "Heterosexual" to be the reference level.
+-   `married`: Order the variable by marriage status.
 
 ```{r}
 dass_fit_df =
@@ -75,6 +78,7 @@ dass_fit_df |> summary()
 ## Model Fitting
 
 First fit a model without variables selection.
+
 ```{r}
 dass_fit = 
   dass_fit_df |> 
@@ -86,16 +90,17 @@ dass_fit =
 ```
 
 Test the parallel assumption.
+
 ```{r}
 car::poTest(dass_fit)
 ```
 
-Because the overall $p value < 0.001$, we reject the null hypothesis and conclude that the parallel assumption is not met.
+Because the overall $p-value < 0.001$, we reject the null hypothesis and conclude that the parallel assumption is not met.
 
 To meet the parallel assumption, we try the following two methods:
 
- * **Select independent variables**: Because we think `religion` and `race`, `married` and `orientation`, `country` and `urban` are strongly correlated with each other, and we care more about `race`, `orientation`, and `country`, first delete `religion`, `married`, and `urban`. We also delete `education` to meet the parallel assumption.
- * **Regroup dependent variable**: Regroup `depression_level` into "Moderate or Below", "Severe", "Extremely severe".
+-   **Select independent variables**: Because we think `religion` and `race`, `married` and `orientation`, `country` and `urban` are strongly correlated with each other, and we care more about `race`, `orientation`, and `country`, first delete `religion`, `married`, and `urban`. We also delete `education` to meet the parallel assumption.
+-   **Regroup dependent variable**: Regroup `depression_level` into "Moderate or Below", "Severe", "Extremely severe".
 
 ```{r}
 dass_fit_df =
@@ -121,13 +126,109 @@ The model meets the parallel assumption at $\alpha=0.05$ level (with an overall 
 dass_fit1 |> summary()
 ```
 
-The estimated model can be written as:
-$$logit(\hat P(Depression\: Level\leq Severe))=-0.69+0.18*I(country=CA)+0.20*I(country=GB)\\-0.04*I(country=ID)-0.19*I(country=MY)+0.13*I(country=PH)+0.11*I(country=Other)\\-0.10*I(gender=Male)+0.38*I(gender=Other)-0.03*age+0.23*I(orientation=Asexual)\\+0.40*I(orientation=Bisexual)+0.30*I(orientation=Homosexual)+0.22*I(orientation=Other)\\-0.16*I(race=Asian)-0.09*I(race=Black)+0.11*I(race=Native\:American)-0.10*I(race=Other)$$
+The estimated model can be written as: \begin{align*}
+\text{logit}(\hat P(\text{Depression Level} \leq \text{Severe})) &= -0.69 \\
+&+ 0.18 \times I(\text{country} = \text{CA}) \\
+&+ 0.20 \times I(\text{country} = \text{GB}) \\
+&- 0.04 \times I(\text{country} = \text{ID}) \\
+&- 0.19 \times I(\text{country} = \text{MY}) \\
+&+ 0.13 \times I(\text{country} = \text{PH}) \\
+&+ 0.11 \times I(\text{country} = \text{Other}) \\
+&- 0.10 \times I(\text{gender} = \text{Male}) \\
+&+ 0.38 \times I(\text{gender} = \text{Other}) \\
+&- 0.03 \times \text{age} \\
+&+ 0.23 \times I(\text{orientation} = \text{Asexual}) \\
+&+ 0.40 \times I(\text{orientation} = \text{Bisexual}) \\
+&+ 0.30 \times I(\text{orientation} = \text{Homosexual}) \\
+&+ 0.22 \times I(\text{orientation} = \text{Other}) \\
+&- 0.16 \times I(\text{race} = \text{Asian}) \\
+&- 0.09 \times I(\text{race} = \text{Black}) \\
+&+ 0.11 \times I(\text{race} = \text{Native American}) \\
+&- 0.10 \times I(\text{race} = \text{Other})
+\end{align*}
 
-$$logit(\hat P(Depression\: Level\leq Extremely\:Severe))=0.01+0.18*I(country=CA)+0.20*I(country=GB)\\-0.04*I(country=ID)-0.19*I(country=MY)+0.13*I(country=PH)+0.11*I(country=Other)\\-0.10*I(gender=Male)+0.38*I(gender=Other)-0.03*age+0.23*I(orientation=Asexual)\\+0.40*I(orientation=Bisexual)+0.30*I(orientation=Homosexual)+0.22*I(orientation=Other)\\-0.16*I(race=Asian)-0.09*I(race=Black)+0.11*I(race=Native\:American)-0.10*I(race=Other)$$
+\begin{align*}
+\text{logit}(\hat P(\text{Depression Level} \leq \text{Extremely Severe})) &= 0.01 \\
+&+ 0.18 \times I(\text{country} = \text{CA}) \\
+&+ 0.20 \times I(\text{country} = \text{GB}) \\
+&- 0.04 \times I(\text{country} = \text{ID}) \\
+&- 0.19 \times I(\text{country} = \text{MY}) \\
+&+ 0.13 \times I(\text{country} = \text{PH}) \\
+&+ 0.11 \times I(\text{country} = \text{Other}) \\
+&- 0.10 \times I(\text{gender} = \text{Male}) \\
+&+ 0.38 \times I(\text{gender} = \text{Other}) \\
+&- 0.03 \times \text{age} \\
+&+ 0.23 \times I(\text{orientation} = \text{Asexual}) \\
+&+ 0.40 \times I(\text{orientation} = \text{Bisexual}) \\
+&+ 0.30 \times I(\text{orientation} = \text{Homosexual}) \\
+&+ 0.22 \times I(\text{orientation} = \text{Other}) \\
+&- 0.16 \times I(\text{race} = \text{Asian}) \\
+&- 0.09 \times I(\text{race} = \text{Black}) \\
+&+ 0.11 \times I(\text{race} = \text{Native American}) \\
+&- 0.10 \times I(\text{race} = \text{Other})
+\end{align*}
+
+## Effect of Countries on Depression Levels
+```{r}
+# Extract coefficients for countries
+pos_country = str_starts(names(dass_fit1$coefficients), "country")
+
+country_coefficients <- data.frame(
+  country = substr(names(dass_fit1$coefficients)[pos_country], 8, 20),
+  coefficient = dass_fit1$coefficients[pos_country]
+  )
+
+# Plotting coefficients for countries
+ggplot(country_coefficients, aes(x = country, y = coefficient)) +
+  geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+  labs(title = "Effect of Countries on Depression Levels",
+       x = "Country", y = "Coefficient")
+```
+
+## Effect of Races on Depression Levels
+```{r}
+# Extract coefficients for races
+pos_race <- str_starts(names(dass_fit1$coefficients), "race")
+
+race_coefficients <- data.frame(
+  race = substr(names(dass_fit1$coefficients)[pos_race], 5, 20),
+  coefficient = dass_fit1$coefficients[pos_race]
+)
+
+# Plotting coefficients for races
+ggplot(race_coefficients, aes(x = race, y = coefficient)) +
+  geom_bar(stat = "identity", fill = "pink", color = "black") +
+  labs(
+    title = "Effect of Races on Depression Levels",
+    x = "Race",
+    y = "Coefficient"
+  )
+```
+
+## Effect of Orientations on Depression Levels
+```{r}
+# Extract coefficients for orientations
+pos_orientation <- str_starts(names(dass_fit1$coefficients), "orientation")
+
+orientation_coefficients <- data.frame(
+  orientation = substr(names(dass_fit1$coefficients)[pos_orientation], 12, 20),
+  coefficient = dass_fit1$coefficients[pos_orientation]
+)
+
+# Plotting coefficients for orientations
+ggplot(orientation_coefficients, aes(x = orientation, y = coefficient)) +
+  geom_bar(stat = "identity", fill = "palegreen", color = "black") +
+  labs(
+    title = "Effect of Orientations on Depression Levels",
+    x = "Orientation",
+    y = "Coefficient"
+  )
+```
 
 ## Interpretation
+
 Calculate the odds ratio and CI for variables:
+
 ```{r}
 exp(cbind(OR = coef(dass_fit1), confint(dass_fit1))) |> 
   knitr::kable()
@@ -135,30 +236,30 @@ exp(cbind(OR = coef(dass_fit1), confint(dass_fit1))) |>
 
 **Country**:
 
- * For Canadian, Britain, and Philippines participants, the odds of having a more severe depression level is higher than that of US participants, holding constant all other variables.
- * For Indonesia and Malaysia participants, the odds of having a more severe depression level is lower than that of US participants, holding constant all other variables.
- 
+-   For Canadian, Britain, and Philippines participants, the odds of having a more severe depression level is higher than that of US participants, holding constant all other variables.
+-   For Indonesia and Malaysia participants, the odds of having a more severe depression level is lower than that of US participants, holding constant all other variables.
+
 **Gender**:
 
- * For male participants, the odds of having a more severe depression level is 0.90 times that of female participants, holding constant all other variables.
- * For non-binary participants, the odds of having a more severe depression level is 1.47 times that of female participants, holding constant all other variables.
- 
+-   For male participants, the odds of having a more severe depression level is 0.90 times that of female participants, holding constant all other variables.
+-   For non-binary participants, the odds of having a more severe depression level is 1.47 times that of female participants, holding constant all other variables.
+
 **Age**:
 
- * For every one unit increase in participant's age, the odds of having a more severe depression level is multiplied 0.98 times, holding constant all other variables. It indicates that older people may have less risk to get depressed.
- 
+-   For every one unit increase in participant's age, the odds of having a more severe depression level is multiplied 0.98 times, holding constant all other variables. It indicates that older people may have less risk to get depressed.
+
 **Orientation**:
 
- * For sexual minorities, the odds of having a more severe depression level is higher than that of heterosexual orientation participants, holding constant all other variables.
- 
+-   For sexual minorities, the odds of having a more severe depression level is higher than that of heterosexual orientation participants, holding constant all other variables.
+
 **Race**:
 
- * For Native American participants, the odds of having a more severe depression level is higher than that of White participants, holding constant all other variables.
- * For Asian, Black, and Other participants, the odds of having a more severe depression level is lower than that of White participants, holding constant all other variables.
+-   For Native American participants, the odds of having a more severe depression level is higher than that of White participants, holding constant all other variables.
+-   For Asian, Black, and Other participants, the odds of having a more severe depression level is lower than that of White participants, holding constant all other variables.
 
-## Graphs Based On Current Regression Models
+## Receiver Operating Characteristic Curve for Depression Level
 ```{r}
-library(pROC)
+
 
 # Predicting probabilities for all classes
 predicted_probs <- predict(dass_fit1, type = "probs")
@@ -167,34 +268,26 @@ predicted_probs <- predict(dass_fit1, type = "probs")
 response <- ifelse(dass_fit_df$depression_level == "Moderate or Below", 1,
                    ifelse(dass_fit_df$depression_level == "Severe", 2, 3))
 
-# Calculating ROC curve for Severe (class 2)
-roc_obj <- roc(as.numeric(response == 1), predicted_probs[, "Moderate or Below"])
+# Calculating ROC curves for three responses
+roc_obj_1 <- roc(as.numeric(response == 1), predicted_probs[, "Moderate or Below"])
+roc_obj_2 <- roc(as.numeric(response == 2), predicted_probs[, "Severe"])
+roc_obj_3 <- roc(as.numeric(response == 3), predicted_probs[, "Extremely severe"])
 
-# Plotting ROC curve
-plot(roc_obj, col = "blue", main = "ROC Curve for Severe Depression Level")
+# Plotting ROC curves for three responses on the same graph
+plot(roc_obj_1, col = "blue", main = "ROC Curves for Three Responses")
+plot(roc_obj_2, col = "red", add = TRUE)
+plot(roc_obj_3, col = "green", add = TRUE)
+legend("bottomright",
+       legend = c("Moderate or Below", "Severe", "Extremely Severe"),
+       col = c("blue", "red", "green"), lty = 1)
 ```
+According to this graph, the ROC curves for "Moderate or Below" and "Extremely Severe" are close to the top-left corner of the plot, showing a good model's performance in these two categories. The performance on "Severe" may indicate that we need more data points that have a depression level of "Severe."
 
-```{r}
-# Extract coefficients for countries
-pos_country = str_starts(names(dass_fit1$coefficients), "country")
-
-country_coefficients <- data.frame(
-  country = substr(names(dass_fit1$coefficients)[pos_country], 8, 20),
-  coefficient = dass_fit1$coefficients[pos_country]
-)
-
-# Plotting coefficients for countries
-ggplot(country_coefficients, aes(x = country, y = coefficient)) +
-  geom_bar(stat = "identity", fill = "skyblue", color = "black") +
-  labs(title = "Effect of Countries on Depression Levels", x = "Country", y = "Coefficient")
-```
-
-
-```{r, fig.width=22, fig.height=53, message = FALSE}
-library(effects)
-
+## Effects of Predictors on Depression Levels
+```{r, fig.width=22, fig.height=55, message = FALSE}
 # Create a data frame with the predictor values for visualization
-predictor_data <- model.matrix(depression_level ~ country + gender + age + orientation + race, data = dass_fit_df)
+predictor_data <- model.matrix(depression_level ~ country + gender + age
+                               + orientation + race, data = dass_fit_df)
 
 # Compute the effects
 effects <- allEffects(dass_fit1, xlevels = list(predictor_data))
@@ -205,9 +298,9 @@ plot(effects, style = "stacked")
 
 ## Limitations
 
- * Imbalance within samples (e.g. 76.3% female samples).
- * Strong dependence between independent variables (e.g. race versus religion).
- * Counterintuitive results (e.g. Asian people have lower risk of getting severely depressed than white people).
- * Future Improvements:
-    * Clustering to decrease dependence;
-    * Fit a separate model for each depression level to avoid parallel assumption.
+-   Imbalance within samples (e.g. 76.3% female samples).
+-   Strong dependence between independent variables (e.g. race versus religion).
+-   Counterintuitive results (e.g. Asian people have lower risk of getting severely depressed than white people).
+-   Future Improvements:
+    -   Clustering to decrease dependence;
+    -   Fit a separate model for each depression level to avoid parallel assumption.

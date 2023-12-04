@@ -11,7 +11,7 @@
 
 <meta name="author" content="Huanyu Chen, Shaolei Ma" />
 
-<meta name="date" content="2023-12-03" />
+<meta name="date" content="2023-12-04" />
 
 <title>Logistic Model</title>
 
@@ -299,7 +299,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Logistic Model</h1>
 <h4 class="author">Huanyu Chen, Shaolei Ma</h4>
-<h4 class="date">2023-12-03</h4>
+<h4 class="date">2023-12-04</h4>
 
 </div>
 
@@ -536,7 +536,7 @@ dass_fit_df |&gt; summary()</code></pre>
 ## marriedPreviously married   -8.04e-02      8.10  3      0.044 *  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>Because the overall <span class="math inline">\(p value &lt;
+<p>Because the overall <span class="math inline">\(p-value &lt;
 0.001\)</span>, we reject the null hypothesis and conclude that the
 parallel assumption is not met.</p>
 <p>To meet the parallel assumption, we try the following two
@@ -650,10 +650,107 @@ class="math inline">\(p = 0.067 &gt; 0.05\)</span>).</p>
 ## Residual Deviance: 60223.12 
 ## AIC: 60261.12</code></pre>
 <p>The estimated model can be written as: <span
-class="math display">\[logit(\hat P(Depression\: Level\leq
-Severe))=-0.69+0.18*I(country=CA)+0.20*I(country=GB)\\-0.04*I(country=ID)-0.19*I(country=MY)+0.13*I(country=PH)+0.11*I(country=Other)\\-0.10*I(gender=Male)+0.38*I(gender=Other)-0.03*age+0.23*I(orientation=Asexual)\\+0.40*I(orientation=Bisexual)+0.30*I(orientation=Homosexual)+0.22*I(orientation=Other)\\-0.16*I(race=Asian)-0.09*I(race=Black)+0.11*I(race=Native\:American)-0.10*I(race=Other)\]</span></p>
-<p><span class="math display">\[logit(\hat P(Depression\: Level\leq
-Extremely\:Severe))=0.01+0.18*I(country=CA)+0.20*I(country=GB)\\-0.04*I(country=ID)-0.19*I(country=MY)+0.13*I(country=PH)+0.11*I(country=Other)\\-0.10*I(gender=Male)+0.38*I(gender=Other)-0.03*age+0.23*I(orientation=Asexual)\\+0.40*I(orientation=Bisexual)+0.30*I(orientation=Homosexual)+0.22*I(orientation=Other)\\-0.16*I(race=Asian)-0.09*I(race=Black)+0.11*I(race=Native\:American)-0.10*I(race=Other)\]</span></p>
+class="math display">\[\begin{align*}
+\text{logit}(\hat P(\text{Depression Level} \leq \text{Severe})) &amp;=
+-0.69 \\
+&amp;+ 0.18 \times I(\text{country} = \text{CA}) \\
+&amp;+ 0.20 \times I(\text{country} = \text{GB}) \\
+&amp;- 0.04 \times I(\text{country} = \text{ID}) \\
+&amp;- 0.19 \times I(\text{country} = \text{MY}) \\
+&amp;+ 0.13 \times I(\text{country} = \text{PH}) \\
+&amp;+ 0.11 \times I(\text{country} = \text{Other}) \\
+&amp;- 0.10 \times I(\text{gender} = \text{Male}) \\
+&amp;+ 0.38 \times I(\text{gender} = \text{Other}) \\
+&amp;- 0.03 \times \text{age} \\
+&amp;+ 0.23 \times I(\text{orientation} = \text{Asexual}) \\
+&amp;+ 0.40 \times I(\text{orientation} = \text{Bisexual}) \\
+&amp;+ 0.30 \times I(\text{orientation} = \text{Homosexual}) \\
+&amp;+ 0.22 \times I(\text{orientation} = \text{Other}) \\
+&amp;- 0.16 \times I(\text{race} = \text{Asian}) \\
+&amp;- 0.09 \times I(\text{race} = \text{Black}) \\
+&amp;+ 0.11 \times I(\text{race} = \text{Native American}) \\
+&amp;- 0.10 \times I(\text{race} = \text{Other})
+\end{align*}\]</span></p>
+<p><span class="math display">\[\begin{align*}
+\text{logit}(\hat P(\text{Depression Level} \leq \text{Extremely
+Severe})) &amp;= 0.01 \\
+&amp;+ 0.18 \times I(\text{country} = \text{CA}) \\
+&amp;+ 0.20 \times I(\text{country} = \text{GB}) \\
+&amp;- 0.04 \times I(\text{country} = \text{ID}) \\
+&amp;- 0.19 \times I(\text{country} = \text{MY}) \\
+&amp;+ 0.13 \times I(\text{country} = \text{PH}) \\
+&amp;+ 0.11 \times I(\text{country} = \text{Other}) \\
+&amp;- 0.10 \times I(\text{gender} = \text{Male}) \\
+&amp;+ 0.38 \times I(\text{gender} = \text{Other}) \\
+&amp;- 0.03 \times \text{age} \\
+&amp;+ 0.23 \times I(\text{orientation} = \text{Asexual}) \\
+&amp;+ 0.40 \times I(\text{orientation} = \text{Bisexual}) \\
+&amp;+ 0.30 \times I(\text{orientation} = \text{Homosexual}) \\
+&amp;+ 0.22 \times I(\text{orientation} = \text{Other}) \\
+&amp;- 0.16 \times I(\text{race} = \text{Asian}) \\
+&amp;- 0.09 \times I(\text{race} = \text{Black}) \\
+&amp;+ 0.11 \times I(\text{race} = \text{Native American}) \\
+&amp;- 0.10 \times I(\text{race} = \text{Other})
+\end{align*}\]</span></p>
+</div>
+<div id="effect-of-countries-on-depression-levels"
+class="section level2">
+<h2>Effect of Countries on Depression Levels</h2>
+<pre class="r"><code># Extract coefficients for countries
+pos_country = str_starts(names(dass_fit1$coefficients), &quot;country&quot;)
+
+country_coefficients &lt;- data.frame(
+  country = substr(names(dass_fit1$coefficients)[pos_country], 8, 20),
+  coefficient = dass_fit1$coefficients[pos_country]
+  )
+
+# Plotting coefficients for countries
+ggplot(country_coefficients, aes(x = country, y = coefficient)) +
+  geom_bar(stat = &quot;identity&quot;, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
+  labs(title = &quot;Effect of Countries on Depression Levels&quot;,
+       x = &quot;Country&quot;, y = &quot;Coefficient&quot;)</code></pre>
+<p><img src="logit_models_files/figure-html/unnamed-chunk-7-1.png" width="90%" /></p>
+</div>
+<div id="effect-of-races-on-depression-levels" class="section level2">
+<h2>Effect of Races on Depression Levels</h2>
+<pre class="r"><code># Extract coefficients for races
+pos_race &lt;- str_starts(names(dass_fit1$coefficients), &quot;race&quot;)
+
+race_coefficients &lt;- data.frame(
+  race = substr(names(dass_fit1$coefficients)[pos_race], 5, 20),
+  coefficient = dass_fit1$coefficients[pos_race]
+)
+
+# Plotting coefficients for races
+ggplot(race_coefficients, aes(x = race, y = coefficient)) +
+  geom_bar(stat = &quot;identity&quot;, fill = &quot;pink&quot;, color = &quot;black&quot;) +
+  labs(
+    title = &quot;Effect of Races on Depression Levels&quot;,
+    x = &quot;Race&quot;,
+    y = &quot;Coefficient&quot;
+  )</code></pre>
+<p><img src="logit_models_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
+</div>
+<div id="effect-of-orientations-on-depression-levels"
+class="section level2">
+<h2>Effect of Orientations on Depression Levels</h2>
+<pre class="r"><code># Extract coefficients for orientations
+pos_orientation &lt;- str_starts(names(dass_fit1$coefficients), &quot;orientation&quot;)
+
+orientation_coefficients &lt;- data.frame(
+  orientation = substr(names(dass_fit1$coefficients)[pos_orientation], 12, 20),
+  coefficient = dass_fit1$coefficients[pos_orientation]
+)
+
+# Plotting coefficients for orientations
+ggplot(orientation_coefficients, aes(x = orientation, y = coefficient)) +
+  geom_bar(stat = &quot;identity&quot;, fill = &quot;palegreen&quot;, color = &quot;black&quot;) +
+  labs(
+    title = &quot;Effect of Orientations on Depression Levels&quot;,
+    x = &quot;Orientation&quot;,
+    y = &quot;Coefficient&quot;
+  )</code></pre>
+<p><img src="logit_models_files/figure-html/unnamed-chunk-9-1.png" width="90%" /></p>
 </div>
 <div id="interpretation" class="section level2">
 <h2>Interpretation</h2>
@@ -815,48 +912,48 @@ severe depression level is lower than that of White participants,
 holding constant all other variables.</li>
 </ul>
 </div>
-<div id="graphs-based-on-current-regression-models"
+<div id="receiver-operating-characteristic-curve-for-depression-level"
 class="section level2">
-<h2>Graphs Based On Current Regression Models</h2>
-<pre class="r"><code>library(pROC)
-
-# Predicting probabilities for all classes
+<h2>Receiver Operating Characteristic Curve for Depression Level</h2>
+<pre class="r"><code># Predicting probabilities for all classes
 predicted_probs &lt;- predict(dass_fit1, type = &quot;probs&quot;)
 
 # Extracting the response variable
 response &lt;- ifelse(dass_fit_df$depression_level == &quot;Moderate or Below&quot;, 1,
                    ifelse(dass_fit_df$depression_level == &quot;Severe&quot;, 2, 3))
 
-# Calculating ROC curve for Severe (class 2)
-roc_obj &lt;- roc(as.numeric(response == 1), predicted_probs[, &quot;Moderate or Below&quot;])
+# Calculating ROC curves for three responses
+roc_obj_1 &lt;- roc(as.numeric(response == 1), predicted_probs[, &quot;Moderate or Below&quot;])
+roc_obj_2 &lt;- roc(as.numeric(response == 2), predicted_probs[, &quot;Severe&quot;])
+roc_obj_3 &lt;- roc(as.numeric(response == 3), predicted_probs[, &quot;Extremely severe&quot;])
 
-# Plotting ROC curve
-plot(roc_obj, col = &quot;blue&quot;, main = &quot;ROC Curve for Severe Depression Level&quot;)</code></pre>
-<p><img src="logit_models_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
-<pre class="r"><code># Extract coefficients for countries
-pos_country = str_starts(names(dass_fit1$coefficients), &quot;country&quot;)
-
-country_coefficients &lt;- data.frame(
-  country = substr(names(dass_fit1$coefficients)[pos_country], 8, 20),
-  coefficient = dass_fit1$coefficients[pos_country]
-)
-
-# Plotting coefficients for countries
-ggplot(country_coefficients, aes(x = country, y = coefficient)) +
-  geom_bar(stat = &quot;identity&quot;, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
-  labs(title = &quot;Effect of Countries on Depression Levels&quot;, x = &quot;Country&quot;, y = &quot;Coefficient&quot;)</code></pre>
-<p><img src="logit_models_files/figure-html/unnamed-chunk-9-1.png" width="90%" /></p>
-<pre class="r"><code>library(effects)
-
-# Create a data frame with the predictor values for visualization
-predictor_data &lt;- model.matrix(depression_level ~ country + gender + age + orientation + race, data = dass_fit_df)
+# Plotting ROC curves for three responses on the same graph
+plot(roc_obj_1, col = &quot;blue&quot;, main = &quot;ROC Curves for Three Responses&quot;)
+plot(roc_obj_2, col = &quot;red&quot;, add = TRUE)
+plot(roc_obj_3, col = &quot;green&quot;, add = TRUE)
+legend(&quot;bottomright&quot;,
+       legend = c(&quot;Moderate or Below&quot;, &quot;Severe&quot;, &quot;Extremely Severe&quot;),
+       col = c(&quot;blue&quot;, &quot;red&quot;, &quot;green&quot;), lty = 1)</code></pre>
+<p><img src="logit_models_files/figure-html/unnamed-chunk-11-1.png" width="90%" />
+According to this graph, the ROC curves for “Moderate or Below” and
+“Extremely Severe” are close to the top-left corner of the plot, showing
+a good model’s performance in these two categories. The performance on
+“Severe” may indicate that we need more data points that have a
+depression level of “Severe.”</p>
+</div>
+<div id="effects-of-predictors-on-depression-levels"
+class="section level2">
+<h2>Effects of Predictors on Depression Levels</h2>
+<pre class="r"><code># Create a data frame with the predictor values for visualization
+predictor_data &lt;- model.matrix(depression_level ~ country + gender + age
+                               + orientation + race, data = dass_fit_df)
 
 # Compute the effects
 effects &lt;- allEffects(dass_fit1, xlevels = list(predictor_data))
 
 # Plot the effects
 plot(effects, style = &quot;stacked&quot;)</code></pre>
-<p><img src="logit_models_files/figure-html/unnamed-chunk-10-1.png" width="90%" /></p>
+<p><img src="logit_models_files/figure-html/unnamed-chunk-12-1.png" width="90%" /></p>
 </div>
 <div id="limitations" class="section level2">
 <h2>Limitations</h2>
