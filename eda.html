@@ -301,11 +301,14 @@ $(document).ready(function () {
 
 
 <p>Shiny app list here</p>
+<div id="plot-distribution-of-age" class="section level1">
+<h1>Plot: “Distribution of Age”</h1>
 <pre class="r"><code># distribution histogram of age
 ggplot(dass_new, aes(x=age)) + 
     geom_histogram(binwidth=.5,
                    fill=&quot;steelblue&quot;) </code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+# Plot: “Distribution of Race”</p>
 <pre class="r"><code>race_count = dass_new|&gt;
   count(race)
 
@@ -314,7 +317,8 @@ ggplot(race_count, aes(x = reorder(race, -n), y = n)) +
   labs(title = &#39;Distribution of Race&#39;, x = &#39;Race&#39;, y = &#39;Count&#39;) +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p><img src="eda_files/figure-html/unnamed-chunk-2-1.png" width="672" />
+# Plot: “Distribution of Orientation”</p>
 <pre class="r"><code>orientation_count = dass_new|&gt;
   count(orientation)
 
@@ -324,6 +328,7 @@ ggplot(orientation_count, aes(x = reorder(orientation, -n), y = n)) +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
 <div id="plot-depression-level-vs.-age-vs.-race" class="section level1">
 <h1>Plot: Depression Level vs. Age vs. Race</h1>
 <pre class="r"><code>dass_new|&gt;

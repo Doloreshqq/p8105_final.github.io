@@ -40,7 +40,17 @@ ggplot(orientation_count, aes(x = reorder(orientation, -n), y = n)) +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-
+# Plot: Age Distribution for Each Gender
+```{r}
+boxplot(age~gender,
+data=dass_new,
+main="Age Distribution for Each Gender",
+xlab="Gender",
+ylab="Age",
+col="pink",
+border="steelblue"
+)
+```
 
 
 # Plot: Depression Level vs. Age vs. Race
