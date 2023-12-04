@@ -315,6 +315,15 @@ ggplot(race_count, aes(x = reorder(race, -n), y = n)) +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>orientation_count = dass_new|&gt;
+  count(orientation)
+
+ggplot(orientation_count, aes(x = reorder(orientation, -n), y = n)) +
+  geom_bar(stat = &#39;identity&#39;, fill=&quot;steelblue&quot;) +
+  labs(title = &#39;Distribution of Orientation&#39;, x = &#39;Orientation&#39;, y = &#39;Count&#39;) +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <div id="plot-depression-level-vs.-age-vs.-race" class="section level1">
 <h1>Plot: Depression Level vs. Age vs. Race</h1>
 <pre class="r"><code>dass_new|&gt;
@@ -329,7 +338,7 @@ ggplot(race_count, aes(x = reorder(race, -n), y = n)) +
        y = &quot;Race&quot;, 
        title = &quot;Depression level vs. Age vs. Race&quot;)</code></pre>
 <pre><code>## Picking joint bandwidth of 2.16</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="eda_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 </div>
 <div id="plots-depression-level-vs.-race-groups" class="section level1">
 <h1>Plots: Depression Level vs. Race groups</h1>
@@ -360,7 +369,7 @@ ggplot(race_count, aes(x = reorder(race, -n), y = n)) +
   labs(x = &quot;Depression level&quot;, 
        y = &quot;count of cases&quot;, 
        title = &quot;Depression level vs. race groups&quot;)</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="eda_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
 <div id="plot-depression-level-vs.-age-groups" class="section level1">
 <h1>Plot: Depression Level vs. Age groups</h1>
@@ -388,7 +397,7 @@ ggplot(race_count, aes(x = reorder(race, -n), y = n)) +
   labs(x = &quot;Depression level&quot;, 
        y = &quot;count of cases&quot;, 
        title = &quot;Depression level vs. age groups&quot;)</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="eda_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
 <div id="chi-squared-test-1-age-depression-level"
 class="section level1">
