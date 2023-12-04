@@ -284,7 +284,8 @@ legend("bottomright",
 According to this graph, the ROC curves for "Moderate or Below" and "Extremely Severe" are close to the top-left corner of the plot, showing a good model's performance in these two categories. The performance on "Severe" may indicate that we need more data points that have a depression level of "Severe."
 
 ## Effects of Predictors on Depression Levels
-```{r, fig.width=22, fig.height=55, message = FALSE}
+The following graphs show the probability of depression level on different categorical variables.
+```{r, fig.width=20, fig.height=50, message = FALSE}
 # Create a data frame with the predictor values for visualization
 predictor_data <- model.matrix(depression_level ~ country + gender + age
                                + orientation + race, data = dass_fit_df)
