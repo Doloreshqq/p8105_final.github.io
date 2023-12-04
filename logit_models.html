@@ -617,6 +617,203 @@ dass_fit1 |&gt; poTest()</code></pre>
 <p>The model meets the parallel assumption at <span
 class="math inline">\(\alpha=0.05\)</span> level (with an overall <span
 class="math inline">\(p = 0.067 &gt; 0.05\)</span>).</p>
+<pre class="r"><code>dass_fit1 |&gt; summary()</code></pre>
+<pre><code>## Call:
+## polr(formula = depression_level ~ country + gender + age + orientation + 
+##     race, data = dass_fit_df)
+## 
+## Coefficients:
+##                          Value Std. Error  t value
+## countryCA              0.17607   0.073979   2.3799
+## countryGB              0.20429   0.069477   2.9405
+## countryID             -0.03701   0.081140  -0.4561
+## countryMY             -0.18594   0.043530  -4.2716
+## countryOther           0.10529   0.039054   2.6959
+## countryPH              0.13180   0.088407   1.4908
+## genderMale            -0.10458   0.027345  -3.8244
+## genderOther            0.38262   0.097990   3.9047
+## age                   -0.02532   0.001429 -17.7177
+## orientationAsexual     0.22638   0.048992   4.6208
+## orientationBisexual    0.40403   0.033836  11.9406
+## orientationHomosexual  0.29795   0.050291   5.9245
+## orientationOther       0.22051   0.038272   5.7617
+## raceAsian             -0.15662   0.042257  -3.7064
+## raceBlack             -0.08899   0.094209  -0.9447
+## raceNative American    0.10589   0.150678   0.7027
+## raceOther             -0.10281   0.043678  -2.3539
+## 
+## Intercepts:
+##                          Value    Std. Error t value 
+## Moderate or Below|Severe  -0.6896   0.0476   -14.4866
+## Severe|Extremely severe    0.0067   0.0474     0.1414
+## 
+## Residual Deviance: 60223.12 
+## AIC: 60261.12</code></pre>
+<p>The estimated model can be written as: <span
+class="math display">\[logit(\hat P(Depression\: Level\leq
+Severe))=-0.69+0.18*I(country=CA)+0.20*I(country=GB)\\-0.04*I(country=ID)-0.19*I(country=MY)+0.13*I(country=PH)+0.11*I(country=Other)\\-0.10*I(gender=Male)+0.38*I(gender=Other)-0.03*age+0.23*I(orientation=Asexual)\\+0.40*I(orientation=Bisexual)+0.30*I(orientation=Homosexual)+0.22*I(orientation=Other)\\-0.16*I(race=Asian)-0.09*I(race=Black)+0.11*I(race=Native\:American)-0.10*I(race=Other)\]</span></p>
+<p><span class="math display">\[logit(\hat P(Depression\: Level\leq
+Extremely\:Severe))=0.01+0.18*I(country=CA)+0.20*I(country=GB)\\-0.04*I(country=ID)-0.19*I(country=MY)+0.13*I(country=PH)+0.11*I(country=Other)\\-0.10*I(gender=Male)+0.38*I(gender=Other)-0.03*age+0.23*I(orientation=Asexual)\\+0.40*I(orientation=Bisexual)+0.30*I(orientation=Homosexual)+0.22*I(orientation=Other)\\-0.16*I(race=Asian)-0.09*I(race=Black)+0.11*I(race=Native\:American)-0.10*I(race=Other)\]</span></p>
+</div>
+<div id="interpretation" class="section level2">
+<h2>Interpretation</h2>
+<p>Calculate the odds ratio and CI for variables:</p>
+<pre class="r"><code>exp(cbind(OR = coef(dass_fit1), confint(dass_fit1))) |&gt; 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">OR</th>
+<th align="right">2.5 %</th>
+<th align="right">97.5 %</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">countryCA</td>
+<td align="right">1.1925157</td>
+<td align="right">1.0318245</td>
+<td align="right">1.3782103</td>
+</tr>
+<tr class="even">
+<td align="left">countryGB</td>
+<td align="right">1.2266600</td>
+<td align="right">1.0704578</td>
+<td align="right">1.4055722</td>
+</tr>
+<tr class="odd">
+<td align="left">countryID</td>
+<td align="right">0.9636663</td>
+<td align="right">0.8218074</td>
+<td align="right">1.1293962</td>
+</tr>
+<tr class="even">
+<td align="left">countryMY</td>
+<td align="right">0.8303232</td>
+<td align="right">0.7624447</td>
+<td align="right">0.9043076</td>
+</tr>
+<tr class="odd">
+<td align="left">countryOther</td>
+<td align="right">1.1110279</td>
+<td align="right">1.0292477</td>
+<td align="right">1.1993359</td>
+</tr>
+<tr class="even">
+<td align="left">countryPH</td>
+<td align="right">1.1408746</td>
+<td align="right">0.9592119</td>
+<td align="right">1.3566382</td>
+</tr>
+<tr class="odd">
+<td align="left">genderMale</td>
+<td align="right">0.9007041</td>
+<td align="right">0.8536665</td>
+<td align="right">0.9502554</td>
+</tr>
+<tr class="even">
+<td align="left">genderOther</td>
+<td align="right">1.4661200</td>
+<td align="right">1.2111017</td>
+<td align="right">1.7784689</td>
+</tr>
+<tr class="odd">
+<td align="left">age</td>
+<td align="right">0.9750021</td>
+<td align="right">0.9722673</td>
+<td align="right">0.9777274</td>
+</tr>
+<tr class="even">
+<td align="left">orientationAsexual</td>
+<td align="right">1.2540564</td>
+<td align="right">1.1391381</td>
+<td align="right">1.3801892</td>
+</tr>
+<tr class="odd">
+<td align="left">orientationBisexual</td>
+<td align="right">1.4978457</td>
+<td align="right">1.4017927</td>
+<td align="right">1.6005003</td>
+</tr>
+<tr class="even">
+<td align="left">orientationHomosexual</td>
+<td align="right">1.3470905</td>
+<td align="right">1.2206347</td>
+<td align="right">1.4865163</td>
+</tr>
+<tr class="odd">
+<td align="left">orientationOther</td>
+<td align="right">1.2467100</td>
+<td align="right">1.1566076</td>
+<td align="right">1.3436678</td>
+</tr>
+<tr class="even">
+<td align="left">raceAsian</td>
+<td align="right">0.8550255</td>
+<td align="right">0.7870384</td>
+<td align="right">0.9288322</td>
+</tr>
+<tr class="odd">
+<td align="left">raceBlack</td>
+<td align="right">0.9148506</td>
+<td align="right">0.7603206</td>
+<td align="right">1.1000728</td>
+</tr>
+<tr class="even">
+<td align="left">raceNative American</td>
+<td align="right">1.1116959</td>
+<td align="right">0.8274552</td>
+<td align="right">1.4947023</td>
+</tr>
+<tr class="odd">
+<td align="left">raceOther</td>
+<td align="right">0.9022940</td>
+<td align="right">0.8282279</td>
+<td align="right">0.9829067</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Country</strong>:</p>
+<ul>
+<li>For Canadian, Britain, and Philippines participants, the odds of
+having a more severe depression level is higher than that of US
+participants, holding constant all other variables.</li>
+<li>For Indonesia and Malaysia participants, the odds of having a more
+severe depression level is lower than that of US participants, holding
+constant all other variables.</li>
+</ul>
+<p><strong>Gender</strong>:</p>
+<ul>
+<li>For male participants, the odds of having a more severe depression
+level is 0.90 times that of female participants, holding constant all
+other variables.</li>
+<li>For non-binary participants, the odds of having a more severe
+depression level is 1.47 times that of female participants, holding
+constant all other variables.</li>
+</ul>
+<p><strong>Age</strong>:</p>
+<ul>
+<li>For every one unit increase in participant’s age, the odds of having
+a more severe depression level is multiplied 0.98 times, holding
+constant all other variables. It indicates that older people may have
+less risk to get depressed.</li>
+</ul>
+<p><strong>Orientation</strong>:</p>
+<ul>
+<li>For sexual minorities, the odds of having a more severe depression
+level is higher than that of heterosexual orientation participants,
+holding constant all other variables.</li>
+</ul>
+<p><strong>Race</strong>:</p>
+<ul>
+<li>For Native American participants, the odds of having a more severe
+depression level is higher than that of White participants, holding
+constant all other variables.</li>
+<li>For Asian, Black, and Other participants, the odds of having a more
+severe depression level is lower than that of White participants,
+holding constant all other variables.</li>
+</ul>
 </div>
 <div id="graphs-based-on-current-regression-models"
 class="section level2">
@@ -635,7 +832,7 @@ roc_obj &lt;- roc(as.numeric(response == 1), predicted_probs[, &quot;Moderate or
 
 # Plotting ROC curve
 plot(roc_obj, col = &quot;blue&quot;, main = &quot;ROC Curve for Severe Depression Level&quot;)</code></pre>
-<p><img src="logit_models_files/figure-html/unnamed-chunk-6-1.png" width="90%" /></p>
+<p><img src="logit_models_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
 <pre class="r"><code># Extract coefficients for countries
 pos_country = str_starts(names(dass_fit1$coefficients), &quot;country&quot;)
 
@@ -648,7 +845,7 @@ country_coefficients &lt;- data.frame(
 ggplot(country_coefficients, aes(x = country, y = coefficient)) +
   geom_bar(stat = &quot;identity&quot;, fill = &quot;skyblue&quot;, color = &quot;black&quot;) +
   labs(title = &quot;Effect of Countries on Depression Levels&quot;, x = &quot;Country&quot;, y = &quot;Coefficient&quot;)</code></pre>
-<p><img src="logit_models_files/figure-html/unnamed-chunk-7-1.png" width="90%" /></p>
+<p><img src="logit_models_files/figure-html/unnamed-chunk-9-1.png" width="90%" /></p>
 <pre class="r"><code>library(effects)
 
 # Create a data frame with the predictor values for visualization
@@ -659,7 +856,23 @@ effects &lt;- allEffects(dass_fit1, xlevels = list(predictor_data))
 
 # Plot the effects
 plot(effects, style = &quot;stacked&quot;)</code></pre>
-<p><img src="logit_models_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
+<p><img src="logit_models_files/figure-html/unnamed-chunk-10-1.png" width="90%" /></p>
+</div>
+<div id="limitations" class="section level2">
+<h2>Limitations</h2>
+<ul>
+<li>Imbalance within samples (e.g. 76.3% female samples).</li>
+<li>Strong dependence between independent variables (e.g. race versus
+religion).</li>
+<li>Counterintuitive results (e.g. Asian people have lower risk of
+getting severely depressed than white people).</li>
+<li>Future Improvements:
+<ul>
+<li>Clustering to decrease dependence;</li>
+<li>Fit a separate model for each depression level to avoid parallel
+assumption.</li>
+</ul></li>
+</ul>
 </div>
 
 

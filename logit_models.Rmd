@@ -117,6 +117,45 @@ dass_fit1 |> poTest()
 
 The model meets the parallel assumption at $\alpha=0.05$ level (with an overall $p = 0.067 > 0.05$).
 
+```{r}
+dass_fit1 |> summary()
+```
+
+The estimated model can be written as:
+$$logit(\hat P(Depression\: Level\leq Severe))=-0.69+0.18*I(country=CA)+0.20*I(country=GB)\\-0.04*I(country=ID)-0.19*I(country=MY)+0.13*I(country=PH)+0.11*I(country=Other)\\-0.10*I(gender=Male)+0.38*I(gender=Other)-0.03*age+0.23*I(orientation=Asexual)\\+0.40*I(orientation=Bisexual)+0.30*I(orientation=Homosexual)+0.22*I(orientation=Other)\\-0.16*I(race=Asian)-0.09*I(race=Black)+0.11*I(race=Native\:American)-0.10*I(race=Other)$$
+
+$$logit(\hat P(Depression\: Level\leq Extremely\:Severe))=0.01+0.18*I(country=CA)+0.20*I(country=GB)\\-0.04*I(country=ID)-0.19*I(country=MY)+0.13*I(country=PH)+0.11*I(country=Other)\\-0.10*I(gender=Male)+0.38*I(gender=Other)-0.03*age+0.23*I(orientation=Asexual)\\+0.40*I(orientation=Bisexual)+0.30*I(orientation=Homosexual)+0.22*I(orientation=Other)\\-0.16*I(race=Asian)-0.09*I(race=Black)+0.11*I(race=Native\:American)-0.10*I(race=Other)$$
+
+## Interpretation
+Calculate the odds ratio and CI for variables:
+```{r}
+exp(cbind(OR = coef(dass_fit1), confint(dass_fit1))) |> 
+  knitr::kable()
+```
+
+**Country**:
+
+ * For Canadian, Britain, and Philippines participants, the odds of having a more severe depression level is higher than that of US participants, holding constant all other variables.
+ * For Indonesia and Malaysia participants, the odds of having a more severe depression level is lower than that of US participants, holding constant all other variables.
+ 
+**Gender**:
+
+ * For male participants, the odds of having a more severe depression level is 0.90 times that of female participants, holding constant all other variables.
+ * For non-binary participants, the odds of having a more severe depression level is 1.47 times that of female participants, holding constant all other variables.
+ 
+**Age**:
+
+ * For every one unit increase in participant's age, the odds of having a more severe depression level is multiplied 0.98 times, holding constant all other variables. It indicates that older people may have less risk to get depressed.
+ 
+**Orientation**:
+
+ * For sexual minorities, the odds of having a more severe depression level is higher than that of heterosexual orientation participants, holding constant all other variables.
+ 
+**Race**:
+
+ * For Native American participants, the odds of having a more severe depression level is higher than that of White participants, holding constant all other variables.
+ * For Asian, Black, and Other participants, the odds of having a more severe depression level is lower than that of White participants, holding constant all other variables.
+
 ## Graphs Based On Current Regression Models
 ```{r}
 library(pROC)
@@ -163,3 +202,12 @@ effects <- allEffects(dass_fit1, xlevels = list(predictor_data))
 # Plot the effects
 plot(effects, style = "stacked")
 ```
+
+## Limitations
+
+ * Imbalance within samples (e.g. 76.3% female samples).
+ * Strong dependence between independent variables (e.g. race versus religion).
+ * Counterintuitive results (e.g. Asian people have lower risk of getting severely depressed than white people).
+ * Future Improvements:
+    * Clustering to decrease dependence;
+    * Fit a separate model for each depression level to avoid parallel assumption.
