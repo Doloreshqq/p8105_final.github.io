@@ -37,7 +37,7 @@ scale_fill_discrete = scale_fill_viridis_d
 
 The goal is to fit an ordered logit model.
 
-## Independent Variables
+# Independent Variables
 
 First, test the distribution of independent variables.
 
@@ -75,7 +75,7 @@ dass_fit_df =
 dass_fit_df |> summary()
 ```
 
-## Model Fitting
+# Model Fitting
 
 First fit a model without variables selection.
 
@@ -168,6 +168,7 @@ The estimated model can be written as: \begin{align*}
 &- 0.10 \times I(\text{race} = \text{Other})
 \end{align*}
 
+# Effect on Depression Levels
 ## Effect of Countries on Depression Levels
 ```{r}
 # Extract coefficients for countries
@@ -225,7 +226,7 @@ ggplot(orientation_coefficients, aes(x = orientation, y = coefficient)) +
   )
 ```
 
-## Interpretation
+# Interpretation
 
 Calculate the odds ratio and CI for variables:
 
@@ -257,7 +258,7 @@ exp(cbind(OR = coef(dass_fit1), confint(dass_fit1))) |>
 -   For Native American participants, the odds of having a more severe depression level is higher than that of White participants, holding constant all other variables.
 -   For Asian, Black, and Other participants, the odds of having a more severe depression level is lower than that of White participants, holding constant all other variables.
 
-## Receiver Operating Characteristic Curve for Depression Level
+# Receiver Operating Characteristic Curve for Depression Level
 ```{r}
 
 
@@ -281,10 +282,12 @@ legend("bottomright",
        legend = c("Moderate or Below", "Severe", "Extremely Severe"),
        col = c("blue", "red", "green"), lty = 1)
 ```
-According to this graph, the ROC curves for "Moderate or Below" and "Extremely Severe" are close to the top-left corner of the plot, showing a good model's performance in these two categories. The performance on "Severe" may indicate that we need more data points that have a depression level of "Severe."
 
-## Effects of Predictors on Depression Levels
+According to this graph, the ROC curves for "Moderate or Below" and "Extremely Severe" are close to the top-left corner of the plot, showing a good performance in these two categories. The performance on "Severe" may indicate that we need more data points that have a depression level of "Severe."
+
+# Depression Levels Distribution
 The following graphs show the probability of depression level on different categorical variables.
+
 ```{r, fig.width=20, fig.height=50, message = FALSE}
 # Create a data frame with the predictor values for visualization
 predictor_data <- model.matrix(depression_level ~ country + gender + age
@@ -297,7 +300,7 @@ effects <- allEffects(dass_fit1, xlevels = list(predictor_data))
 plot(effects, style = "stacked")
 ```
 
-## Limitations
+# Limitations
 
 -   Imbalance within samples (e.g. 76.3% female samples).
 -   Strong dependence between independent variables (e.g. race versus religion).

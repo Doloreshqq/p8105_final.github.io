@@ -31,6 +31,9 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
@@ -227,6 +230,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -234,6 +300,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -305,8 +381,8 @@ $(document).ready(function () {
 
 
 <p>The goal is to fit an ordered logit model.</p>
-<div id="independent-variables" class="section level2">
-<h2>Independent Variables</h2>
+<div id="independent-variables" class="section level1">
+<h1>Independent Variables</h1>
 <p>First, test the distribution of independent variables.</p>
 <pre class="r"><code>dass_new = read_csv(&quot;data/dass_new.csv&quot;)
 
@@ -403,8 +479,8 @@ dass_fit_df |&gt; summary()</code></pre>
 ##                                                                             
 ## </code></pre>
 </div>
-<div id="model-fitting" class="section level2">
-<h2>Model Fitting</h2>
+<div id="model-fitting" class="section level1">
+<h1>Model Fitting</h1>
 <p>First fit a model without variables selection.</p>
 <pre class="r"><code>dass_fit = 
   dass_fit_df |&gt; 
@@ -693,6 +769,8 @@ Severe})) &amp;= 0.01 \\
 &amp;- 0.10 \times I(\text{race} = \text{Other})
 \end{align*}\]</span></p>
 </div>
+<div id="effect-on-depression-levels" class="section level1">
+<h1>Effect on Depression Levels</h1>
 <div id="effect-of-countries-on-depression-levels"
 class="section level2">
 <h2>Effect of Countries on Depression Levels</h2>
@@ -752,8 +830,9 @@ ggplot(orientation_coefficients, aes(x = orientation, y = coefficient)) +
   )</code></pre>
 <p><img src="logit_models_files/figure-html/unnamed-chunk-9-1.png" width="90%" /></p>
 </div>
-<div id="interpretation" class="section level2">
-<h2>Interpretation</h2>
+</div>
+<div id="interpretation" class="section level1">
+<h1>Interpretation</h1>
 <p>Calculate the odds ratio and CI for variables:</p>
 <pre class="r"><code>exp(cbind(OR = coef(dass_fit1), confint(dass_fit1))) |&gt; 
   knitr::kable()</code></pre>
@@ -913,8 +992,8 @@ holding constant all other variables.</li>
 </ul>
 </div>
 <div id="receiver-operating-characteristic-curve-for-depression-level"
-class="section level2">
-<h2>Receiver Operating Characteristic Curve for Depression Level</h2>
+class="section level1">
+<h1>Receiver Operating Characteristic Curve for Depression Level</h1>
 <pre class="r"><code># Predicting probabilities for all classes
 predicted_probs &lt;- predict(dass_fit1, type = &quot;probs&quot;)
 
@@ -934,16 +1013,17 @@ plot(roc_obj_3, col = &quot;green&quot;, add = TRUE)
 legend(&quot;bottomright&quot;,
        legend = c(&quot;Moderate or Below&quot;, &quot;Severe&quot;, &quot;Extremely Severe&quot;),
        col = c(&quot;blue&quot;, &quot;red&quot;, &quot;green&quot;), lty = 1)</code></pre>
-<p><img src="logit_models_files/figure-html/unnamed-chunk-11-1.png" width="90%" />
-According to this graph, the ROC curves for “Moderate or Below” and
+<p><img src="logit_models_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
+<p>According to this graph, the ROC curves for “Moderate or Below” and
 “Extremely Severe” are close to the top-left corner of the plot, showing
-a good model’s performance in these two categories. The performance on
-“Severe” may indicate that we need more data points that have a
-depression level of “Severe.”</p>
+a good performance in these two categories. The performance on “Severe”
+may indicate that we need more data points that have a depression level
+of “Severe.”</p>
 </div>
-<div id="effects-of-predictors-on-depression-levels"
-class="section level2">
-<h2>Effects of Predictors on Depression Levels</h2>
+<div id="depression-levels-distribution" class="section level1">
+<h1>Depression Levels Distribution</h1>
+<p>The following graphs show the probability of depression level on
+different categorical variables.</p>
 <pre class="r"><code># Create a data frame with the predictor values for visualization
 predictor_data &lt;- model.matrix(depression_level ~ country + gender + age
                                + orientation + race, data = dass_fit_df)
@@ -955,8 +1035,8 @@ effects &lt;- allEffects(dass_fit1, xlevels = list(predictor_data))
 plot(effects, style = &quot;stacked&quot;)</code></pre>
 <p><img src="logit_models_files/figure-html/unnamed-chunk-12-1.png" width="90%" /></p>
 </div>
-<div id="limitations" class="section level2">
-<h2>Limitations</h2>
+<div id="limitations" class="section level1">
+<h1>Limitations</h1>
 <ul>
 <li>Imbalance within samples (e.g. 76.3% female samples).</li>
 <li>Strong dependence between independent variables (e.g. race versus
@@ -974,6 +1054,8 @@ assumption.</li>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -1011,6 +1093,35 @@ $(document).ready(function () {
 });
 </script>
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
