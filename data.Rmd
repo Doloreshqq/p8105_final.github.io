@@ -94,7 +94,7 @@ dass_new = dass %>%
   na.omit()
 ```
 
-Based on the scoring criteria, we add up the values for Q3A, Q5A, Q10A, Q13A, Q16A, Q17A, Q21A, Q24A, Q26A, Q31A, Q34A, Q37A, Q38A and Q42A as the depression scores. Similarly, add up the values for Q2A, Q4A, Q7A, Q9A, Q15A, Q19A, Q20A, Q23A, Q25A, Q28A, Q30A, Q36A, Q40A and Q41A as the anxiety scores and the sum of Q1A, Q6A, Q8A, Q11A, Q12A, Q14A, Q18A, Q22A, Q27A, Q29A, Q32A, Q33A, Q35A and Q39A as the stress scores. Considering that the scoring criteria we refer to is 0-3 scale but Kaggle dataset is 1-4 scale, we modify these three scores by minus 14.
+Based on the scoring criteria (as shown in DASS-42-scoring.pdf), we add up the values for Q3A, Q5A, Q10A, Q13A, Q16A, Q17A, Q21A, Q24A, Q26A, Q31A, Q34A, Q37A, Q38A and Q42A as the depression scores. Similarly, add up the values for Q2A, Q4A, Q7A, Q9A, Q15A, Q19A, Q20A, Q23A, Q25A, Q28A, Q30A, Q36A, Q40A and Q41A as the anxiety scores and the sum of Q1A, Q6A, Q8A, Q11A, Q12A, Q14A, Q18A, Q22A, Q27A, Q29A, Q32A, Q33A, Q35A and Q39A as the stress scores. Considering that the scoring criteria we refer to is 0-3 scale but Kaggle dataset is 1-4 scale, we modify these three scores by minus 14.
 
 After that, we could assign depression level, anxiety level and stress level for each observation refer to the rule of:
 
