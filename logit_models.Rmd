@@ -1,7 +1,5 @@
 ---
 title: "Logistic Model"
-author: "Huanyu Chen, Shaolei Ma"
-date: "`r Sys.Date()`"
 output: html_document
 ---
 
@@ -286,7 +284,7 @@ legend("bottomright",
 According to this graph, the ROC curves for "Moderate or Below" and "Extremely Severe" are close to the top-left corner of the plot, showing a good performance in these two categories. The performance on "Severe" may indicate that we need more data points that have a depression level of "Severe."
 
 # Depression Levels Distribution
-The following graphs show the probability of depression level on different categorical variables.
+The following graphs show the probability of depression level on different categorical and continuous variables.
 
 ```{r, fig.width=20, fig.height=50, message = FALSE}
 # Create a data frame with the predictor values for visualization
