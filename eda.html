@@ -379,50 +379,6 @@ div.tocify {
 <p>Shiny app list here</p>
 <div id="plot" class="section level1">
 <h1>Plot:</h1>
-<div id="distribution-of-age" class="section level2">
-<h2>Distribution of Age</h2>
-<pre class="r"><code># distribution histogram of age
-ggplot(dass_new, aes(x=age)) + 
-    geom_histogram(binwidth=.5,
-                   fill=&quot;steelblue&quot;) </code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
-</div>
-<div id="distribution-of-race" class="section level2">
-<h2>Distribution of Race</h2>
-<pre class="r"><code>race_count = dass_new|&gt;
-  count(race)
-
-ggplot(race_count, aes(x = reorder(race, -n), y = n)) +
-  geom_bar(stat = &#39;identity&#39;, fill=&quot;steelblue&quot;) +
-  labs(title = &#39;Distribution of Race&#39;, x = &#39;Race&#39;, y = &#39;Count&#39;) +
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-</div>
-<div id="distribution-of-orientation" class="section level2">
-<h2>Distribution of Orientation</h2>
-<pre class="r"><code>orientation_count = dass_new|&gt;
-  count(orientation)
-
-ggplot(orientation_count, aes(x = reorder(orientation, -n), y = n)) +
-  geom_bar(stat = &#39;identity&#39;, fill=&quot;steelblue&quot;) +
-  labs(title = &#39;Distribution of Orientation&#39;, x = &#39;Orientation&#39;, y = &#39;Count&#39;) +
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
-</div>
-<div id="age-distribution-for-each-gender" class="section level2">
-<h2>Age Distribution for Each Gender</h2>
-<pre class="r"><code>boxplot(age~gender,
-data=dass_new,
-main=&quot;Age Distribution for Each Gender&quot;,
-xlab=&quot;Gender&quot;,
-ylab=&quot;Age&quot;,
-col=&quot;pink&quot;,
-border=&quot;steelblue&quot;
-)</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-</div>
 <div id="depression-level-vs.-orientation-vs.-gender"
 class="section level2">
 <h2>Depression Level vs. Orientation vs. Gender</h2>
@@ -446,25 +402,56 @@ class="section level2">
   labs(x = &quot;Depression level&quot;, 
        y = &quot;count of cases&quot;, 
        title = &quot;Depression level vs. orientation vs. gender&quot;)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;gender&#39;. You can override using the
-## `.groups` argument.</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre><code>## `summarise()` has grouped output by &#39;gender&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
 </div>
-<div id="depression-level-vs.-age-vs.-race" class="section level2">
-<h2>Depression Level vs. Age vs. Race</h2>
+<div id="depression-level-vs.-orientation" class="section level2">
+<h2>Depression level vs. Orientation</h2>
 <pre class="r"><code>dass_new|&gt;
-  group_by(race)|&gt;
-  mutate(depression_level = factor(depression_level, 
-                                   levels = c(&quot;Normal&quot;, &quot;Mild&quot;,&quot;Moderate&quot;, 
-                                              &quot;Severe&quot;, &quot;Extremely severe&quot;)))|&gt;
-  ggplot(aes(x = age, y = race, color=depression_level, fill=depression_level)) +
-  geom_density_ridges(scale = 1, alpha = 0.5)+
+  group_by(orientation)|&gt;
+  summarise(Normal = sum(depression_level==&quot;Normal&quot;),
+            Mild = sum(depression_level==&quot;Mild&quot;),
+            Moderate = sum(depression_level==&quot;Moderate&quot;),
+            Severe = sum(depression_level==&quot;Severe&quot;),
+            Extremely_Severe = sum(depression_level==&quot;Extremely severe&quot;))|&gt;
+  pivot_longer(
+    Normal:Extremely_Severe,
+    names_to = &quot;Level&quot;,
+    values_to = &quot;Count&quot;)|&gt;
+  mutate(Level = factor(Level, levels = unique(Level)))|&gt;
+  ggplot(aes(x = Level, y = Count, group = orientation, color = orientation)) +
+  geom_point()+
+  geom_line()+
   theme_minimal()+
-  labs(x = &quot;Age&quot;, 
-       y = &quot;Race&quot;, 
-       title = &quot;Depression level vs. Age vs. Race&quot;)</code></pre>
-<pre><code>## Picking joint bandwidth of 2.16</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+  labs(x = &quot;Depression level&quot;, 
+       y = &quot;count of cases&quot;, 
+       title = &quot;Depression level vs. orientation groups&quot;)</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+<div id="depression-level-vs.-gender" class="section level2">
+<h2>Depression level vs. Gender</h2>
+<pre class="r"><code># distribution histogram of gender
+dass_new|&gt;
+  group_by(gender)|&gt;
+  summarise(Normal = sum(depression_level==&quot;Normal&quot;),
+            Mild = sum(depression_level==&quot;Mild&quot;),
+            Moderate = sum(depression_level==&quot;Moderate&quot;),
+            Severe = sum(depression_level==&quot;Severe&quot;),
+            Extremely_Severe = sum(depression_level==&quot;Extremely severe&quot;))|&gt;
+  pivot_longer(
+    Normal:Extremely_Severe,
+    names_to = &quot;Level&quot;,
+    values_to = &quot;Count&quot;)|&gt;
+  mutate(Level = factor(Level, levels = unique(Level)))|&gt;
+  ggplot(aes(x = Level, y = Count, group = gender, color = gender)) +
+  geom_point()+
+  geom_line()+
+  theme_minimal()+
+  labs(x = &quot;Depression level&quot;, 
+       y = &quot;count of cases&quot;, 
+       title = &quot;Depression level vs. gender groups&quot;)</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 </div>
 <div id="depression-level-vs.-race-groups" class="section level2">
 <h2>Depression Level vs. Race groups</h2>
@@ -495,7 +482,19 @@ class="section level2">
   labs(x = &quot;Depression level&quot;, 
        y = &quot;count of cases&quot;, 
        title = &quot;Depression level vs. race groups&quot;)</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="eda_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="age-distribution-for-each-depression-level"
+class="section level2">
+<h2>Age Distribution for Each Depression Level</h2>
+<pre class="r"><code>dass_new %&gt;%
+  ggplot(aes(x=depression_level, y=age)) +
+  geom_boxplot(aes(fill=depression_level)) +
+  labs(title = &quot;Age Distribution for Each Depression Level&quot;,
+        xlab = &quot;Depression Level&quot;,
+        ylab = &quot;Age&quot;)+
+  theme_minimal()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
 <div id="depression-level-vs.-age-groups" class="section level2">
 <h2>Depression Level vs. Age groups</h2>
@@ -523,7 +522,7 @@ class="section level2">
   labs(x = &quot;Depression level&quot;, 
        y = &quot;count of cases&quot;, 
        title = &quot;Depression level vs. age groups&quot;)</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="eda_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
 </div>
 <div id="chi-squared-test" class="section level1">
