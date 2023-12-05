@@ -16,7 +16,7 @@ library(gtsummary)
 
 **DASS-42 Responses**
 
-Our group applied the dataset from Kaggle Depression, Anxiety, and Stress Scales Responses (can be find [here]([https://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses](https://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses/data?select=codebook.txt))) for this project. The DASS-42 is a self-report scale consisting of 42 items intended to gauge emotional states related to depression, anxiety, and stress. The primary benefit of utilizing the DASS in a clinical context is its ability to ascertain the specific location of emotional turmoil, contributing to a more comprehensive clinical assessment. Its core function is to evaluate the severity of the fundamental symptoms associated with depression, anxiety, and stress.
+Our group applied the dataset from Kaggle Depression, Anxiety, and Stress Scales Responses (can be find [here](<https://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses>)) for this project. The DASS-42 is a self-report scale consisting of 42 items intended to gauge emotional states related to depression, anxiety, and stress. The primary benefit of utilizing the DASS in a clinical context is its ability to ascertain the specific location of emotional turmoil, contributing to a more comprehensive clinical assessment. Its core function is to evaluate the severity of the fundamental symptoms associated with depression, anxiety, and stress.
 
 ```{r}
 # Load the dataset
