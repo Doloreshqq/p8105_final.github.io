@@ -378,15 +378,41 @@ div.tocify {
 
 <div id="data-source" class="section level2">
 <h2>Data Source</h2>
-<p>(where DASS comes from, code.txt, data.csv, scoring table)</p>
+<p><strong>DASS-42 Responses</strong></p>
+<p>Our group applied the dataset from Kaggle Depression, Anxiety, and
+Stress Scales Responses (can be find <a
+href="%5Bhttps://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses%5D(https://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses/data?select=codebook.txt)">here</a>)
+for this project. The DASS-42 is a self-report scale consisting of 42
+items intended to gauge emotional states related to depression, anxiety,
+and stress. The primary benefit of utilizing the DASS in a clinical
+context is its ability to ascertain the specific location of emotional
+turmoil, contributing to a more comprehensive clinical assessment. Its
+core function is to evaluate the severity of the fundamental symptoms
+associated with depression, anxiety, and stress.</p>
 <pre class="r"><code># Load the dataset
 dass_raw = read.csv(&quot;./data/data.csv&quot;, sep = &quot;\t&quot;)</code></pre>
+<p>The raw data contain 39775 observations and 172 variables, where
+contains the information of the participants’ responses.</p>
 </div>
 <div id="data-establishment-and-data-cleaning" class="section level2">
 <h2>Data Establishment and Data Cleaning</h2>
-<p>Based on codebook.txt, we select the variables we want… (explain how
-to check whether the survey is usable and what variables we need,
-explain each one)</p>
+<p>As we mentioned before, the raw data contains the basic information
+from the responses. Based on codebook.txt from Kaggle, we checked
+whether the individual response is meaningful. The criteria are as
+follow:</p>
+<ul>
+<li><p>The survey includes an accuracy check section, which provides
+several word spelling questions to check whether participants had filled
+out the questionnaire carefully.
+<code>VCL6</code>,<code>VCL9</code>,<code>VCL12</code> represents words
+that not exist. If the participants chose 1 in any of these three
+questions, the response could be omit.</p></li>
+<li><p>The raw data contains different missing values which needs to be
+omitted. Specifically, <code>country</code> variable has “NONE” as the
+missing value.</p></li>
+<li><p><code>Age</code> variable have impossible values we need to clean
+out. For example, 299 years for an age is not reasonable.</p></li>
+</ul>
 <pre class="r"><code># kick out meaningless observation
 dass = dass_raw %&gt;%
   filter(!(VCL6 == 1 | VCL9 == 1 | VCL12 == 1)) %&gt;%
@@ -396,8 +422,13 @@ dass = dass_raw %&gt;%
 dass = dass %&gt;%
   dplyr::select(matches(&#39;Q\\d+A&#39;), country, education, urban, gender, age, religion, orientation, race, married) %&gt;%
   na.omit()</code></pre>
-<p>( refactor the factor, mention these variable = 0 means missing value
-)</p>
+<p>Since we observed that there are some variables have actual meaning
+corresponding to the original numeric value, we refactor these
+variables, including <code>education</code>, <code>urban</code>,
+<code>gender</code>, <code>religion</code>, <code>orientation</code>,
+<code>race</code>, <code>married</code>. In these variables, if the
+value is 0, it represents missing value and we delete these
+observations.</p>
 <pre class="r"><code># refactor the variables
 dass_new = dass %&gt;%
   mutate(
@@ -440,10 +471,46 @@ dass_new = dass %&gt;%
                         married == 3 ~ &#39;Previously married&#39;)
     ) %&gt;%
   na.omit()</code></pre>
-<p>Based on scoring …. create <code>depression</code>,
-<code>anxiety</code>, <code>stress</code> variable for each
-observation.</p>
-<p>(explain how) -14 means scale to 0-3 scale from 1-4 scale</p>
+<p>Based on the scoring criteria, we add up the values for Q3A, Q5A,
+Q10A, Q13A, Q16A, Q17A, Q21A, Q24A, Q26A, Q31A, Q34A, Q37A, Q38A and
+Q42A as the depression scores. Similarly, add up the values for Q2A,
+Q4A, Q7A, Q9A, Q15A, Q19A, Q20A, Q23A, Q25A, Q28A, Q30A, Q36A, Q40A and
+Q41A as the anxiety scores and the sum of Q1A, Q6A, Q8A, Q11A, Q12A,
+Q14A, Q18A, Q22A, Q27A, Q29A, Q32A, Q33A, Q35A and Q39A as the stress
+scores. Considering that the scoring criteria we refer to is 0-3 scale
+but Kaggle dataset is 1-4 scale, we modify these three scores by minus
+14.</p>
+<p>After that, we could assign depression level, anxiety level and
+stress level for each observation refer to the rule of:</p>
+<ol style="list-style-type: decimal">
+<li><p>Depression</p>
+<ul>
+<li><p>0 - 9 normal</p></li>
+<li><p>10 - 13 mild</p></li>
+<li><p>14 - 20 moderate</p></li>
+<li><p>21 - 27 severe</p></li>
+<li><p>&gt;27 extremely severe</p></li>
+</ul></li>
+<li><p>Anxiety</p>
+<ul>
+<li><p>0 - 7 normal</p></li>
+<li><p>8 - 9 mild</p></li>
+<li><p>10 - 14 moderate</p></li>
+<li><p>15 - 19 severe</p></li>
+<li><p>&gt;19 extremely severe</p></li>
+</ul></li>
+<li><p>Stress</p>
+<ul>
+<li><p>0 - 14 normal</p></li>
+<li><p>15 - 18 mild</p></li>
+<li><p>19 - 25 moderate</p></li>
+<li><p>26 - 33 severe</p></li>
+<li><p>&gt;33 extremely severe</p></li>
+</ul></li>
+</ol>
+<p>Considering that stress, anxiety and depression might have
+correlations, we apply correlation test for <code>stress_level</code>,
+<code>depression_level</code>, <code>anxiety_level</code>.</p>
 <pre class="r"><code>dass_heat2 &lt;- dass %&gt;%
   mutate(
     depression = Q3A + Q5A + Q10A + Q13A + Q16A + Q17A + Q21A + Q24A + Q26A + Q31A + Q34A + Q37A + Q38A + Q42A - 14,
@@ -491,13 +558,14 @@ pheatmap(r1,
          breaks = seq(0, 1, length.out = 90)
 )</code></pre>
 <p><img src="data_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<p>Since three associate, we take depression as representative.</p>
+<p>According to the heat map, we could conclude that these three
+variables have strong correlation. Therefore, in our project, we take
+depression_level as the representative.</p>
+<p>Finally, we get our clean and tidy dataset for the project.</p>
 <pre class="r"><code># create three different dataset
 dass_new = dass_new %&gt;%
   mutate(
-    depression = Q3A + Q5A + Q10A + Q13A + Q16A + Q17A + Q21A + Q24A + Q26A + Q31A + Q34A + Q37A + Q38A + Q42A - 14,
-    #anxiety = Q2A + Q4A + Q7A + Q9A + Q15A + Q19A + Q20A + Q23A + Q25A + Q28A + Q30A + Q36A + Q40A + Q41A - 14,
-    #stress = Q1A + Q6A + Q8A + Q11A + Q12A + Q14A + Q18A + Q22A + Q27A + Q29A + Q32A + Q33A + Q35A + Q39A - 14
+    depression = Q3A + Q5A + Q10A + Q13A + Q16A + Q17A + Q21A + Q24A + Q26A + Q31A + Q34A + Q37A + Q38A + Q42A - 14
     ) %&gt;%
   mutate(education = factor(education, levels = c(&#39;Less than high school&#39;, &#39;High school&#39;, &#39;University degree&#39;, &#39;Graduate degree&#39;))) %&gt;%
   mutate(married = factor(married, levels = c(&quot;Previously married&quot;, &quot;Currently married&quot;, &quot;Never married&quot;))) %&gt;%
@@ -512,27 +580,30 @@ dass_new = dass_new %&gt;%
     depression &gt;= 21 &amp; depression &lt;= 27 ~ &#39;Severe&#39;,
     depression &gt;= 28 ~ &#39;Extremely severe&#39;
   )) %&gt;%
- # mutate(anxiety_level = case_when(
-    #anxiety &gt;= 0 &amp; anxiety &lt;= 7 ~ &#39;Normal&#39;,
-    #anxiety &gt;= 8 &amp; anxiety &lt;= 9 ~ &#39;Mild&#39;,
-    #anxiety &gt;= 10 &amp; anxiety &lt;= 14 ~ &#39;Moderate&#39;,
-    #anxiety &gt;= 15 &amp; anxiety &lt;= 19 ~ &#39;Severe&#39;,
-    #anxiety &gt;= 20 ~ &#39;Extremely severe&#39;
-# )) %&gt;%
-# mutate(stress_level = case_when(
-    #stress &gt;= 0 &amp; stress &lt;= 14 ~ &#39;Normal&#39;,
-    #stress &gt;= 15 &amp; stress &lt;= 18 ~ &#39;Mild&#39;,
-    #stress &gt;= 19 &amp; stress &lt;= 25 ~ &#39;Moderate&#39;,
-    #stress &gt;= 26 &amp; stress &lt;= 33 ~ &#39;Severe&#39;,
-    #stress &gt;= 34 ~ &#39;Extremely severe&#39;
-#  )) %&gt;%
   mutate(depression_level = factor(depression_level, c(&quot;Normal&quot;,&quot;Mild&quot;,&quot;Moderate&quot;,&quot;Severe&quot;,&quot;Extremely severe&quot;))) %&gt;%
-  #mutate(anxiety_level = factor(anxiety_level, c(&quot;Normal&quot;,&quot;Mild&quot;,&quot;Moderate&quot;,&quot;Severe&quot;,&quot;Extremely severe&quot;))) %&gt;%
-  #mutate(stress_level = factor(stress_level, c(&quot;Normal&quot;,&quot;Mild&quot;,&quot;Moderate&quot;,&quot;Severe&quot;,&quot;Extremely severe&quot;))) %&gt;%
-  dplyr::select(-depression)</code></pre>
+  dplyr::select(-depression)
+
+head(dass_new)</code></pre>
+<pre><code>##   country             education    urban gender age             religion
+## 1      IN           High school    Urban Female  16                Other
+## 3      PL           High school    Urban Female  17 Christian (Catholic)
+## 4      US Less than high school    Urban Female  13 Christian (Catholic)
+## 5      MY     University degree Suburban Female  19               Muslim
+## 6      US           High school    Urban Female  20 Christian (Catholic)
+## 7      MX           High school    Urban Female  17    Christian (Other)
+##    orientation  race       married depression_level
+## 1 Heterosexual Asian Never married           Severe
+## 3   Homosexual White Never married Extremely severe
+## 4        Other Other Never married         Moderate
+## 5 Heterosexual Asian Never married Extremely severe
+## 6 Heterosexual Other Never married             Mild
+## 7     Bisexual White Never married Extremely severe</code></pre>
 </div>
 <div id="data-summary" class="section level2">
 <h2>Data Summary</h2>
+<p>Above all, we got our dataset for further analysis. It contains 30309
+observations and 10 variables. The explanation of each variables are
+listed below:</p>
 <ul>
 <li><p><code>country</code>: The country where the participants
 from.</p></li>
@@ -553,11 +624,7 @@ survey.</p></li>
 <li><p><code>depression_level</code>: The depression level of the
 participants according to the survey and scores.</p></li>
 </ul>
-<pre class="r"><code>library(gtsummary)
-
-library(gtsummary)
-
-dass_new %&gt;%
+<pre class="r"><code>dass_new %&gt;%
   dplyr::select(-country) %&gt;%
   tbl_summary(type = list(
     education ~ &quot;categorical&quot;, 
@@ -585,23 +652,23 @@ dass_new %&gt;%
   )) %&gt;%
   bold_labels() %&gt;%
   as_gt()  # Display the table as a gt object</code></pre>
-<div id="kwlpsopwsf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#kwlpsopwsf table {
+<div id="manxrvybzn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#manxrvybzn table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#kwlpsopwsf thead, #kwlpsopwsf tbody, #kwlpsopwsf tfoot, #kwlpsopwsf tr, #kwlpsopwsf td, #kwlpsopwsf th {
+#manxrvybzn thead, #manxrvybzn tbody, #manxrvybzn tfoot, #manxrvybzn tr, #manxrvybzn td, #manxrvybzn th {
   border-style: none;
 }
 
-#kwlpsopwsf p {
+#manxrvybzn p {
   margin: 0;
   padding: 0;
 }
 
-#kwlpsopwsf .gt_table {
+#manxrvybzn .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -627,12 +694,12 @@ dass_new %&gt;%
   border-left-color: #D3D3D3;
 }
 
-#kwlpsopwsf .gt_caption {
+#manxrvybzn .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#kwlpsopwsf .gt_title {
+#manxrvybzn .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -644,7 +711,7 @@ dass_new %&gt;%
   border-bottom-width: 0;
 }
 
-#kwlpsopwsf .gt_subtitle {
+#manxrvybzn .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -656,7 +723,7 @@ dass_new %&gt;%
   border-top-width: 0;
 }
 
-#kwlpsopwsf .gt_heading {
+#manxrvybzn .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -668,13 +735,13 @@ dass_new %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#kwlpsopwsf .gt_bottom_border {
+#manxrvybzn .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#kwlpsopwsf .gt_col_headings {
+#manxrvybzn .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -689,7 +756,7 @@ dass_new %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#kwlpsopwsf .gt_col_heading {
+#manxrvybzn .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -709,7 +776,7 @@ dass_new %&gt;%
   overflow-x: hidden;
 }
 
-#kwlpsopwsf .gt_column_spanner_outer {
+#manxrvybzn .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -721,15 +788,15 @@ dass_new %&gt;%
   padding-right: 4px;
 }
 
-#kwlpsopwsf .gt_column_spanner_outer:first-child {
+#manxrvybzn .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#kwlpsopwsf .gt_column_spanner_outer:last-child {
+#manxrvybzn .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#kwlpsopwsf .gt_column_spanner {
+#manxrvybzn .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -741,11 +808,11 @@ dass_new %&gt;%
   width: 100%;
 }
 
-#kwlpsopwsf .gt_spanner_row {
+#manxrvybzn .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#kwlpsopwsf .gt_group_heading {
+#manxrvybzn .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -771,7 +838,7 @@ dass_new %&gt;%
   text-align: left;
 }
 
-#kwlpsopwsf .gt_empty_group_heading {
+#manxrvybzn .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -786,15 +853,15 @@ dass_new %&gt;%
   vertical-align: middle;
 }
 
-#kwlpsopwsf .gt_from_md > :first-child {
+#manxrvybzn .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#kwlpsopwsf .gt_from_md > :last-child {
+#manxrvybzn .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#kwlpsopwsf .gt_row {
+#manxrvybzn .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -813,7 +880,7 @@ dass_new %&gt;%
   overflow-x: hidden;
 }
 
-#kwlpsopwsf .gt_stub {
+#manxrvybzn .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -826,7 +893,7 @@ dass_new %&gt;%
   padding-right: 5px;
 }
 
-#kwlpsopwsf .gt_stub_row_group {
+#manxrvybzn .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -840,15 +907,15 @@ dass_new %&gt;%
   vertical-align: top;
 }
 
-#kwlpsopwsf .gt_row_group_first td {
+#manxrvybzn .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#kwlpsopwsf .gt_row_group_first th {
+#manxrvybzn .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#kwlpsopwsf .gt_summary_row {
+#manxrvybzn .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -858,16 +925,16 @@ dass_new %&gt;%
   padding-right: 5px;
 }
 
-#kwlpsopwsf .gt_first_summary_row {
+#manxrvybzn .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#kwlpsopwsf .gt_first_summary_row.thick {
+#manxrvybzn .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#kwlpsopwsf .gt_last_summary_row {
+#manxrvybzn .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -877,7 +944,7 @@ dass_new %&gt;%
   border-bottom-color: #D3D3D3;
 }
 
-#kwlpsopwsf .gt_grand_summary_row {
+#manxrvybzn .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -887,7 +954,7 @@ dass_new %&gt;%
   padding-right: 5px;
 }
 
-#kwlpsopwsf .gt_first_grand_summary_row {
+#manxrvybzn .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -897,7 +964,7 @@ dass_new %&gt;%
   border-top-color: #D3D3D3;
 }
 
-#kwlpsopwsf .gt_last_grand_summary_row_top {
+#manxrvybzn .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -907,11 +974,11 @@ dass_new %&gt;%
   border-bottom-color: #D3D3D3;
 }
 
-#kwlpsopwsf .gt_striped {
+#manxrvybzn .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#kwlpsopwsf .gt_table_body {
+#manxrvybzn .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -920,7 +987,7 @@ dass_new %&gt;%
   border-bottom-color: #D3D3D3;
 }
 
-#kwlpsopwsf .gt_footnotes {
+#manxrvybzn .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -934,7 +1001,7 @@ dass_new %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#kwlpsopwsf .gt_footnote {
+#manxrvybzn .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -943,7 +1010,7 @@ dass_new %&gt;%
   padding-right: 5px;
 }
 
-#kwlpsopwsf .gt_sourcenotes {
+#manxrvybzn .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -957,7 +1024,7 @@ dass_new %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#kwlpsopwsf .gt_sourcenote {
+#manxrvybzn .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -965,63 +1032,63 @@ dass_new %&gt;%
   padding-right: 5px;
 }
 
-#kwlpsopwsf .gt_left {
+#manxrvybzn .gt_left {
   text-align: left;
 }
 
-#kwlpsopwsf .gt_center {
+#manxrvybzn .gt_center {
   text-align: center;
 }
 
-#kwlpsopwsf .gt_right {
+#manxrvybzn .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#kwlpsopwsf .gt_font_normal {
+#manxrvybzn .gt_font_normal {
   font-weight: normal;
 }
 
-#kwlpsopwsf .gt_font_bold {
+#manxrvybzn .gt_font_bold {
   font-weight: bold;
 }
 
-#kwlpsopwsf .gt_font_italic {
+#manxrvybzn .gt_font_italic {
   font-style: italic;
 }
 
-#kwlpsopwsf .gt_super {
+#manxrvybzn .gt_super {
   font-size: 65%;
 }
 
-#kwlpsopwsf .gt_footnote_marks {
+#manxrvybzn .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#kwlpsopwsf .gt_asterisk {
+#manxrvybzn .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#kwlpsopwsf .gt_indent_1 {
+#manxrvybzn .gt_indent_1 {
   text-indent: 5px;
 }
 
-#kwlpsopwsf .gt_indent_2 {
+#manxrvybzn .gt_indent_2 {
   text-indent: 10px;
 }
 
-#kwlpsopwsf .gt_indent_3 {
+#manxrvybzn .gt_indent_3 {
   text-indent: 15px;
 }
 
-#kwlpsopwsf .gt_indent_4 {
+#manxrvybzn .gt_indent_4 {
   text-indent: 20px;
 }
 
-#kwlpsopwsf .gt_indent_5 {
+#manxrvybzn .gt_indent_5 {
   text-indent: 25px;
 }
 </style>

@@ -9,9 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Huanyu Chen, Shaolei Ma" />
 
-<meta name="date" content="2023-12-04" />
 
 <title>Logistic Model</title>
 
@@ -374,8 +372,6 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Logistic Model</h1>
-<h4 class="author">Huanyu Chen, Shaolei Ma</h4>
-<h4 class="date">2023-12-04</h4>
 
 </div>
 
@@ -1023,7 +1019,7 @@ of “Severe.”</p>
 <div id="depression-levels-distribution" class="section level1">
 <h1>Depression Levels Distribution</h1>
 <p>The following graphs show the probability of depression level on
-different categorical variables.</p>
+different categorical and continuous variables.</p>
 <pre class="r"><code># Create a data frame with the predictor values for visualization
 predictor_data &lt;- model.matrix(depression_level ~ country + gender + age
                                + orientation + race, data = dass_fit_df)
