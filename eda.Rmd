@@ -10,9 +10,20 @@ library(ggridges)
 dass_new = read.csv("./data/dass_new.csv")
 ```
 
-Shiny app list here
+# Shiny app
 
-# Plot:
+The data we used to analyze potential factors of depression levels comes from a worldwide survey. 
+The raw data includes 9 potential factors:`country`, `education`, `urban`, `gender`, `religion`, 
+`orientation`, `race`, `married`, and `age`. We would like to focus on `country`, `orientation`, `gender`, `age`, and `race` to analyze the relationship between these factors and depression level. 
+This [shiny app](https://doloreshqq.shinyapps.io/r_shiny_for_p8105/) 
+provides visualizations of depression levels for individual countries on a global scale. A screenshot is shown below:
+
+<img src="shinny_scr.jpg" style ="width:80%">
+
+# Plots
+
+
+
 ## Depression Level vs. Orientation vs. Gender
 ```{r}
 dass_new|>
@@ -280,3 +291,4 @@ chisq.test(pull(dass_chi, race), pull(dass_chi, depression_level))|>
 The null hypothesis for the chi-squared test is that depression levels and race groups are independent. Since the p-value is smaller than 0.05, the null hypothesis is rejected. \
 We may conclude that race is associated with depression levels.
 
+Based on the performed tests, orientation, gender, age, and race are strongly associated with depression levels. 

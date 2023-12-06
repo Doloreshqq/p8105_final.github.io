@@ -376,9 +376,24 @@ div.tocify {
 </div>
 
 
-<p>Shiny app list here</p>
-<div id="plot" class="section level1">
-<h1>Plot:</h1>
+<div id="shiny-app" class="section level1">
+<h1>Shiny app</h1>
+<p>The data we used to analyze potential factors of depression levels
+comes from a worldwide survey. The raw data includes 9 potential
+factors:<code>country</code>, <code>education</code>,
+<code>urban</code>, <code>gender</code>, <code>religion</code>,
+<code>orientation</code>, <code>race</code>, <code>married</code>, and
+<code>age</code>. We would like to focus on <code>country</code>,
+<code>orientation</code>, <code>gender</code>, <code>age</code>, and
+<code>race</code> to analyze the relationship between these factors and
+depression level. This <a
+href="https://doloreshqq.shinyapps.io/r_shiny_for_p8105/">shiny app</a>
+provides visualizations of depression levels for individual countries on
+a global scale. A screenshot is shown below:</p>
+<p><img src="shinny_scr.jpg" style ="width:80%"></p>
+</div>
+<div id="plots" class="section level1">
+<h1>Plots</h1>
 <div id="depression-level-vs.-orientation-vs.-gender"
 class="section level2">
 <h2>Depression Level vs. Orientation vs. Gender</h2>
@@ -402,8 +417,8 @@ class="section level2">
   labs(x = &quot;Depression level&quot;, 
        y = &quot;count of cases&quot;, 
        title = &quot;Depression level vs. orientation vs. gender&quot;)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;gender&#39;. You can override
-## using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;gender&#39;. You can override using the
+## `.groups` argument.</code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
 </div>
 <div id="depression-level-vs.-orientation" class="section level2">
@@ -758,6 +773,8 @@ chisq.test(pull(dass_chi, race), pull(dass_chi, depression_level))|&gt;
 levels and race groups are independent. Since the p-value is smaller
 than 0.05, the null hypothesis is rejected.<br />
 We may conclude that race is associated with depression levels.</p>
+<p>Based on the performed tests, orientation, gender, age, and race are
+strongly associated with depression levels.</p>
 </div>
 </div>
 
