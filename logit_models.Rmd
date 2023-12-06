@@ -33,11 +33,11 @@ scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
 
-The goal is to fit an ordered logit model.
+Now, we want to investigate the relationship between demographic variables and depression levels. Because the dependent variable `depression_level` is an ordinal variable with five levels ("Normal", "Mild", "Moderate", "Severe", "Extremely severe"), we choose to fit an ordered logit model.
 
 # Independent Variables
 
-First, test the distribution of independent variables.
+Imbalanced data may result in an inaccurate outcome due to a small sample size in some classes. Therefore, we first want to test the distribution of independent variables to avoid the imbalance of samples between different categories.
 
 ```{r}
 dass_new = read_csv("data/dass_new.csv")
@@ -48,7 +48,7 @@ dass_new |>
   summary()
 ```
 
-Some categories contain few samples. For the efficacy of the model, we regroup the independent variables following the standards below:
+Some categories contain few samples (e.g. countries other than the listed six countries have less than 500 samples). For the efficacy of the model and considering which class most interests us, we regroup the independent variables following the standards below:
 
 -   `country`: Group the country with less than 500 samples into "Other", and set "US" to be the reference level.
 -   `education`: Order the variable by the length of education.
@@ -87,7 +87,9 @@ dass_fit =
   summary())
 ```
 
-Test the parallel assumption.
+When conducting an ordered logit model, the underlying assumption is that the coefficients that describe the relationship between, say, the lowest versus all higher categories of the response variable are the same as those that describe the relationship between the next lowest category and all higher categories, etc. This is called the proportional odds assumption or the parallel assumption.
+
+Now, we want to test if the model conducted meets the parallel assumption.
 
 ```{r}
 car::poTest(dass_fit)
@@ -95,7 +97,7 @@ car::poTest(dass_fit)
 
 Because the overall $p-value < 0.001$, we reject the null hypothesis and conclude that the parallel assumption is not met.
 
-To meet the parallel assumption, we try the following two methods:
+To meet the parallel assumption, considering the variables of interest in EDA, we try the following two methods:
 
 -   **Select independent variables**: Because we think `religion` and `race`, `married` and `orientation`, `country` and `urban` are strongly correlated with each other, and we care more about `race`, `orientation`, and `country`, first delete `religion`, `married`, and `urban`. We also delete `education` to meet the parallel assumption.
 -   **Regroup dependent variable**: Regroup `depression_level` into "Moderate or Below", "Severe", "Extremely severe".
@@ -120,6 +122,7 @@ dass_fit1 |> poTest()
 
 The model meets the parallel assumption at $\alpha=0.05$ level (with an overall $p = 0.067 > 0.05$).
 
+# Results
 ```{r}
 dass_fit1 |> summary()
 ```
@@ -166,66 +169,6 @@ The estimated model can be written as: \begin{align*}
 &- 0.10 \times I(\text{race} = \text{Other})
 \end{align*}
 
-# Effect on Depression Levels
-## Effect of Countries on Depression Levels
-```{r}
-# Extract coefficients for countries
-pos_country = str_starts(names(dass_fit1$coefficients), "country")
-
-country_coefficients <- data.frame(
-  country = substr(names(dass_fit1$coefficients)[pos_country], 8, 20),
-  coefficient = dass_fit1$coefficients[pos_country]
-  )
-
-# Plotting coefficients for countries
-ggplot(country_coefficients, aes(x = country, y = coefficient)) +
-  geom_bar(stat = "identity", fill = "skyblue", color = "black") +
-  labs(title = "Effect of Countries on Depression Levels",
-       x = "Country", y = "Coefficient")
-```
-
-## Effect of Races on Depression Levels
-```{r}
-# Extract coefficients for races
-pos_race <- str_starts(names(dass_fit1$coefficients), "race")
-
-race_coefficients <- data.frame(
-  race = substr(names(dass_fit1$coefficients)[pos_race], 5, 20),
-  coefficient = dass_fit1$coefficients[pos_race]
-)
-
-# Plotting coefficients for races
-ggplot(race_coefficients, aes(x = race, y = coefficient)) +
-  geom_bar(stat = "identity", fill = "pink", color = "black") +
-  labs(
-    title = "Effect of Races on Depression Levels",
-    x = "Race",
-    y = "Coefficient"
-  )
-```
-
-## Effect of Orientations on Depression Levels
-```{r}
-# Extract coefficients for orientations
-pos_orientation <- str_starts(names(dass_fit1$coefficients), "orientation")
-
-orientation_coefficients <- data.frame(
-  orientation = substr(names(dass_fit1$coefficients)[pos_orientation], 12, 20),
-  coefficient = dass_fit1$coefficients[pos_orientation]
-)
-
-# Plotting coefficients for orientations
-ggplot(orientation_coefficients, aes(x = orientation, y = coefficient)) +
-  geom_bar(stat = "identity", fill = "palegreen", color = "black") +
-  labs(
-    title = "Effect of Orientations on Depression Levels",
-    x = "Orientation",
-    y = "Coefficient"
-  )
-```
-
-# Interpretation
-
 Calculate the odds ratio and CI for variables:
 
 ```{r}
@@ -233,28 +176,88 @@ exp(cbind(OR = coef(dass_fit1), confint(dass_fit1))) |>
   knitr::kable()
 ```
 
-**Country**:
+## Interpretation
+
+### **Country**
 
 -   For Canadian, Britain, and Philippines participants, the odds of having a more severe depression level is higher than that of US participants, holding constant all other variables.
 -   For Indonesia and Malaysia participants, the odds of having a more severe depression level is lower than that of US participants, holding constant all other variables.
 
-**Gender**:
+```{r}
+# Extract coefficients for countries
+pos_country = str_starts(names(dass_fit1$coefficients), "country")
+
+country_coefficients =
+  tibble(
+    country = substr(names(dass_fit1$coefficients)[pos_country], 8, 20),
+    OR = exp(dass_fit1$coefficients[pos_country])
+  ) |> 
+  mutate(country = fct_reorder(country, OR))
+  
+
+# Plotting coefficients for countries
+ggplot(country_coefficients, aes(x = country, y = OR - 1)) +
+  geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+  labs(title = "Effect of Countries on Depression Levels",
+       x = "Country", y = "OR - 1")
+```
+
+### **Age**:
+
+-   For every one unit increase in participant's age, the odds of having a more severe depression level is multiplied 0.98 times, holding constant all other variables. It indicates that older people may have less risk to get depressed.
+
+### **Gender**:
 
 -   For male participants, the odds of having a more severe depression level is 0.90 times that of female participants, holding constant all other variables.
 -   For non-binary participants, the odds of having a more severe depression level is 1.47 times that of female participants, holding constant all other variables.
 
-**Age**:
+### **Race**
 
--   For every one unit increase in participant's age, the odds of having a more severe depression level is multiplied 0.98 times, holding constant all other variables. It indicates that older people may have less risk to get depressed.
+-   For Native American, Asian, Black, and Other participants, the odds of having a more severe depression level is lower than that of White participants, holding constant all other variables.
 
-**Orientation**:
+```{r}
+# Extract coefficients for races
+pos_race <- str_starts(names(dass_fit1$coefficients), "race")
+
+race_coefficients =
+  tibble(
+    race = substr(names(dass_fit1$coefficients)[pos_race], 5, 20),
+    OR = dass_fit1$coefficients[pos_race]
+  ) |> 
+  mutate(race = fct_reorder(race, OR))
+
+# Plotting coefficients for races
+ggplot(race_coefficients, aes(x = race, y = OR - 1)) +
+  geom_bar(stat = "identity", fill = "pink", color = "black") +
+  labs(
+    title = "Effect of Races on Depression Levels",
+    x = "Race",
+    y = "OR - 1"
+  )
+```
+
+### **Orientation**
 
 -   For sexual minorities, the odds of having a more severe depression level is higher than that of heterosexual orientation participants, holding constant all other variables.
 
-**Race**:
+```{r}
+# Extract coefficients for orientations
+pos_orientation <- str_starts(names(dass_fit1$coefficients), "orientation")
 
--   For Native American participants, the odds of having a more severe depression level is higher than that of White participants, holding constant all other variables.
--   For Asian, Black, and Other participants, the odds of having a more severe depression level is lower than that of White participants, holding constant all other variables.
+orientation_coefficients <- data.frame(
+  orientation = substr(names(dass_fit1$coefficients)[pos_orientation], 12, 20),
+  OR = exp(dass_fit1$coefficients[pos_orientation])
+)
+
+# Plotting coefficients for orientations
+ggplot(orientation_coefficients, aes(x = orientation, y = OR - 1)) +
+  geom_bar(stat = "identity", fill = "palegreen", color = "black") +
+  labs(
+    title = "Effect of Orientations on Depression Levels",
+    x = "Orientation",
+    y = "OR - 1"
+  )
+```
 
 # Receiver Operating Characteristic Curve for Depression Level
 ```{r}
