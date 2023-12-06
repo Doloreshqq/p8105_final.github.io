@@ -397,13 +397,18 @@ a global scale. A screenshot is shown below:</p>
 <div id="depression-level-vs.-orientation-vs.-gender"
 class="section level2">
 <h2>Depression Level vs. Orientation vs. Gender</h2>
+<p>First, we would like to observe the distribution of depression levels
+according to orientation and gender. The plot below shows the number of
+different depression level cases in each gender groups among
+orientation.</p>
 <pre class="r"><code>dass_new|&gt;
   group_by(gender, orientation)|&gt;
   summarise(Normal = sum(depression_level==&quot;Normal&quot;),
           Mild = sum(depression_level==&quot;Mild&quot;),
           Moderate = sum(depression_level==&quot;Moderate&quot;),
           Severe = sum(depression_level==&quot;Severe&quot;),
-          Extremely_Severe = sum(depression_level==&quot;Extremely severe&quot;))|&gt;
+          Extremely_Severe = sum(depression_level==&quot;Extremely severe&quot;),
+          .groups = &quot;keep&quot;)|&gt;
   pivot_longer(
     Normal:Extremely_Severe,
     names_to = &quot;Level&quot;,
@@ -417,12 +422,15 @@ class="section level2">
   labs(x = &quot;Depression level&quot;, 
        y = &quot;count of cases&quot;, 
        title = &quot;Depression level vs. orientation vs. gender&quot;)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;gender&#39;. You can override using the
-## `.groups` argument.</code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>From the plot, we observed that female gender group tends to have a
+higher number of depression cases in all orientation groups compared
+with other gender groups.</p>
 </div>
 <div id="depression-level-vs.-orientation" class="section level2">
 <h2>Depression level vs. Orientation</h2>
+<p>Next, we would like to delve deeper into studying the relationship
+between the level of depression and orientation.</p>
 <pre class="r"><code>dass_new|&gt;
   group_by(orientation)|&gt;
   summarise(Normal = sum(depression_level==&quot;Normal&quot;),
@@ -499,6 +507,18 @@ dass_new|&gt;
        title = &quot;Depression level vs. race groups&quot;)</code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 </div>
+<div id="age-distribution-for-each-depression-level"
+class="section level2">
+<h2>Age Distribution for Each Depression Level</h2>
+<pre class="r"><code>dass_new %&gt;%
+  ggplot(aes(x=depression_level, y=age)) +
+  geom_boxplot(aes(fill=depression_level)) +
+  labs(title = &quot;Age Distribution for Each Depression Level&quot;,
+        xlab = &quot;Depression Level&quot;,
+        ylab = &quot;Age&quot;)+
+  theme_minimal()</code></pre>
+<p><img src="eda_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
 <div id="depression-level-vs.-age-groups" class="section level2">
 <h2>Depression Level vs. Age groups</h2>
 <pre class="r"><code>dass_new|&gt;
@@ -525,31 +545,22 @@ dass_new|&gt;
   labs(x = &quot;Depression level&quot;, 
        y = &quot;count of cases&quot;, 
        title = &quot;Depression level vs. age groups&quot;)</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-</div>
-<div id="age-distribution-for-each-depression-level"
-class="section level2">
-<h2>Age Distribution for Each Depression Level</h2>
-<pre class="r"><code>dass_new %&gt;%
-  ggplot(aes(x=depression_level, y=age)) +
-  geom_boxplot(aes(fill=depression_level)) +
-  labs(title = &quot;Age Distribution for Each Depression Level&quot;,
-        xlab = &quot;Depression Level&quot;,
-        ylab = &quot;Age&quot;)+
-  theme_minimal()</code></pre>
 <p><img src="eda_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
 </div>
 <div id="chi-squared-test" class="section level1">
 <h1>Chi-squared Test</h1>
+<p>From the plots above, we observed that the distribution of cases of
+different depression levels among different orientation groups, the
+distribution of cases of different depression levels among different
+gender groups, the distribution of cases of different depression levels
+among different age groups, and the distribution of cases of different
+depression levels among different race groups follow a similar pattern.
+Thus, we would like to perform a chi-squared test to study if these
+factors and depression levels are associated.<br />
+</p>
 <div id="orientation-depression-level" class="section level2">
 <h2>1: Orientation &amp; Depression Level</h2>
-<p>From the plot of depression level vs. orientation, we observed that
-the distribution of cases of different depression levels among different
-orientation groups follow a similar pattern. Thus, we would like to
-perform a chi-squared test to study if the depression levels and
-orientation are associated.<br />
-</p>
 <p><span class="math inline">\(H_0\)</span>: The depression levels and
 orientation are independent.<br />
 <span class="math inline">\(H_1\)</span>: The depression levels and
@@ -600,12 +611,6 @@ levels.</p>
 </div>
 <div id="gender-depression-level" class="section level2">
 <h2>2: Gender &amp; Depression Level</h2>
-<p>From the plot of depression level vs. gender, we observed that the
-distribution of cases of different depression levels among different
-gender groups follow a similar pattern. Thus, we would like to perform a
-chi-squared test to study if the depression levels and gender are
-associated.<br />
-</p>
 <p><span class="math inline">\(H_0\)</span>: The depression levels and
 gender are independent.<br />
 <span class="math inline">\(H_1\)</span>: The depression levels and
@@ -653,12 +658,6 @@ We may conclude that gender is associated with depression levels.</p>
 </div>
 <div id="age-depression-level" class="section level2">
 <h2>3: Age &amp; Depression Level</h2>
-<p>From the plot of depression level vs. age groups, we observed that
-the distribution of cases of different depression levels among different
-age groups follow a similar pattern. Thus, we would like to perform a
-chi-squared test to study if the depression levels and age are
-associated.<br />
-</p>
 <p><span class="math inline">\(H_0\)</span>: The depression levels and
 age are independent.<br />
 <span class="math inline">\(H_1\)</span>: The depression levels and age
@@ -713,12 +712,6 @@ We may conclude that age is associated with depression levels.</p>
 </div>
 <div id="race-depression-level" class="section level2">
 <h2>4: Race &amp; Depression Level</h2>
-<p>Similarly, we observed that the distribution of cases of different
-depression levels among different race groups follow a similar pattern
-from the plot of depression levels vs. race groups. Thus, we would like
-to perform a chi-squared test to study if the depression levels and race
-groups are associated.<br />
-</p>
 <p><span class="math inline">\(H_0\)</span>: The depression levels and
 race groups are independent.<br />
 <span class="math inline">\(H_1\)</span>: The depression levels and race
