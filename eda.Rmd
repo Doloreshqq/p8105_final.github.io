@@ -51,7 +51,8 @@ dass_new|>
        title = "Depression level vs. orientation vs. gender")
 ```
 
-From the plot, we observed that female gender group tends to have a higher number of depression cases in all orientation groups compared with other gender groups.  
+From the plot, we observed that the female gender group in all orientation categories tends to exhibit a higher number of depression cases compared to other gender groups.
+
 
 ## Depression level vs. Orientation
 

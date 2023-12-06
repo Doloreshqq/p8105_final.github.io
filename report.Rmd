@@ -17,8 +17,7 @@ Observing that mental health issues appear at a younger and younger age, we woul
 
 * What factors have a significant impact on the level of depression?\
 * Do different countries exhibit significantly varied rates of depression at different levels of development?\
-* What factors account for the differences in the development of depression levels?\
-* What factors can be used to predict depression levels?\
+* How do factors account for the differences in the development of depression levels?\
 
 ## *Data*
 
