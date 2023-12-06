@@ -11,16 +11,19 @@ Observing that mental health issues appear at a younger and younger age, we woul
 
 ## *Related Work*
 
+[Antony et. al](https://doi.org/10.1037/1040-3590.10.2.176)
 
 ## *Initial Questions*
 
-
+* What factors have a significant impact on the level of depression?\
+* Do different countries exhibit significantly varied rates of depression at different levels of development?\
+* What factors account for the differences in the development of depression levels?\
+* What factors can be used to predict depression levels?\
 
 ## *Data*
 
-Our group applied the dataset from Kaggle Depression, Anxiety, and Stress Scales Responses (link attached below) for this project. The DASS-42 is a self-report scale consisting of 42 items intended to gauge emotional states related to depression, anxiety, and stress. The primary benefit of utilizing the DASS in a clinical context is its ability to ascertain the specific location of emotional turmoil, contributing to a more comprehensive clinical assessment. Its core function is to evaluate the severity of the fundamental symptoms associated with depression, anxiety, and stress.
+Our group applied the dataset from [Kaggle Depression, Anxiety, and Stress Scales Responses](https://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses/data?select=codebook.txt) for this project. The DASS-42 is a self-report scale consisting of 42 items intended to gauge emotional states related to depression, anxiety, and stress. The primary benefit of utilizing the DASS in a clinical context is its ability to ascertain the specific location of emotional turmoil, contributing to a more comprehensive clinical assessment. Its core function is to evaluate the severity of the fundamental symptoms associated with depression, anxiety, and stress.
 
-[https://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses/](https://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses/data?select=codebook.txt)
 
 ## *Exploratory Analysis*
 
