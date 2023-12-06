@@ -119,18 +119,6 @@ dass_new|>
        title = "Depression level vs. race groups")
 ```
 
-## Age Distribution for Each Depression Level
-```{r}
-dass_new %>%
-  ggplot(aes(x=depression_level, y=age)) +
-  geom_boxplot(aes(fill=depression_level)) +
-  labs(title = "Age Distribution for Each Depression Level",
-        xlab = "Depression Level",
-        ylab = "Age")+
-  theme_minimal()
-
-```
-
 ## Depression Level vs. Age groups
 
 ```{r}
@@ -160,14 +148,79 @@ dass_new|>
        title = "Depression level vs. age groups")
 ```
 
+## Age Distribution for Each Depression Level
+```{r}
+dass_new %>%
+  ggplot(aes(x=depression_level, y=age)) +
+  geom_boxplot(aes(fill=depression_level)) +
+  labs(title = "Age Distribution for Each Depression Level",
+        xlab = "Depression Level",
+        ylab = "Age")+
+  theme_minimal()
+
+```
+
+
 # Chi-squared Test
 
-## 1: Age & Depression Level
+## 1: Orientation & Depression Level
 
-From the plot of depression level vs. age groups, we observed that the distribution of cases of different depression levels among different age groups follow a similar pattern. Thus, we would like to perform a chi-squared test to study if the distribution of depression levels among different age groups are the same.\
+From the plot of depression level vs. orientation, we observed that the distribution of cases of different depression levels among different orientation groups follow a similar pattern. Thus, we would like to perform a chi-squared test to study if the depression levels and orientation are associated.\
 
-$H_0$: The proportion in different depression levels among age groups are equal.\
-$H_1$: Not all proportions are equal.
+$H_0$: The depression levels and orientation are independent.\
+$H_1$: The depression levels and orientation are associated.
+
+```{r}
+# show result table to perform chi-squared test
+dass_new|>
+  group_by(orientation)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+            Mild = sum(depression_level=="Mild"),
+            Moderate = sum(depression_level=="Moderate"),
+            Severe = sum(depression_level=="Severe"),
+            Extremely_Severe = sum(depression_level=="Extremely severe"))
+# perform chi-squared test
+chisq.test(pull(dass_new, orientation), pull(dass_new, depression_level))|>
+  broom::tidy()|>
+  knitr::kable()
+```
+
+The null hypothesis for the chi-squared test is that the depression levels and orientation are independent. Since the p-value is smaller than 0.05, the null hypothesis is rejected. \
+We may conclude that orientation is associated with depression levels.
+
+
+## 2: Gender & Depression Level
+
+From the plot of depression level vs. gender, we observed that the distribution of cases of different depression levels among different gender groups follow a similar pattern. Thus, we would like to perform a chi-squared test to study if the depression levels and gender are associated.\
+
+$H_0$: The depression levels and gender are independent.\
+$H_1$: The depression levels and gender are associated.
+
+```{r}
+# show result table to perform chi-squared test
+dass_new|>
+  group_by(gender)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+            Mild = sum(depression_level=="Mild"),
+            Moderate = sum(depression_level=="Moderate"),
+            Severe = sum(depression_level=="Severe"),
+            Extremely_Severe = sum(depression_level=="Extremely severe"))
+# perform chi-squared test
+chisq.test(pull(dass_new, gender), pull(dass_new, depression_level))|>
+  broom::tidy()|>
+  knitr::kable()
+```
+
+The null hypothesis for the chi-squared test is that the depression levels and gender are independent. Since the p-value is smaller than 0.05, the null hypothesis is rejected. \
+We may conclude that gender is associated with depression levels.
+
+
+## 3: Age & Depression Level
+
+From the plot of depression level vs. age groups, we observed that the distribution of cases of different depression levels among different age groups follow a similar pattern. Thus, we would like to perform a chi-squared test to study if the depression levels and age are associated.\
+
+$H_0$: The depression levels and age are independent.\
+$H_1$: The depression levels and age are associated.
 
 ```{r}
 dass_chi <- dass_new|>
@@ -190,14 +243,15 @@ chisq.test(pull(dass_chi, age), pull(dass_chi, depression_level))|>
   knitr::kable()
 ```
 
-The null hypothesis for the chi-squared test is that the distributions among different age groups and different depression levels are the same. Since the p-value is smaller than 0.05, the null hypothesis is rejected. We may conclude that age is associated with depression levels.
+The null hypothesis for the chi-squared test is that depression levels and age are independent. Since the p-value is smaller than 0.05, the null hypothesis is rejected.\
+We may conclude that age is associated with depression levels.
 
-## 2: Race & Depression Level
+## 4: Race & Depression Level
 
-Similarly, we observed that the distribution of cases of different depression levels among different race groups follow a similar pattern from the plot of depression level vs. race groups. Thus, we would like to perform a chi-squared test to study if the distribution of depression levels among different race groups are the same.\
+Similarly, we observed that the distribution of cases of different depression levels among different race groups follow a similar pattern from the plot of depression levels vs. race groups. Thus, we would like to perform a chi-squared test to study if the depression levels and race groups are associated.\
 
-$H_0$: The proportion in different depression levels among race groups are equal.\
-$H_1$: Not all proportions are equal.
+$H_0$: The depression levels and race groups are independent.\
+$H_1$: The depression levels and race groups are associated.
 
 ```{r}
 dass_chi <- dass_new|>
@@ -223,5 +277,6 @@ chisq.test(pull(dass_chi, race), pull(dass_chi, depression_level))|>
   knitr::kable()
 ```
 
-The null hypothesis for the chi-squared test is that the distributions among different race groups and different depression levels are the same. Since the p-value is smaller than 0.05, the null hypothesis is rejected. We may conclude that race is associated with depression levels.
+The null hypothesis for the chi-squared test is that depression levels and race groups are independent. Since the p-value is smaller than 0.05, the null hypothesis is rejected. \
+We may conclude that race is associated with depression levels.
 
