@@ -176,18 +176,18 @@ exp(cbind(OR = coef(dass_fit1), confint(dass_fit1))) |>
   knitr::kable()
 ```
 
-## Interpretation
+# Interpretation
 
 
-### Continuous Variable
+## Continuous Variable
 
-#### **Age**
+### **Age**
 
 -   For every one unit increase in participant's age, the odds of having a more severe depression level is multiplied 0.98 times, holding constant all other variables. It indicates that older people may have less risk to get depressed.
 
-### Categorical Variables
+## Categorical Variables
 
-#### **Country**
+### **Country**
 
 -   For Canadian, Britain, and Philippines participants, the odds of having a more severe depression level is higher than that of US participants, holding constant all other variables.
 -   For Indonesia and Malaysia participants, the odds of having a more severe depression level is lower than that of US participants, holding constant all other variables.
@@ -211,7 +211,7 @@ ggplot(country_coefficients, aes(x = country, y = OR - 1)) +
        x = "Country", y = "OR - 1")
 ```
 
-#### **Gender**
+### **Gender**
 
 -   For male participants, the odds of having a more severe depression level is 0.90 times that of female participants, holding constant all other variables.
 -   For non-binary participants, the odds of having a more severe depression level is 1.47 times that of female participants, holding constant all other variables.
@@ -234,7 +234,7 @@ ggplot(gender_coefficients, aes(x = gender, y = OR - 1)) +
        x = "Gender", y = "OR - 1")
 ```
 
-#### **Race**
+### **Race**
 
 -   For Native American, Asian, Black, and Other participants, the odds of having a more severe depression level is lower than that of White participants, holding constant all other variables.
 
@@ -259,7 +259,7 @@ ggplot(race_coefficients, aes(x = race, y = OR - 1)) +
   )
 ```
 
-#### **Orientation**
+### **Orientation**
 
 -   For sexual minorities, the odds of having a more severe depression level is higher than that of heterosexual orientation participants, holding constant all other variables.
 
@@ -284,7 +284,6 @@ ggplot(orientation_coefficients, aes(x = orientation, y = OR - 1)) +
 
 # Receiver Operating Characteristic Curve for Depression Level
 ```{r}
-
 
 # Predicting probabilities for all classes
 predicted_probs <- predict(dass_fit1, type = "probs")

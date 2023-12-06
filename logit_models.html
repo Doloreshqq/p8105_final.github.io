@@ -900,12 +900,13 @@ Severe})) &amp;= 0.01 \\
 </tr>
 </tbody>
 </table>
-<div id="interpretation" class="section level2">
-<h2>Interpretation</h2>
-<div id="continuous-variable" class="section level3">
-<h3>Continuous Variable</h3>
-<div id="age" class="section level4">
-<h4><strong>Age</strong></h4>
+</div>
+<div id="interpretation" class="section level1">
+<h1>Interpretation</h1>
+<div id="continuous-variable" class="section level2">
+<h2>Continuous Variable</h2>
+<div id="age" class="section level3">
+<h3><strong>Age</strong></h3>
 <ul>
 <li>For every one unit increase in participant’s age, the odds of having
 a more severe depression level is multiplied 0.98 times, holding
@@ -914,10 +915,10 @@ less risk to get depressed.</li>
 </ul>
 </div>
 </div>
-<div id="categorical-variables" class="section level3">
-<h3>Categorical Variables</h3>
-<div id="country" class="section level4">
-<h4><strong>Country</strong></h4>
+<div id="categorical-variables" class="section level2">
+<h2>Categorical Variables</h2>
+<div id="country" class="section level3">
+<h3><strong>Country</strong></h3>
 <ul>
 <li>For Canadian, Britain, and Philippines participants, the odds of
 having a more severe depression level is higher than that of US
@@ -944,8 +945,8 @@ ggplot(country_coefficients, aes(x = country, y = OR - 1)) +
        x = &quot;Country&quot;, y = &quot;OR - 1&quot;)</code></pre>
 <p><img src="logit_models_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
 </div>
-<div id="gender" class="section level4">
-<h4><strong>Gender</strong></h4>
+<div id="gender" class="section level3">
+<h3><strong>Gender</strong></h3>
 <ul>
 <li>For male participants, the odds of having a more severe depression
 level is 0.90 times that of female participants, holding constant all
@@ -971,8 +972,8 @@ ggplot(gender_coefficients, aes(x = gender, y = OR - 1)) +
        x = &quot;Gender&quot;, y = &quot;OR - 1&quot;)</code></pre>
 <p><img src="logit_models_files/figure-html/unnamed-chunk-9-1.png" width="90%" /></p>
 </div>
-<div id="race" class="section level4">
-<h4><strong>Race</strong></h4>
+<div id="race" class="section level3">
+<h3><strong>Race</strong></h3>
 <ul>
 <li>For Native American, Asian, Black, and Other participants, the odds
 of having a more severe depression level is lower than that of White
@@ -998,8 +999,8 @@ ggplot(race_coefficients, aes(x = race, y = OR - 1)) +
   )</code></pre>
 <p><img src="logit_models_files/figure-html/unnamed-chunk-10-1.png" width="90%" /></p>
 </div>
-<div id="orientation" class="section level4">
-<h4><strong>Orientation</strong></h4>
+<div id="orientation" class="section level3">
+<h3><strong>Orientation</strong></h3>
 <ul>
 <li>For sexual minorities, the odds of having a more severe depression
 level is higher than that of heterosexual orientation participants,
@@ -1022,7 +1023,6 @@ ggplot(orientation_coefficients, aes(x = orientation, y = OR - 1)) +
     y = &quot;OR - 1&quot;
   )</code></pre>
 <p><img src="logit_models_files/figure-html/unnamed-chunk-11-1.png" width="90%" /></p>
-</div>
 </div>
 </div>
 </div>
