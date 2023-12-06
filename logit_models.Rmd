@@ -178,7 +178,16 @@ exp(cbind(OR = coef(dass_fit1), confint(dass_fit1))) |>
 
 ## Interpretation
 
-### **Country**
+
+### Continuous Variable
+
+#### **Age**
+
+-   For every one unit increase in participant's age, the odds of having a more severe depression level is multiplied 0.98 times, holding constant all other variables. It indicates that older people may have less risk to get depressed.
+
+### Categorical Variables
+
+#### **Country**
 
 -   For Canadian, Britain, and Philippines participants, the odds of having a more severe depression level is higher than that of US participants, holding constant all other variables.
 -   For Indonesia and Malaysia participants, the odds of having a more severe depression level is lower than that of US participants, holding constant all other variables.
@@ -202,16 +211,30 @@ ggplot(country_coefficients, aes(x = country, y = OR - 1)) +
        x = "Country", y = "OR - 1")
 ```
 
-### **Age**:
-
--   For every one unit increase in participant's age, the odds of having a more severe depression level is multiplied 0.98 times, holding constant all other variables. It indicates that older people may have less risk to get depressed.
-
-### **Gender**:
+#### **Gender**
 
 -   For male participants, the odds of having a more severe depression level is 0.90 times that of female participants, holding constant all other variables.
 -   For non-binary participants, the odds of having a more severe depression level is 1.47 times that of female participants, holding constant all other variables.
 
-### **Race**
+```{r}
+# Extract coefficients for Gender
+pos_gender = str_starts(names(dass_fit1$coefficients), "gender")
+
+gender_coefficients =
+  tibble(
+    gender = substr(names(dass_fit1$coefficients)[pos_gender], 7, 20),
+    OR = exp(dass_fit1$coefficients[pos_gender])
+  ) |> 
+  mutate(gender = fct_reorder(gender, OR))
+
+# Plotting coefficients for Gender
+ggplot(gender_coefficients, aes(x = gender, y = OR - 1)) +
+  geom_bar(stat = "identity", fill = "#d8b4e2", color = "black") +
+  labs(title = "Effect of Countries on Depression Levels",
+       x = "Gender", y = "OR - 1")
+```
+
+#### **Race**
 
 -   For Native American, Asian, Black, and Other participants, the odds of having a more severe depression level is lower than that of White participants, holding constant all other variables.
 
@@ -236,7 +259,7 @@ ggplot(race_coefficients, aes(x = race, y = OR - 1)) +
   )
 ```
 
-### **Orientation**
+#### **Orientation**
 
 -   For sexual minorities, the odds of having a more severe depression level is higher than that of heterosexual orientation participants, holding constant all other variables.
 
@@ -284,10 +307,10 @@ legend("bottomright",
        col = c("blue", "red", "green"), lty = 1)
 ```
 
-According to this graph, the ROC curves for "Moderate or Below" and "Extremely Severe" are close to the top-left corner of the plot, showing a good performance in these two categories. The performance on "Severe" may indicate that we need more data points that have a depression level of "Severe."
+Looking at the ROC curves, it is clear that both the "Moderate or Below" and "Extremely Severe" categories show good performance and are close to the upper left corner, indicating effective performance in discriminating between these categories. However, the performance of the "Severe" category suggests an avaliable but less significant trend compared to the above two categories. The positioning of this curve indicates room for improvement, implying a need for more data points representing individuals with a "severe" level of depression. Expanding the data set to include additional instances characterized by a "Severe" level of depression could improve the model's ability to discriminate and accurately predict within this specific category.
 
 # Depression Levels Distribution
-The following graphs show the probability of depression level on different categorical and continuous variables.
+After constructing the logistic regression model, we can further visualize the data based on the effective covariate as well as the good stratum of depression level. The accompanying graphs display the probability of depression levels across various categorical and continuous variables. For instance, the trend depicted in the graph indicates higher rates of extreme depression among young people.
 
 ```{r, fig.width=20, fig.height=50, message = FALSE}
 # Create a data frame with the predictor values for visualization
