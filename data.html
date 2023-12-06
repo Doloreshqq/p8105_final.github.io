@@ -391,7 +391,7 @@ core function is to evaluate the severity of the fundamental symptoms
 associated with depression, anxiety, and stress.</p>
 <pre class="r"><code># Load the dataset
 dass_raw = read.csv(&quot;./data/data.csv&quot;, sep = &quot;\t&quot;)</code></pre>
-<p>The raw data contain 39775 observations and 172 variables, where
+<p>The raw data contain 39775 observations and 172 variables, which
 contains the information of the participants’ responses.</p>
 </div>
 <div id="data-establishment-and-data-cleaning" class="section level2">
@@ -406,7 +406,7 @@ several word spelling questions to check whether participants had filled
 out the questionnaire carefully.
 <code>VCL6</code>,<code>VCL9</code>,<code>VCL12</code> represents words
 that not exist. If the participants chose 1 in any of these three
-questions, the response could be omit.</p></li>
+questions, the response should be omit.</p></li>
 <li><p>The raw data contains different missing values which needs to be
 omitted. Specifically, <code>country</code> variable has “NONE” as the
 missing value.</p></li>
@@ -473,39 +473,40 @@ dass_new = dass %&gt;%
   na.omit()</code></pre>
 <p>Based on the scoring criteria (as shown in DASS-42-scoring.pdf), we
 add up the values for Q3A, Q5A, Q10A, Q13A, Q16A, Q17A, Q21A, Q24A,
-Q26A, Q31A, Q34A, Q37A, Q38A and Q42A as the depression scores.
-Similarly, add up the values for Q2A, Q4A, Q7A, Q9A, Q15A, Q19A, Q20A,
-Q23A, Q25A, Q28A, Q30A, Q36A, Q40A and Q41A as the anxiety scores and
-the sum of Q1A, Q6A, Q8A, Q11A, Q12A, Q14A, Q18A, Q22A, Q27A, Q29A,
-Q32A, Q33A, Q35A and Q39A as the stress scores. Considering that the
-scoring criteria we refer to is 0-3 scale but Kaggle dataset is 1-4
-scale, we modify these three scores by minus 14.</p>
+Q26A, Q31A, Q34A, Q37A, Q38A and Q42A as the depression scores.</p>
+<p>Similarly, add up the values for Q2A, Q4A, Q7A, Q9A, Q15A, Q19A,
+Q20A, Q23A, Q25A, Q28A, Q30A, Q36A, Q40A and Q41A as the anxiety scores
+and the sum of Q1A, Q6A, Q8A, Q11A, Q12A, Q14A, Q18A, Q22A, Q27A, Q29A,
+Q32A, Q33A, Q35A and Q39A as the stress scores.</p>
+<p>Considering that the scoring criteria we refer to is 0-3 scale but
+Kaggle dataset is 1-4 scale, we modify these three scores by minus
+14.</p>
 <p>After that, we could assign depression level, anxiety level and
 stress level for each observation refer to the rule of:</p>
 <ol style="list-style-type: decimal">
-<li><p>Depression</p>
+<li><p>Depression （score ~ level)</p>
 <ul>
-<li><p>0 - 9 normal</p></li>
-<li><p>10 - 13 mild</p></li>
-<li><p>14 - 20 moderate</p></li>
-<li><p>21 - 27 severe</p></li>
-<li><p>&gt;27 extremely severe</p></li>
+<li><p>0 - 9 ~ normal</p></li>
+<li><p>10 - 13 ~ mild</p></li>
+<li><p>14 - 20 ~ moderate</p></li>
+<li><p>21 - 27 ~ severe</p></li>
+<li><p>&gt;27 ~ extremely severe</p></li>
 </ul></li>
 <li><p>Anxiety</p>
 <ul>
-<li><p>0 - 7 normal</p></li>
-<li><p>8 - 9 mild</p></li>
-<li><p>10 - 14 moderate</p></li>
-<li><p>15 - 19 severe</p></li>
-<li><p>&gt;19 extremely severe</p></li>
+<li><p>0 - 7 ~ normal</p></li>
+<li><p>8 - 9 ~ mild</p></li>
+<li><p>10 - 14 ~ moderate</p></li>
+<li><p>15 - 19 ~ severe</p></li>
+<li><p>&gt;19 ~ extremely severe</p></li>
 </ul></li>
 <li><p>Stress</p>
 <ul>
-<li><p>0 - 14 normal</p></li>
-<li><p>15 - 18 mild</p></li>
-<li><p>19 - 25 moderate</p></li>
-<li><p>26 - 33 severe</p></li>
-<li><p>&gt;33 extremely severe</p></li>
+<li><p>0 - 14 ~ normal</p></li>
+<li><p>15 - 18 ~ mild</p></li>
+<li><p>19 - 25 ~ moderate</p></li>
+<li><p>26 - 33 ~ severe</p></li>
+<li><p>&gt;33 ~ extremely severe</p></li>
 </ul></li>
 </ol>
 <p>Considering that stress, anxiety and depression might have
@@ -652,23 +653,23 @@ participants according to the survey and scores.</p></li>
   )) %&gt;%
   bold_labels() %&gt;%
   as_gt()  # Display the table as a gt object</code></pre>
-<div id="hvzgfmvtmr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#hvzgfmvtmr table {
+<div id="ydsqvjvdql" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ydsqvjvdql table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#hvzgfmvtmr thead, #hvzgfmvtmr tbody, #hvzgfmvtmr tfoot, #hvzgfmvtmr tr, #hvzgfmvtmr td, #hvzgfmvtmr th {
+#ydsqvjvdql thead, #ydsqvjvdql tbody, #ydsqvjvdql tfoot, #ydsqvjvdql tr, #ydsqvjvdql td, #ydsqvjvdql th {
   border-style: none;
 }
 
-#hvzgfmvtmr p {
+#ydsqvjvdql p {
   margin: 0;
   padding: 0;
 }
 
-#hvzgfmvtmr .gt_table {
+#ydsqvjvdql .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -694,12 +695,12 @@ participants according to the survey and scores.</p></li>
   border-left-color: #D3D3D3;
 }
 
-#hvzgfmvtmr .gt_caption {
+#ydsqvjvdql .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#hvzgfmvtmr .gt_title {
+#ydsqvjvdql .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -711,7 +712,7 @@ participants according to the survey and scores.</p></li>
   border-bottom-width: 0;
 }
 
-#hvzgfmvtmr .gt_subtitle {
+#ydsqvjvdql .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -723,7 +724,7 @@ participants according to the survey and scores.</p></li>
   border-top-width: 0;
 }
 
-#hvzgfmvtmr .gt_heading {
+#ydsqvjvdql .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -735,13 +736,13 @@ participants according to the survey and scores.</p></li>
   border-right-color: #D3D3D3;
 }
 
-#hvzgfmvtmr .gt_bottom_border {
+#ydsqvjvdql .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hvzgfmvtmr .gt_col_headings {
+#ydsqvjvdql .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -756,7 +757,7 @@ participants according to the survey and scores.</p></li>
   border-right-color: #D3D3D3;
 }
 
-#hvzgfmvtmr .gt_col_heading {
+#ydsqvjvdql .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -776,7 +777,7 @@ participants according to the survey and scores.</p></li>
   overflow-x: hidden;
 }
 
-#hvzgfmvtmr .gt_column_spanner_outer {
+#ydsqvjvdql .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -788,15 +789,15 @@ participants according to the survey and scores.</p></li>
   padding-right: 4px;
 }
 
-#hvzgfmvtmr .gt_column_spanner_outer:first-child {
+#ydsqvjvdql .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hvzgfmvtmr .gt_column_spanner_outer:last-child {
+#ydsqvjvdql .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hvzgfmvtmr .gt_column_spanner {
+#ydsqvjvdql .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -808,11 +809,11 @@ participants according to the survey and scores.</p></li>
   width: 100%;
 }
 
-#hvzgfmvtmr .gt_spanner_row {
+#ydsqvjvdql .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#hvzgfmvtmr .gt_group_heading {
+#ydsqvjvdql .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -838,7 +839,7 @@ participants according to the survey and scores.</p></li>
   text-align: left;
 }
 
-#hvzgfmvtmr .gt_empty_group_heading {
+#ydsqvjvdql .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -853,15 +854,15 @@ participants according to the survey and scores.</p></li>
   vertical-align: middle;
 }
 
-#hvzgfmvtmr .gt_from_md > :first-child {
+#ydsqvjvdql .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hvzgfmvtmr .gt_from_md > :last-child {
+#ydsqvjvdql .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hvzgfmvtmr .gt_row {
+#ydsqvjvdql .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -880,7 +881,7 @@ participants according to the survey and scores.</p></li>
   overflow-x: hidden;
 }
 
-#hvzgfmvtmr .gt_stub {
+#ydsqvjvdql .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -893,7 +894,7 @@ participants according to the survey and scores.</p></li>
   padding-right: 5px;
 }
 
-#hvzgfmvtmr .gt_stub_row_group {
+#ydsqvjvdql .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -907,15 +908,15 @@ participants according to the survey and scores.</p></li>
   vertical-align: top;
 }
 
-#hvzgfmvtmr .gt_row_group_first td {
+#ydsqvjvdql .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#hvzgfmvtmr .gt_row_group_first th {
+#ydsqvjvdql .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#hvzgfmvtmr .gt_summary_row {
+#ydsqvjvdql .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -925,16 +926,16 @@ participants according to the survey and scores.</p></li>
   padding-right: 5px;
 }
 
-#hvzgfmvtmr .gt_first_summary_row {
+#ydsqvjvdql .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#hvzgfmvtmr .gt_first_summary_row.thick {
+#ydsqvjvdql .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#hvzgfmvtmr .gt_last_summary_row {
+#ydsqvjvdql .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -944,7 +945,7 @@ participants according to the survey and scores.</p></li>
   border-bottom-color: #D3D3D3;
 }
 
-#hvzgfmvtmr .gt_grand_summary_row {
+#ydsqvjvdql .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -954,7 +955,7 @@ participants according to the survey and scores.</p></li>
   padding-right: 5px;
 }
 
-#hvzgfmvtmr .gt_first_grand_summary_row {
+#ydsqvjvdql .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -964,7 +965,7 @@ participants according to the survey and scores.</p></li>
   border-top-color: #D3D3D3;
 }
 
-#hvzgfmvtmr .gt_last_grand_summary_row_top {
+#ydsqvjvdql .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -974,11 +975,11 @@ participants according to the survey and scores.</p></li>
   border-bottom-color: #D3D3D3;
 }
 
-#hvzgfmvtmr .gt_striped {
+#ydsqvjvdql .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hvzgfmvtmr .gt_table_body {
+#ydsqvjvdql .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -987,7 +988,7 @@ participants according to the survey and scores.</p></li>
   border-bottom-color: #D3D3D3;
 }
 
-#hvzgfmvtmr .gt_footnotes {
+#ydsqvjvdql .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1001,7 +1002,7 @@ participants according to the survey and scores.</p></li>
   border-right-color: #D3D3D3;
 }
 
-#hvzgfmvtmr .gt_footnote {
+#ydsqvjvdql .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1010,7 +1011,7 @@ participants according to the survey and scores.</p></li>
   padding-right: 5px;
 }
 
-#hvzgfmvtmr .gt_sourcenotes {
+#ydsqvjvdql .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1024,7 +1025,7 @@ participants according to the survey and scores.</p></li>
   border-right-color: #D3D3D3;
 }
 
-#hvzgfmvtmr .gt_sourcenote {
+#ydsqvjvdql .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1032,63 +1033,63 @@ participants according to the survey and scores.</p></li>
   padding-right: 5px;
 }
 
-#hvzgfmvtmr .gt_left {
+#ydsqvjvdql .gt_left {
   text-align: left;
 }
 
-#hvzgfmvtmr .gt_center {
+#ydsqvjvdql .gt_center {
   text-align: center;
 }
 
-#hvzgfmvtmr .gt_right {
+#ydsqvjvdql .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hvzgfmvtmr .gt_font_normal {
+#ydsqvjvdql .gt_font_normal {
   font-weight: normal;
 }
 
-#hvzgfmvtmr .gt_font_bold {
+#ydsqvjvdql .gt_font_bold {
   font-weight: bold;
 }
 
-#hvzgfmvtmr .gt_font_italic {
+#ydsqvjvdql .gt_font_italic {
   font-style: italic;
 }
 
-#hvzgfmvtmr .gt_super {
+#ydsqvjvdql .gt_super {
   font-size: 65%;
 }
 
-#hvzgfmvtmr .gt_footnote_marks {
+#ydsqvjvdql .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#hvzgfmvtmr .gt_asterisk {
+#ydsqvjvdql .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#hvzgfmvtmr .gt_indent_1 {
+#ydsqvjvdql .gt_indent_1 {
   text-indent: 5px;
 }
 
-#hvzgfmvtmr .gt_indent_2 {
+#ydsqvjvdql .gt_indent_2 {
   text-indent: 10px;
 }
 
-#hvzgfmvtmr .gt_indent_3 {
+#ydsqvjvdql .gt_indent_3 {
   text-indent: 15px;
 }
 
-#hvzgfmvtmr .gt_indent_4 {
+#ydsqvjvdql .gt_indent_4 {
   text-indent: 20px;
 }
 
-#hvzgfmvtmr .gt_indent_5 {
+#ydsqvjvdql .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
