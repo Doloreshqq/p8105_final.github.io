@@ -25,7 +25,7 @@ With our existence data, we need to evaluate the depression level with respect t
 
 ## Depression Level vs. Orientation vs. Gender
 
-Our first plot gives an overall view of the relationship with gender, orientation and depression level. The x axis illustrates depression levels categorized by various orientations, while the y axis denotes the count of cases. Additionally, the bar plot's proportional filling conveys the gender distribution within a particular depression level under each orientation. From this plot, we found that depression level has significant differences between distinct orientation groups and genders. So we would like to further investigate the correlation between depression levels and each factor individually.
+Our first plot gives an overall view of the relationship with gender, orientation and depression level. 
 
 The plot below shows the number of different depression level cases in each gender groups among orientation. 
 
@@ -52,8 +52,7 @@ dass_new|>
        y = "count of cases", 
        title = "Depression level vs. orientation vs. gender")
 ```
-
-From the plot, we observed that the female gender group in all orientation categories tends to exhibit a higher number of depression cases compared to other gender groups.
+The x axis illustrates depression levels categorized by various orientations, while the y axis denotes the count of cases. Additionally, the bar plot's proportional filling conveys the gender distribution within a particular depression level under each orientation. From the plot, we observed that the female gender group in all orientation categories tends to exhibit a higher number of depression cases compared to other gender groups. Also, we found that depression level has significant differences between distinct orientation groups and genders. So we would like to further investigate the correlation between depression levels and each factor individually. 
 
 
 ## Depression level vs. Orientation
@@ -81,7 +80,7 @@ dass_new|>
        y = "count of cases", 
        title = "Depression level vs. orientation groups")
 ```
-
+This plot shows the relationship between depression levels and orientations. Given that heterosexual data is the most abundant, it naturally exhibits the highest case count. However, our primary emphasis in this analysis is on discerning the overarching trends across various depression levels.
 
 
 ## Depression level vs. Gender
