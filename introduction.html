@@ -11,7 +11,7 @@
 
 
 
-<title>Statistical Analysis</title>
+<title>Introduction</title>
 
 <script src="site_libs/header-attrs-2.24/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -380,89 +380,65 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Statistical Analysis</h1>
+<h1 class="title toc-ignore">Introduction</h1>
 
 </div>
 
 
-<pre class="r"><code>dass_raw = read.csv(&quot;./data/data.csv&quot;, sep = &quot;\t&quot;)
-dass = dass_raw %&gt;%
-  filter(!(VCL6 == 1 | VCL9 == 1 | VCL12 == 1)) %&gt;%
-  filter(!country == &quot;NONE&quot;) %&gt;%
-  filter(age &lt;= 100)
-
-dass = dass %&gt;%
-  dplyr::select(matches(&#39;Q\\d+A&#39;), country, education, urban, gender, age, religion, orientation, race, married) %&gt;%
-  na.omit()</code></pre>
-<pre class="r"><code># Select the columns you need and create a data frame
-dass_heat1 &lt;- dass %&gt;%
-  dplyr::select(-matches(&#39;Q\\d+A&#39;)) %&gt;%
-  dplyr::select(-country)
-
-# Calculate the correlation matrix
-
-r &lt;- cor(dass_heat1,
-         method = &quot;pearson&quot;,
-         use = &quot;pairwise.complete.obs&quot;
-) 
-
-pheatmap(r, 
-         show_colnames = TRUE,   
-         show_rownames=TRUE,    
-         fontsize=5,             
-         color = colorRampPalette(c(&#39;#0000ff&#39;,&#39;#ffffff&#39;,&#39;#ff0000&#39;))(100), 
-         annotation_legend=TRUE, 
-         border_color=NA,        
-         scale=&quot;none&quot;,            
-         cluster_rows = T,
-         cluster_cols = T     
-)</code></pre>
-<p><img src="sa_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-<pre class="r"><code>PCA = prcomp(dass_heat1, center = T, scale. = T)
-
-PCA</code></pre>
-<pre><code>## Standard deviations (1, .., p=8):
-## [1] 1.3644747 1.2766075 1.0367275 0.9957232 0.9376937 0.8492498 0.7237589
-## [8] 0.5638192
-## 
-## Rotation (n x k) = (8 x 8):
-##                     PC1          PC2          PC3         PC4         PC5
-## education    0.36115304 -0.426199331 -0.039032188 -0.03434643 -0.20396151
-## urban       -0.09590985  0.005416019 -0.180481735 -0.97388998 -0.07920193
-## gender      -0.15105892 -0.226868602  0.588713727 -0.16174923  0.70915519
-## age          0.65876562 -0.066385747  0.056117873 -0.06872801 -0.01022743
-## religion    -0.10869187 -0.627705234  0.001323761  0.05738545 -0.05176044
-## orientation -0.10219791  0.039512464  0.751148598 -0.07792224 -0.64121312
-## race         0.18042073  0.605485835  0.157616650 -0.02164502  0.11389524
-## married      0.59056656 -0.016129939  0.164623169 -0.09817739  0.14938388
-##                     PC6         PC7          PC8
-## education    0.73315866 -0.04086967 -0.323151938
-## urban       -0.02606578 -0.05209002  0.008418646
-## gender       0.19918666  0.07252278  0.071618518
-## age         -0.03742076  0.02498869  0.742710363
-## religion    -0.33884956 -0.68614680  0.050811208
-## orientation -0.05841775  0.05342668  0.016641983
-## race         0.22600153 -0.71034614 -0.082965654
-## married     -0.50141297  0.10718600 -0.573595696</code></pre>
-<pre class="r"><code>summary(PCA)</code></pre>
-<pre><code>## Importance of components:
-##                           PC1    PC2    PC3    PC4    PC5     PC6     PC7
-## Standard deviation     1.3645 1.2766 1.0367 0.9957 0.9377 0.84925 0.72376
-## Proportion of Variance 0.2327 0.2037 0.1343 0.1239 0.1099 0.09015 0.06548
-## Cumulative Proportion  0.2327 0.4364 0.5708 0.6947 0.8046 0.89479 0.96026
-##                            PC8
-## Standard deviation     0.56382
-## Proportion of Variance 0.03974
-## Cumulative Proportion  1.00000</code></pre>
-<pre class="r"><code>screeplot(PCA, type = &#39;line&#39;)</code></pre>
-<p><img src="sa_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<pre class="r"><code>library(factoextra)</code></pre>
-<pre><code>## Welcome! Want to learn more? See two factoextra-related books at https://goo.gl/ve3WBa</code></pre>
-<pre class="r"><code>fviz_pca_var(PCA, axes = c(1, 2), col.var = &quot;contrib&quot;, gradient.cols = c(&quot;blue&quot;, &quot;red&quot;), repel = TRUE)</code></pre>
-<p><img src="sa_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<pre class="r"><code>fviz_pca_var(PCA, axes = c(2, 3), col.var = &quot;contrib&quot;, gradient.cols = c(&quot;blue&quot;, &quot;red&quot;), 
-            repel = TRUE)</code></pre>
-<p><img src="sa_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<div id="motivation" class="section level1">
+<h1>Motivation</h1>
+<p>Observing that mental health issues appear at a younger and younger
+age, we would like to test if DASS can potentially provide a means to
+objectively evaluate the severity and the potential factors of
+depression among different population including races, ages, etc.</p>
+</div>
+<div id="related-work" class="section level1">
+<h1>Related Work</h1>
+<p><a href="https://doi.org/10.1037/1040-3590.10.2.176">Antony et.
+al</a></p>
+</div>
+<div id="initial-questions" class="section level1">
+<h1>Initial Questions</h1>
+<ul>
+<li><p>What factors have a significant impact on the level of
+depression?</p></li>
+<li><p>Do different countries exhibit significantly varied rates of
+depression at different levels of development?</p></li>
+<li><p>What factors account for the differences in the development of
+depression levels?</p></li>
+<li><p>What factors can be used to predict depression levels?</p></li>
+</ul>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Depression, a pervasive mental health challenge, is becoming
+increasingly prevalent among younger demographics, necessitating a
+deeper understanding of its existence in diverse populations. This study
+seeks to harness the potential of the Depression, Anxiety, and Stress
+Scales (DASS) as a comprehensive tool to objectively assess the severity
+and underlying factors influencing or contributing to depression across
+demographic groups, including differences in race, age groups, and
+more.</p>
+<p>Our study utilizes an extensive dataset from the Depression, Anxiety,
+and Stress Scales (DASS) Responses accessible via Kaggle, to accomplish
+our objectives. This dataset includes 42 self-reported items, carefully
+created to evaluate emotional states associated with depression,
+anxiety, and stress. The objective of our project is to contribute to a
+more thorough comprehension of the determinants of depression, which
+could potentially inform customized support strategies and targeted
+interventions designed for specific population groups.</p>
+<p>Our methodology involves filtering data, performing validity checks,
+and eliminating unreliable data to bolster the integrity of our
+analysis. We will then stratify individuals’ depression levels and
+present their distributions across various variables using graphical
+representations, such as line charts. To compare factor distributions
+across different depression levels, we will employ statistical tools
+like the chi-squared test. Our study aims to employ logistic regression
+models to identify influential factors contributing to varying levels of
+depression, including age, gender, geographical location, and etc.
+Additionally, we plan to create data visualizations on coefficients and
+model fit after constructing the model.</p>
+</div>
 
 
 

@@ -10,6 +10,19 @@ library(pheatmap)
 ```
 
 ```{r}
+dass_raw = read.csv("./data/data.csv", sep = "\t")
+dass = dass_raw %>%
+  filter(!(VCL6 == 1 | VCL9 == 1 | VCL12 == 1)) %>%
+  filter(!country == "NONE") %>%
+  filter(age <= 100)
+
+dass = dass %>%
+  dplyr::select(matches('Q\\d+A'), country, education, urban, gender, age, religion, orientation, race, married) %>%
+  na.omit()
+
+```
+
+```{r}
 # Select the columns you need and create a data frame
 dass_heat1 <- dass %>%
   dplyr::select(-matches('Q\\d+A')) %>%

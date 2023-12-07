@@ -21,10 +21,14 @@ provides visualizations of depression levels for individual countries on a globa
 <img src="shinny_scr.jpg" style ="width:80%">
 
 # Plots
-
-
+With our existence data, we need to evaluate the depression level with respect to different populations. After some preliminary research and plotting, we identified a potential correlation between four variables including `gender`, `orientation`, `age` ,`race` and our predictor Depression Level. Subsequently, we proceeded with following exploratory data analysis to identify pertinent variables that could function as independent variables in our regression model.
 
 ## Depression Level vs. Orientation vs. Gender
+
+Our first plot gives an overall view of the relationship with gender, orientation and depression level. 
+
+The plot below shows the number of different depression level cases in each gender groups among orientation. 
+
 ```{r}
 dass_new|>
   group_by(gender, orientation)|>
@@ -32,7 +36,8 @@ dass_new|>
           Mild = sum(depression_level=="Mild"),
           Moderate = sum(depression_level=="Moderate"),
           Severe = sum(depression_level=="Severe"),
-          Extremely_Severe = sum(depression_level=="Extremely severe"))|>
+          Extremely_Severe = sum(depression_level=="Extremely severe"),
+          .groups = "keep")|>
   pivot_longer(
     Normal:Extremely_Severe,
     names_to = "Level",
@@ -48,7 +53,12 @@ dass_new|>
        title = "Depression level vs. orientation vs. gender")
 ```
 
+The x axis illustrates depression levels categorized by various orientations, while the y axis denotes the count of cases. Additionally, the bar plot's proportional filling conveys the gender distribution within a particular depression level under each orientation. From the plot, we observed that the female gender group in all orientation categories tends to exhibit a higher number of depression cases compared to other gender groups. Also, we found that depression level has significant differences between distinct orientation groups and genders. So we would like to further investigate the correlation between depression levels and each factor individually. 
+
+
 ## Depression level vs. Orientation
+
+Next, we would like to delve deeper into studying the relationship between the level of depression and orientation.
 
 ```{r}
 dass_new|>
@@ -71,6 +81,9 @@ dass_new|>
        y = "count of cases", 
        title = "Depression level vs. orientation groups")
 ```
+
+This plot shows the relationship between depression levels and orientations. Given that heterosexual data is the most abundant, it naturally exhibits the highest case count. However, our primary emphasis in this analysis is on discerning the overarching trends across various depression levels.
+
 
 ## Depression level vs. Gender
 
@@ -130,6 +143,21 @@ dass_new|>
        title = "Depression level vs. race groups")
 ```
 
+## Age Distribution for Each Depression Level
+
+```{r}
+dass_new %>%
+  ggplot(aes(x=depression_level, y=age)) +
+  geom_boxplot(aes(fill=depression_level)) +
+  labs(title = "Age Distribution for Each Depression Level",
+        xlab = "Depression Level",
+        ylab = "Age")+
+  theme_minimal()
+
+```
+
+Regarding the age variable, we examined the box plot representing the general distribution of age and depression level. Our observation revealed the presence of numerous outliers. Across all depression levels, the data predominantly centered on the teenage age groups around 18~25. Thus we divided age into four groups(under 18, 18 ~ 25, 25 ~ 50 and 50+) in next step.
+
 ## Depression Level vs. Age groups
 
 ```{r}
@@ -159,24 +187,12 @@ dass_new|>
        title = "Depression level vs. age groups")
 ```
 
-## Age Distribution for Each Depression Level
-```{r}
-dass_new %>%
-  ggplot(aes(x=depression_level, y=age)) +
-  geom_boxplot(aes(fill=depression_level)) +
-  labs(title = "Age Distribution for Each Depression Level",
-        xlab = "Depression Level",
-        ylab = "Age")+
-  theme_minimal()
-
-```
-
 
 # Chi-squared Test
 
-## 1: Orientation & Depression Level
+From the plots above, we observed that the distribution of cases of different depression levels among different orientation groups, the distribution of cases of different depression levels among different gender groups, the distribution of cases of different depression levels among different age groups, and the distribution of cases of different depression levels among different race groups follow a similar pattern. Thus, we would like to perform a chi-squared test to study if these factors and depression levels are associated.\
 
-From the plot of depression level vs. orientation, we observed that the distribution of cases of different depression levels among different orientation groups follow a similar pattern. Thus, we would like to perform a chi-squared test to study if the depression levels and orientation are associated.\
+## 1: Orientation & Depression Level
 
 $H_0$: The depression levels and orientation are independent.\
 $H_1$: The depression levels and orientation are associated.
@@ -202,8 +218,6 @@ We may conclude that orientation is associated with depression levels.
 
 ## 2: Gender & Depression Level
 
-From the plot of depression level vs. gender, we observed that the distribution of cases of different depression levels among different gender groups follow a similar pattern. Thus, we would like to perform a chi-squared test to study if the depression levels and gender are associated.\
-
 $H_0$: The depression levels and gender are independent.\
 $H_1$: The depression levels and gender are associated.
 
@@ -227,8 +241,6 @@ We may conclude that gender is associated with depression levels.
 
 
 ## 3: Age & Depression Level
-
-From the plot of depression level vs. age groups, we observed that the distribution of cases of different depression levels among different age groups follow a similar pattern. Thus, we would like to perform a chi-squared test to study if the depression levels and age are associated.\
 
 $H_0$: The depression levels and age are independent.\
 $H_1$: The depression levels and age are associated.
@@ -258,8 +270,6 @@ The null hypothesis for the chi-squared test is that depression levels and age a
 We may conclude that age is associated with depression levels.
 
 ## 4: Race & Depression Level
-
-Similarly, we observed that the distribution of cases of different depression levels among different race groups follow a similar pattern from the plot of depression levels vs. race groups. Thus, we would like to perform a chi-squared test to study if the depression levels and race groups are associated.\
 
 $H_0$: The depression levels and race groups are independent.\
 $H_1$: The depression levels and race groups are associated.
