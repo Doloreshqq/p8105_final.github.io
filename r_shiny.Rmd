@@ -2,6 +2,9 @@
 title: "Depression among the World"
 output: 
   flexdashboard::flex_dashboard:
+    theme: 
+      version: 3
+      bootswatch: flatly
     orientation: rows
     source_code: embed
 runtime: shiny
@@ -21,11 +24,13 @@ country_df =
   dass_df |> 
   count(country, depression_level) |> 
   group_by(country) |> 
-  mutate(per =  n / sum(n),
-         code = ifelse(country == "XK", "XKX", countrycode(country, origin = "iso2c", destination = "iso3c")),
-         country = ifelse(country == "XK", "Kosovo", countrycode(country, origin = "iso2c", destination = "country.name"))
-  )
-
+  mutate(
+    proportion =  n / sum(n),
+    code = ifelse(country == "XK", "XKX", countrycode(country, origin = "iso2c", destination = "iso3c")),
+    country = ifelse(country == "XK", "Kosovo", countrycode(country, origin = "iso2c", destination = "country.name")),
+    depression_level = factor(depression_level, levels = c("Normal", "Mild", "Moderate", "Severe", "Extremely severe"), ordered = T)
+  ) |> 
+  rename(occurrences = n)
 ```
 
 ## Column {.sidebar}
@@ -38,13 +43,27 @@ dlevel =
 
 # selectInput widget
 selectInput(
-  inputId = "Depression Level", 
-  label = h3("Select Level"),
+  inputId = "Depression Level",
+  label = h3("Select Depression Level"),
   choices = dlevel,
   selected = "Normal")
+
+selectInput(
+  inputId = "Value Type",
+  label = h3("Occurrences / Proportion"),
+  choices = c("Occurrences", "Proportion"),
+  selected = "Normal")
+
+sliderInput(
+  inputId = "Occurrences Range",
+  label = h3("Select occurrences range"),
+  min = 0, max = 6000,
+  value = c(100, 6000)
+)
 ```
 
-## Row {data-width="650"}
+ 
+## Row {data-width="750"}
 
 ```{r}
 renderPlotly({
@@ -60,14 +79,24 @@ g <- list(
 
 country_df |> 
   filter(depression_level == input[["Depression Level"]]) |> 
+  group_by(country, code) |> 
+  summarise(
+    occurrences = sum(occurrences),
+    proportion = sum(proportion)
+  ) |>
+  filter(
+    occurrences >= input[["Occurrences Range"]][1],
+    occurrences <= input[["Occurrences Range"]][2]
+  ) |> 
+  select(country, code, val = tolower(input[["Value Type"]])) |> 
   plot_geo() |> 
   add_trace(
-  z = ~per, color = ~per, colors = 'Blues',
+  z = ~ val, color = ~ val, colors = 'Blues',
   text = ~ country, locations = ~ code, marker = list(line = l)
   ) |> 
-  colorbar(title = "Percentage") |> 
+  colorbar(title = input[["Value Type"]]) |> 
   layout(
-    title = str_c("Percentage of ",input[["Depression Level"]], " depression among each country"),
+    title = str_c(input[["Value Type"]], " of ",input[["Depression Level"]], " Depression Among Each Country"),
     geo = g
   )
 })
@@ -79,7 +108,13 @@ This map shows how different depression levels spread among the world.
 
 \ \par
 
-For example, if selecting 'normal' level (also default level), the plot would show the percentage of responses with normal depression level for each country around the world.
+For example, if selecting "Normal" level (also default level), "Occurrences", and the default occurrences range "100 - 6000", the plot would show the occurrences of responses with normal depression level for countries with 100 - 6000 normal depression level responses.
+
+\ \par
+
+It could be observed that Malaysia and United States have the largest number of responses. Among all the depression levels, extremely severe depression takes up the largest proportion among most countries.
+
+However, the interactive graph also illustrates the imbalance of responses. If we limit the occurrences to be larger than 500, there will only be Malaysia and United States left. When interpreting the proportion of different depression level, the sample size must be considered.
 
 ### Formula
 
