@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Huanyu Chen, Qin Huang, Ou Sha, Lehan Zou, Shaolei Ma" />
+<meta name="author" content="Huanyu Chen (hc3451), Qin Huang (2284), Ou Sha (os2424), Lehan Zou (lz2950), Shaolei Ma (sm5592)" />
 
 
 <title>Depression Factors Prediction based on DASS Responses Report</title>
@@ -374,12 +374,15 @@ div.tocify {
 
 <h1 class="title toc-ignore">Depression Factors Prediction based on DASS
 Responses Report</h1>
-<h4 class="author">Huanyu Chen, Qin Huang, Ou Sha, Lehan Zou, Shaolei
-Ma</h4>
+<h4 class="author">Huanyu Chen (hc3451), Qin Huang (2284), Ou Sha
+(os2424), Lehan Zou (lz2950), Shaolei Ma (sm5592)</h4>
 
 </div>
 
 
+<div id="introduction" class="section level2">
+<h2><em>Introduction</em></h2>
+</div>
 <div id="motivation" class="section level2">
 <h2><em>Motivation</em></h2>
 <p>Observing that mental health issues appear at a younger and younger
@@ -408,16 +411,844 @@ depression levels?<br />
 </div>
 <div id="data" class="section level2">
 <h2><em>Data</em></h2>
-<p>Our group applied the dataset from <a
-href="https://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses/data?select=codebook.txt">Kaggle
-Depression, Anxiety, and Stress Scales Responses</a> for this project.
-The DASS-42 is a self-report scale consisting of 42 items intended to
-gauge emotional states related to depression, anxiety, and stress. The
-primary benefit of utilizing the DASS in a clinical context is its
-ability to ascertain the specific location of emotional turmoil,
-contributing to a more comprehensive clinical assessment. Its core
-function is to evaluate the severity of the fundamental symptoms
+<div id="data-source" class="section level3">
+<h3>Data Source</h3>
+<p><strong>DASS-42 Responses</strong></p>
+<p>Our group applied the dataset from Kaggle Depression, Anxiety, and
+Stress Scales Responses (can be find <a
+href="https://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses">here</a>)
+for this project. The DASS-42 is a self-report scale consisting of 42
+items intended to gauge emotional states related to depression, anxiety,
+and stress. The primary benefit of utilizing the DASS in a clinical
+context is its ability to ascertain the specific location of emotional
+turmoil, contributing to a more comprehensive clinical assessment. Its
+core function is to evaluate the severity of the fundamental symptoms
 associated with depression, anxiety, and stress.</p>
+<pre class="r"><code># Load the dataset
+dass_raw = read.csv(&quot;./data/data.csv&quot;, sep = &quot;\t&quot;)</code></pre>
+<p>The raw data contain 39775 observations and 172 variables, which
+contains the information of the participants’ responses.</p>
+</div>
+<div id="data-establishment-and-data-cleaning" class="section level3">
+<h3>Data Establishment and Data Cleaning</h3>
+<p>As we mentioned before, the raw data contains the basic information
+from the responses. Based on codebook.txt from Kaggle, we checked
+whether the individual response is meaningful. The criteria are as
+follow:</p>
+<ul>
+<li><p>The survey includes an accuracy check section, which provides
+several word spelling questions to check whether participants had filled
+out the questionnaire carefully.
+<code>VCL6</code>,<code>VCL9</code>,<code>VCL12</code> represents words
+that not exist. If the participants chose 1 in any of these three
+questions, the response should be omit.</p></li>
+<li><p>The raw data contains different missing values which needs to be
+omitted. Specifically, <code>country</code> variable has “NONE” as the
+missing value.</p></li>
+<li><p><code>Age</code> variable have impossible values we need to clean
+out. For example, 299 years for an age is not reasonable.</p></li>
+</ul>
+<pre class="r"><code># kick out meaningless observation
+dass = dass_raw %&gt;%
+  filter(!(VCL6 == 1 | VCL9 == 1 | VCL12 == 1)) %&gt;%
+  filter(!country == &quot;NONE&quot;) %&gt;%
+  filter(age &lt;= 100)
+
+dass = dass %&gt;%
+  dplyr::select(matches(&#39;Q\\d+A&#39;), country, education, urban, gender, age, religion, orientation, race, married) %&gt;%
+  na.omit()</code></pre>
+<p>Since we observed that there are some variables have actual meaning
+corresponding to the original numeric value, we refactor these
+variables, including <code>education</code>, <code>urban</code>,
+<code>gender</code>, <code>religion</code>, <code>orientation</code>,
+<code>race</code>, <code>married</code>. In these variables, if the
+value is 0, it represents missing value and we delete these
+observations.</p>
+<pre class="r"><code># refactor the variables
+dass_new = dass %&gt;%
+  mutate(
+    education = case_when(education == 1 ~ &#39;Less than high school&#39;, 
+                               education == 2 ~ &#39;High school&#39;, 
+                               education == 3 ~ &#39;University degree&#39;, 
+                               education == 4 ~ &#39;Graduate degree&#39;),
+    urban = case_when(urban == 1 ~ &#39;Rural&#39;,
+                      urban == 2 ~ &#39;Suburban&#39;, 
+                      urban == 3 ~ &#39;Urban&#39;),
+    gender = case_when(gender == 1 ~ &#39;Male&#39;,
+                       gender == 2 ~ &#39;Female&#39;,
+                       gender == 3 ~ &#39;Other&#39;),
+    religion = case_when(religion == 1 ~ &#39;Agnostic&#39;, 
+                         religion == 2 ~ &#39;Atheist&#39;, 
+                         religion == 3 ~ &#39;Buddhist&#39;, 
+                         religion == 4 ~ &#39;Christian (Catholic)&#39;, 
+                         religion == 5 ~ &#39;Christian (Mormon)&#39;, 
+                         religion == 6 ~ &#39;Christian (Protestant)&#39;, 
+                         religion == 7 ~ &#39;Christian (Other)&#39;, 
+                         religion == 8 ~ &#39;Hindu&#39;, 
+                         religion == 9 ~ &#39;Jewish&#39;, 
+                         religion == 10 ~ &#39;Muslim&#39;, 
+                         religion == 11 ~ &#39;Sikh&#39;, 
+                         religion == 12 ~ &#39;Other&#39;),
+    orientation = case_when(orientation == 1 ~ &#39;Heterosexual&#39;, 
+                            orientation == 2 ~ &#39;Bisexual&#39;, 
+                            orientation == 3 ~ &#39;Homosexual&#39;, 
+                            orientation == 4 ~ &#39;Asexual&#39;, 
+                            orientation == 5 ~ &#39;Other&#39;),
+    race = case_when(race == 10 ~ &#39;Asian&#39;, 
+                     race == 20 ~ &#39;Arab&#39;, 
+                     race == 30 ~ &#39;Black&#39;, 
+                     race == 40 ~ &#39;Indigenous Australian&#39;, 
+                     race == 50 ~ &#39;Native American&#39;, 
+                     race == 60 ~ &#39;White&#39;, 
+                     race == 70 ~ &#39;Other&#39;),
+    married = case_when(married == 1 ~ &#39;Never married&#39;, 
+                        married == 2 ~ &#39;Currently married&#39;, 
+                        married == 3 ~ &#39;Previously married&#39;)
+    ) %&gt;%
+  na.omit()</code></pre>
+<p>Based on the scoring criteria (as shown in DASS-42-scoring.pdf), we
+add up the values for Q3A, Q5A, Q10A, Q13A, Q16A, Q17A, Q21A, Q24A,
+Q26A, Q31A, Q34A, Q37A, Q38A and Q42A as the depression scores.</p>
+<p>Similarly, add up the values for Q2A, Q4A, Q7A, Q9A, Q15A, Q19A,
+Q20A, Q23A, Q25A, Q28A, Q30A, Q36A, Q40A and Q41A as the anxiety scores
+and the sum of Q1A, Q6A, Q8A, Q11A, Q12A, Q14A, Q18A, Q22A, Q27A, Q29A,
+Q32A, Q33A, Q35A and Q39A as the stress scores.</p>
+<p>Considering that the scoring criteria we refer to is 0-3 scale but
+Kaggle dataset is 1-4 scale, we modify these three scores by minus
+14.</p>
+<p>After that, we could assign depression level, anxiety level and
+stress level for each observation refer to the rule of:</p>
+<ol style="list-style-type: decimal">
+<li><p>Depression （score ~ level)</p>
+<ul>
+<li><p>0 - 9 ~ normal</p></li>
+<li><p>10 - 13 ~ mild</p></li>
+<li><p>14 - 20 ~ moderate</p></li>
+<li><p>21 - 27 ~ severe</p></li>
+<li><p>&gt;27 ~ extremely severe</p></li>
+</ul></li>
+<li><p>Anxiety</p>
+<ul>
+<li><p>0 - 7 ~ normal</p></li>
+<li><p>8 - 9 ~ mild</p></li>
+<li><p>10 - 14 ~ moderate</p></li>
+<li><p>15 - 19 ~ severe</p></li>
+<li><p>&gt;19 ~ extremely severe</p></li>
+</ul></li>
+<li><p>Stress</p>
+<ul>
+<li><p>0 - 14 ~ normal</p></li>
+<li><p>15 - 18 ~ mild</p></li>
+<li><p>19 - 25 ~ moderate</p></li>
+<li><p>26 - 33 ~ severe</p></li>
+<li><p>&gt;33 ~ extremely severe</p></li>
+</ul></li>
+</ol>
+<p>Considering that stress, anxiety and depression might have
+correlations, we apply correlation test for <code>stress_level</code>,
+<code>depression_level</code>, <code>anxiety_level</code>.</p>
+<pre class="r"><code>dass_heat2 &lt;- dass %&gt;%
+  mutate(
+    depression = Q3A + Q5A + Q10A + Q13A + Q16A + Q17A + Q21A + Q24A + Q26A + Q31A + Q34A + Q37A + Q38A + Q42A - 14,
+    anxiety = Q2A + Q4A + Q7A + Q9A + Q15A + Q19A + Q20A + Q23A + Q25A + Q28A + Q30A + Q36A + Q40A + Q41A - 14,
+    stress = Q1A + Q6A + Q8A + Q11A + Q12A + Q14A + Q18A + Q22A + Q27A + Q29A + Q32A + Q33A + Q35A + Q39A - 14
+    ) %&gt;%
+  mutate(depression = case_when(
+    depression &gt;= 0 &amp; depression &lt;= 9 ~ 0,
+    depression &gt;= 10 &amp; depression &lt;= 13 ~ 1,
+    depression &gt;= 14 &amp; depression &lt;= 20 ~ 2,
+    depression &gt;= 21 &amp; depression &lt;= 27 ~ 3,
+    depression &gt;= 28 ~ 4
+  )) %&gt;%
+  mutate(anxiety = case_when(
+    anxiety &gt;= 0 &amp; anxiety &lt;= 7 ~ 0,
+    anxiety &gt;= 8 &amp; anxiety &lt;= 9 ~ 1,
+    anxiety &gt;= 10 &amp; anxiety &lt;= 14 ~ 2,
+    anxiety &gt;= 15 &amp; anxiety &lt;= 19 ~ 3,
+    anxiety &gt;= 20 ~ 4
+  )) %&gt;%
+  mutate(stress = case_when(
+    stress &gt;= 0 &amp; stress &lt;= 14 ~ 0,
+    stress &gt;= 15 &amp; stress &lt;= 18 ~ 1,
+    stress &gt;= 19 &amp; stress &lt;= 25 ~ 2,
+    stress &gt;= 26 &amp; stress &lt;= 33 ~ 3,
+    stress &gt;= 34 ~ 4
+  )) %&gt;%
+  dplyr::select(depression,anxiety,stress)
+
+r1 &lt;- cor(dass_heat2,
+         method = &quot;pearson&quot;,
+         use = &quot;pairwise.complete.obs&quot;
+) 
+
+pheatmap(r1, 
+         show_colnames = TRUE,   
+         show_rownames=TRUE,    
+         fontsize=5,             
+         color = colorRampPalette(c(&#39;#ffffff&#39;,&#39;#ff0000&#39;))(100), 
+         annotation_legend=TRUE, 
+         border_color=NA,        
+         scale=&quot;none&quot;,            
+         cluster_rows = F,
+         cluster_cols = F,
+         breaks = seq(0, 1, length.out = 90)
+)</code></pre>
+<p><img src="report_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>According to the heat map, we could conclude that these three
+variables have strong correlation. Therefore, in our project, we take
+depression_level as the representative.</p>
+<p>Finally, we get our clean and tidy dataset for the project.</p>
+<pre class="r"><code># create three different dataset
+dass_new = dass_new %&gt;%
+  mutate(
+    depression = Q3A + Q5A + Q10A + Q13A + Q16A + Q17A + Q21A + Q24A + Q26A + Q31A + Q34A + Q37A + Q38A + Q42A - 14
+    ) %&gt;%
+  mutate(education = factor(education, levels = c(&#39;Less than high school&#39;, &#39;High school&#39;, &#39;University degree&#39;, &#39;Graduate degree&#39;))) %&gt;%
+  mutate(married = factor(married, levels = c(&quot;Previously married&quot;, &quot;Currently married&quot;, &quot;Never married&quot;))) %&gt;%
+  dplyr::select(-matches(&#39;Q\\d+A&#39;))
+
+# create das level variables
+dass_new = dass_new %&gt;%
+  mutate(depression_level = case_when(
+    depression &gt;= 0 &amp; depression &lt;= 9 ~ &#39;Normal&#39;,
+    depression &gt;= 10 &amp; depression &lt;= 13 ~ &#39;Mild&#39;,
+    depression &gt;= 14 &amp; depression &lt;= 20 ~ &#39;Moderate&#39;,
+    depression &gt;= 21 &amp; depression &lt;= 27 ~ &#39;Severe&#39;,
+    depression &gt;= 28 ~ &#39;Extremely severe&#39;
+  )) %&gt;%
+  mutate(depression_level = factor(depression_level, c(&quot;Normal&quot;,&quot;Mild&quot;,&quot;Moderate&quot;,&quot;Severe&quot;,&quot;Extremely severe&quot;))) %&gt;%
+  dplyr::select(-depression)
+
+head(dass_new)</code></pre>
+<pre><code>##   country             education    urban gender age             religion
+## 1      IN           High school    Urban Female  16                Other
+## 3      PL           High school    Urban Female  17 Christian (Catholic)
+## 4      US Less than high school    Urban Female  13 Christian (Catholic)
+## 5      MY     University degree Suburban Female  19               Muslim
+## 6      US           High school    Urban Female  20 Christian (Catholic)
+## 7      MX           High school    Urban Female  17    Christian (Other)
+##    orientation  race       married depression_level
+## 1 Heterosexual Asian Never married           Severe
+## 3   Homosexual White Never married Extremely severe
+## 4        Other Other Never married         Moderate
+## 5 Heterosexual Asian Never married Extremely severe
+## 6 Heterosexual Other Never married             Mild
+## 7     Bisexual White Never married Extremely severe</code></pre>
+</div>
+<div id="data-summary" class="section level3">
+<h3>Data Summary</h3>
+<p>Above all, we got our dataset for further analysis. It contains 30309
+observations and 10 variables. The explanation of each variables are
+listed below:</p>
+<ul>
+<li><p><code>country</code>: The country where the participants
+from.</p></li>
+<li><p><code>education</code>: The education level of the
+participants.</p></li>
+<li><p><code>urban</code>: The urban level of the place where
+participants live.</p></li>
+<li><p><code>gender</code>: The sex of the participants.</p></li>
+<li><p><code>religion</code>: The religion which the participants belong
+to.</p></li>
+<li><p><code>orientation</code>: The sexual orientation of the
+participants.</p></li>
+<li><p><code>race</code>: The race of participants.</p></li>
+<li><p><code>married</code>: The marriage status of
+participants.</p></li>
+<li><p><code>age</code>: The age when participants response the
+survey.</p></li>
+<li><p><code>depression_level</code>: The depression level of the
+participants according to the survey and scores.</p></li>
+</ul>
+<pre class="r"><code>dass_new %&gt;%
+  dplyr::select(-country) %&gt;%
+  tbl_summary(type = list(
+    education ~ &quot;categorical&quot;, 
+    urban ~ &quot;categorical&quot;, 
+    gender ~ &quot;categorical&quot;,
+    religion ~ &quot;categorical&quot;,
+    orientation ~ &quot;categorical&quot;,
+    race ~ &quot;categorical&quot;,
+    married ~ &quot;categorical&quot;,
+    age ~ &quot;continuous&quot;, 
+    depression_level ~ &quot;categorical&quot;
+  ), 
+  statistic = list(all_continuous() ~ &quot;{mean} ({sd})&quot;), 
+  digits = all_continuous() ~ 1,
+  label = c(
+    education = &quot;Education level&quot;,
+    urban = &quot;Urban level&quot;,
+    gender = &quot;Gender&quot;,
+    religion = &quot;Religion&quot;,
+    orientation = &#39;Sexual orientation&#39;,
+    race = &#39;Race&#39;,
+    married = &#39;Marriage status&#39;,
+    age = &quot;Age (Years)&quot;,
+    depression_level = &quot;Depression level&quot;
+  )) %&gt;%
+  bold_labels() %&gt;%
+  as_gt()  # Display the table as a gt object</code></pre>
+<div id="mcamwvrqnk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#mcamwvrqnk table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#mcamwvrqnk thead, #mcamwvrqnk tbody, #mcamwvrqnk tfoot, #mcamwvrqnk tr, #mcamwvrqnk td, #mcamwvrqnk th {
+  border-style: none;
+}
+
+#mcamwvrqnk p {
+  margin: 0;
+  padding: 0;
+}
+
+#mcamwvrqnk .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#mcamwvrqnk .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#mcamwvrqnk .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#mcamwvrqnk .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#mcamwvrqnk .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#mcamwvrqnk .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mcamwvrqnk .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#mcamwvrqnk .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#mcamwvrqnk .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#mcamwvrqnk .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#mcamwvrqnk .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#mcamwvrqnk .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#mcamwvrqnk .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#mcamwvrqnk .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#mcamwvrqnk .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#mcamwvrqnk .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#mcamwvrqnk .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#mcamwvrqnk .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#mcamwvrqnk .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mcamwvrqnk .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#mcamwvrqnk .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#mcamwvrqnk .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#mcamwvrqnk .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mcamwvrqnk .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#mcamwvrqnk .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#mcamwvrqnk .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mcamwvrqnk .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mcamwvrqnk .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#mcamwvrqnk .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mcamwvrqnk .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#mcamwvrqnk .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mcamwvrqnk .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#mcamwvrqnk .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mcamwvrqnk .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#mcamwvrqnk .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mcamwvrqnk .gt_left {
+  text-align: left;
+}
+
+#mcamwvrqnk .gt_center {
+  text-align: center;
+}
+
+#mcamwvrqnk .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#mcamwvrqnk .gt_font_normal {
+  font-weight: normal;
+}
+
+#mcamwvrqnk .gt_font_bold {
+  font-weight: bold;
+}
+
+#mcamwvrqnk .gt_font_italic {
+  font-style: italic;
+}
+
+#mcamwvrqnk .gt_super {
+  font-size: 65%;
+}
+
+#mcamwvrqnk .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#mcamwvrqnk .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#mcamwvrqnk .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#mcamwvrqnk .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#mcamwvrqnk .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#mcamwvrqnk .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#mcamwvrqnk .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;Characteristic&lt;/strong&gt;"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="&lt;strong&gt;N = 30,309&lt;/strong&gt;&lt;span class=&quot;gt_footnote_marks&quot; style=&quot;white-space:nowrap;font-style:italic;font-weight:normal;&quot;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/span&gt;"><strong>N = 30,309</strong><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Education level</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Less than high school</td>
+<td headers="stat_0" class="gt_row gt_center">2,997 (9.9%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    High school</td>
+<td headers="stat_0" class="gt_row gt_center">11,374 (38%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    University degree</td>
+<td headers="stat_0" class="gt_row gt_center">11,957 (39%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Graduate degree</td>
+<td headers="stat_0" class="gt_row gt_center">3,981 (13%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Urban level</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Rural</td>
+<td headers="stat_0" class="gt_row gt_center">6,295 (21%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Suburban</td>
+<td headers="stat_0" class="gt_row gt_center">10,283 (34%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Urban</td>
+<td headers="stat_0" class="gt_row gt_center">13,731 (45%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Gender</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Female</td>
+<td headers="stat_0" class="gt_row gt_center">23,137 (76%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Male</td>
+<td headers="stat_0" class="gt_row gt_center">6,754 (22%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Other</td>
+<td headers="stat_0" class="gt_row gt_center">418 (1.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Age (Years)</td>
+<td headers="stat_0" class="gt_row gt_center">23.5 (8.4)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Religion</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Agnostic</td>
+<td headers="stat_0" class="gt_row gt_center">2,406 (7.9%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Atheist</td>
+<td headers="stat_0" class="gt_row gt_center">2,943 (9.7%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Buddhist</td>
+<td headers="stat_0" class="gt_row gt_center">419 (1.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Christian (Catholic)</td>
+<td headers="stat_0" class="gt_row gt_center">2,359 (7.8%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Christian (Mormon)</td>
+<td headers="stat_0" class="gt_row gt_center">83 (0.3%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Christian (Other)</td>
+<td headers="stat_0" class="gt_row gt_center">1,699 (5.6%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Christian (Protestant)</td>
+<td headers="stat_0" class="gt_row gt_center">1,177 (3.9%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Hindu</td>
+<td headers="stat_0" class="gt_row gt_center">531 (1.8%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Jewish</td>
+<td headers="stat_0" class="gt_row gt_center">101 (0.3%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Muslim</td>
+<td headers="stat_0" class="gt_row gt_center">17,204 (57%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Other</td>
+<td headers="stat_0" class="gt_row gt_center">1,343 (4.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Sikh</td>
+<td headers="stat_0" class="gt_row gt_center">44 (0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Sexual orientation</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Asexual</td>
+<td headers="stat_0" class="gt_row gt_center">1,649 (5.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Bisexual</td>
+<td headers="stat_0" class="gt_row gt_center">3,921 (13%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Heterosexual</td>
+<td headers="stat_0" class="gt_row gt_center">20,259 (67%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Homosexual</td>
+<td headers="stat_0" class="gt_row gt_center">1,548 (5.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Other</td>
+<td headers="stat_0" class="gt_row gt_center">2,932 (9.7%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Race</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Arab</td>
+<td headers="stat_0" class="gt_row gt_center">228 (0.8%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Asian</td>
+<td headers="stat_0" class="gt_row gt_center">18,041 (60%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Black</td>
+<td headers="stat_0" class="gt_row gt_center">432 (1.4%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Indigenous Australian</td>
+<td headers="stat_0" class="gt_row gt_center">12 (&lt;0.1%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Native American</td>
+<td headers="stat_0" class="gt_row gt_center">159 (0.5%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Other</td>
+<td headers="stat_0" class="gt_row gt_center">3,621 (12%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    White</td>
+<td headers="stat_0" class="gt_row gt_center">7,816 (26%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Marriage status</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Previously married</td>
+<td headers="stat_0" class="gt_row gt_center">771 (2.5%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Currently married</td>
+<td headers="stat_0" class="gt_row gt_center">3,331 (11%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Never married</td>
+<td headers="stat_0" class="gt_row gt_center">26,207 (86%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Depression level</td>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Normal</td>
+<td headers="stat_0" class="gt_row gt_center">6,832 (23%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Mild</td>
+<td headers="stat_0" class="gt_row gt_center">2,921 (9.6%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Moderate</td>
+<td headers="stat_0" class="gt_row gt_center">5,433 (18%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Severe</td>
+<td headers="stat_0" class="gt_row gt_center">4,947 (16%)</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Extremely severe</td>
+<td headers="stat_0" class="gt_row gt_center">10,176 (34%)</td></tr>
+  </tbody>
+  
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="2"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> n (%); Mean (SD)</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
 </div>
 <div id="exploratory-analysis" class="section level2">
 <h2><em>Exploratory Analysis</em></h2>
@@ -425,8 +1256,19 @@ associated with depression, anxiety, and stress.</p>
 <div id="additional-analysis" class="section level2">
 <h2><em>Additional Analysis</em></h2>
 </div>
+<div id="regression" class="section level2">
+<h2><em>Regression</em></h2>
+</div>
 <div id="discussion" class="section level2">
 <h2><em>Discussion</em></h2>
+<div id="challenge" class="section level3">
+<h3>Challenge</h3>
+</div>
+<div id="limitation" class="section level3">
+<h3>Limitation</h3>
+</div>
+<div id="future-work" class="section level3">
+<h3>Future work</h3>
 <p>First, we would like to filter, check validity, and eliminate
 incompetent data; then, we would score each person’s depression levels.
 Our group plans to use box plots and/or scatter plots to show the
@@ -437,6 +1279,10 @@ figure out the possible factors, including age, sex, location, etc,
 leading to depression. Understanding survey questions, as well as
 cleaning and tidying the dataset into a readable format is one of our
 current coding challenges.</p>
+</div>
+</div>
+<div id="reference" class="section level2">
+<h2><em>Reference</em></h2>
 </div>
 
 

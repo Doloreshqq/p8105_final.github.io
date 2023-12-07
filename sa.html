@@ -376,6 +376,15 @@ div.tocify {
 </div>
 
 
+<pre class="r"><code>dass_raw = read.csv(&quot;./data/data.csv&quot;, sep = &quot;\t&quot;)
+dass = dass_raw %&gt;%
+  filter(!(VCL6 == 1 | VCL9 == 1 | VCL12 == 1)) %&gt;%
+  filter(!country == &quot;NONE&quot;) %&gt;%
+  filter(age &lt;= 100)
+
+dass = dass %&gt;%
+  dplyr::select(matches(&#39;Q\\d+A&#39;), country, education, urban, gender, age, religion, orientation, race, married) %&gt;%
+  na.omit()</code></pre>
 <pre class="r"><code># Select the columns you need and create a data frame
 dass_heat1 &lt;- dass %&gt;%
   dplyr::select(-matches(&#39;Q\\d+A&#39;)) %&gt;%
@@ -399,7 +408,7 @@ pheatmap(r,
          cluster_rows = T,
          cluster_cols = T     
 )</code></pre>
-<p><img src="sa_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p><img src="sa_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <pre class="r"><code>PCA = prcomp(dass_heat1, center = T, scale. = T)
 
 PCA</code></pre>
@@ -437,14 +446,14 @@ PCA</code></pre>
 ## Proportion of Variance 0.03974
 ## Cumulative Proportion  1.00000</code></pre>
 <pre class="r"><code>screeplot(PCA, type = &#39;line&#39;)</code></pre>
-<p><img src="sa_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="sa_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <pre class="r"><code>library(factoextra)</code></pre>
 <pre><code>## Welcome! Want to learn more? See two factoextra-related books at https://goo.gl/ve3WBa</code></pre>
 <pre class="r"><code>fviz_pca_var(PCA, axes = c(1, 2), col.var = &quot;contrib&quot;, gradient.cols = c(&quot;blue&quot;, &quot;red&quot;), repel = TRUE)</code></pre>
-<p><img src="sa_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="sa_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <pre class="r"><code>fviz_pca_var(PCA, axes = c(2, 3), col.var = &quot;contrib&quot;, gradient.cols = c(&quot;blue&quot;, &quot;red&quot;), 
             repel = TRUE)</code></pre>
-<p><img src="sa_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<p><img src="sa_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
 
 
 
