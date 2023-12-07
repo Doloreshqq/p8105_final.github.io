@@ -21,6 +21,31 @@ library(effects)
 
 ```
 
+## *Motivation*
+
+Observing that mental health issues appear at a younger and younger age, we would like to test if DASS can potentially provide a means to objectively evaluate the severity and the potential factors of depression among different population including races, ages, etc.
+
+## *Related Work*
+
+[Antony et. al](https://doi.org/10.1037/1040-3590.10.2.176)
+
+## *Initial Questions*
+
+-   What factors have a significant impact on the level of depression?
+
+-   Do different countries exhibit significantly varied rates of depression at different levels of development?
+
+-   What factors account for the differences in the development of depression levels?
+
+-   What factors can be used to predict depression levels?
+
+## *Introduction*
+Depression, a pervasive mental health challenge, is becoming increasingly prevalent among younger demographics, necessitating a deeper understanding of its existence in diverse populations. This study seeks to harness the potential of the Depression, Anxiety, and Stress Scales (DASS) as a comprehensive tool to objectively assess the severity and underlying factors influencing or contributing to depression across demographic groups, including differences in race, age groups, and more.
+
+Our study utilizes an extensive dataset from the Depression, Anxiety, and Stress Scales (DASS) Responses accessible via Kaggle, to accomplish our objectives. This dataset includes 42 self-reported items, carefully created to evaluate emotional states associated with depression, anxiety, and stress. The objective of our project is to contribute to a more thorough comprehension of the determinants of depression, which could potentially inform customized support strategies and targeted interventions designed for specific population groups.
+
+Our methodology involves filtering data, performing validity checks, and eliminating unreliable data to bolster the integrity of our analysis. We will then stratify individuals' depression levels and present their distributions across various variables using graphical representations, such as line charts. To compare factor distributions across different depression levels, we will employ statistical tools like the chi-squared test. Our study aims to employ logistic regression models to identify influential factors contributing to varying levels of depression, including age, gender, geographical location, and etc. Additionally, we plan to create data visualizations on coefficients and model fit after constructing the model.
+
 ## *Data*
 
 ### Data Source
@@ -300,7 +325,7 @@ We want to investigate the relationship between demographic variables and depres
 
 Imbalanced data may result in an inaccurate outcome due to a small sample size in some classes. Therefore, we first want to test the distribution of independent variables to avoid the imbalance of samples between different categories.
 
-```{r}
+```{r, message=FALSE}
 dass_new = read_csv("data/dass_new.csv")
 
 dass_new |> 
@@ -450,7 +475,6 @@ The estimated model can be written as: \begin{align*}
 &- 0.10 \times I(\text{race} = \text{Other})
 \end{align*}
 ```
-
 Calculate the odds ratio and CI for variables:
 
 ```{r}
@@ -462,7 +486,7 @@ Calculate the odds ratio and CI for variables:
 
 At this stage, we would like to draw a receiver operating characteristic (ROC) curve for depression level to check the model fit.
 
-```{r}
+```{r,message=FALSE}
 
 # Predicting probabilities for all classes
 predicted_probs <- predict(dass_fit1, type = "probs")
@@ -592,15 +616,33 @@ ggplot(orientation_coefficients, aes(x = orientation, y = OR - 1)) +
 
 -   For sexual minorities, the odds of having a more severe depression level is higher than that of heterosexual orientation participants, holding constant all other variables.
 
-
 ## *Discussion*
+
+### Conclusion
+
+In our project, we first cleaned and tidied the dataset based on code.txt and DASS-42-scoring.pdf.
+
+After exploratory analysis, we found out age, gender, orientation and race may contribute to the depression level most. We also realized a shiny app to show the distribution of responses for each depression level around the world.
+
+We conducted chi-square tests for age, gender, orientation and race. Based on all p-values<0.05, we could conclude that at 0.05 significance level, the null hypothesis are rejected and these factors are all associated with depression level.
+
+From the regression, we concluded that country, gender, orientation, age and race played important roles in the model. Specifically, we found out older people and male may have less risk to get depressed. Also, people live in Indonesia and Malaysia have less chance to severely depressed while in Canada, UK and Phillipines have more chance compared to US. The results also showed that white people and sexual minorities would be more likely to have more severe depression level. The p-value for our model is 0.067, which greater than 0.05, indicating a success.
 
 ### Challenge
 
-### Limitation
+The challenge we met was that there were some missing or meaningless values in our raw dataset. Missing values for some variables were not just an "N/A" and we needed to dig into the dataset to find out the true expression of missing for each variables. Meaningless data means there were possibilities that the responses were randomly answered by someone or without carefulness. Thus, these observations would not be representative then we should omit.
 
-### Future work
+Another challenge we thought was that there were too much variables in the raw data, we needed to figure out the parts for our project. For example, we didn't need information of accuracy checking remain in the final dataset so we needed to delete these columns. 
 
-First, we would like to filter, check validity, and eliminate incompetent data; then, we would score each person's depression levels. Our group plans to use box plots and/or scatter plots to show the distributions among different variables. We would apply chi-squared test to compare the distribution of different factors within depression levels. Based on the levels, we would also apply regression models to figure out the possible factors, including age, sex, location, etc, leading to depression. Understanding survey questions, as well as cleaning and tidying the dataset into a readable format is one of our current coding challenges.
+### Limitation and Future Improvements
+
+-   The observations with missing values may affect the model but we deleted.
+-   Imbalance within samples (e.g. 76.3% female samples).
+-   Strong dependence between independent variables (e.g. race versus religion).
+-   Counter-intuitive results (e.g. Asian people have lower risk of getting severely depressed than white people).
+-   Future Improvements:
+    -   Try methods to impute the missing values instead of ignoring.
+    -   Clustering to decrease dependence;
+    -   Fit a separate model for each depression level to avoid parallel assumption.
 
 ## *Reference*

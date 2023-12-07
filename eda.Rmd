@@ -18,7 +18,7 @@ The raw data includes 9 potential factors:`country`, `education`, `urban`, `gend
 This [shiny app](https://doloreshqq.shinyapps.io/r_shiny_for_p8105/) 
 provides visualizations of depression levels for individual countries on a global scale. A screenshot is shown below:
 
-<img src="shinny_scr.jpg" style ="width:80%">
+<img src="shiny_scr.jpg" style ="width:85%">
 
 # Plots
 With our existence data, we need to evaluate the depression level with respect to different populations. After some preliminary research and plotting, we identified a potential correlation between four variables including `gender`, `orientation`, `age` ,`race` and our predictor Depression Level. Subsequently, we proceeded with following exploratory data analysis to identify pertinent variables that could function as independent variables in our regression model.

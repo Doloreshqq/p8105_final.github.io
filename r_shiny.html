@@ -26,33 +26,24 @@ window.FlexDashboardComponents = [];
 </script>
 <script src="site_libs/header-attrs-2.24/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
-<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
-<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
-<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
-<style>h1 {font-size: 34px;}
-       h1.title {font-size: 38px;}
-       h2 {font-size: 30px;}
-       h3 {font-size: 24px;}
-       h4 {font-size: 18px;}
-       h5 {font-size: 16px;}
-       h6 {font-size: 12px;}
-       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
-       pre:not([class]) { background-color: white }</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<link href="site_libs/bootstrap-3.4.1/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.4.1/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-accessibility-1.0.6/plugins/js/bootstrap-accessibility.min.js"></script>
+<link href="site_libs/flexdashboard-css-0.6.2/flexdashboard-css.css" rel="stylesheet" />
 <script src="site_libs/stickytableheaders-0.1.19/jquery.stickytableheaders.min.js"></script>
 <link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
-<link href="site_libs/value-box-accent-static-0.6.2/theme-cosmo-value-box.css" rel="stylesheet" />
 <link href="site_libs/featherlight-1.3.5/featherlight.min.css" rel="stylesheet" />
 <script src="site_libs/featherlight-1.3.5/featherlight.min.js"></script>
 <link href="site_libs/prism-1.4.1/prism.css" rel="stylesheet" />
 <script src="site_libs/prism-1.4.1/prism.js"></script>
-<link href="site_libs/flexdashboard-css-0.6.2/flexdashboard.min.css" rel="stylesheet" />
-<link href="site_libs/flexdashboard-css-0.6.2/theme-cosmo.css" rel="stylesheet" />
-<link href="site_libs/selectize-0.15.2/css/selectize.bootstrap3.css" rel="stylesheet" />
-<script src="site_libs/selectize-0.15.2/js/selectize.min.js"></script>
-<script src="site_libs/selectize-0.15.2/accessibility/js/selectize-plugin-a11y.min.js"></script>
+<link href="site_libs/selectize-0.15.2/selectize.css" rel="stylesheet" />
+<script src="site_libs/selectize-0.15.2/selectize.min.js"></script>
+<script src="site_libs/selectize-0.15.2/selectize-plugin-a11y.min.js"></script>
+<script src="site_libs/ionrangeslider-javascript-2.3.1/js/ion.rangeSlider.min.js"></script>
+<script src="site_libs/strftime-0.9.2/strftime-min.js"></script>
+<link href="site_libs/ionRangeSlider-2.3.1/ionRangeSlider.css" rel="stylesheet" />
 <script src="site_libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
 <script src="site_libs/plotly-binding-4.10.3/plotly.js"></script>
 <style type="text/css">
@@ -1877,7 +1868,7 @@ window.FlexDashboardComponents.push({
 </div>
 <div class="form-group shiny-input-container">
 <label class="control-label" id="Depression Level-label" for="Depression Level">
-<h3>Select Level</h3>
+<h3>Select Depression Level</h3>
 </label>
 <div>
 <select id="Depression Level" class="shiny-input-select"><option value="Severe">Severe</option>
@@ -1888,13 +1879,29 @@ window.FlexDashboardComponents.push({
 <script type="application/json" data-for="Depression Level" data-nonempty="">{"plugins":["selectize-plugin-a11y"]}</script>
 </div>
 </div>
+<div class="form-group shiny-input-container">
+<label class="control-label" id="Value Type-label" for="Value Type">
+<h3>Occurrences / Proportion</h3>
+</label>
+<div>
+<select id="Value Type" class="shiny-input-select"><option value="Occurrences">Occurrences</option>
+<option value="Proportion">Proportion</option></select>
+<script type="application/json" data-for="Value Type" data-nonempty="">{"plugins":["selectize-plugin-a11y"]}</script>
 </div>
-<div id="section-row" class="section level2" data-width="650">
+</div>
+<div class="form-group shiny-input-container">
+<label class="control-label" id="Occurrences Range-label" for="Occurrences Range">
+<h3>Select occurrences range</h3>
+</label>
+<input class="js-range-slider" id="Occurrences Range" data-skin="shiny" data-type="double" data-min="0" data-max="6000" data-from="100" data-to="6000" data-step="1" data-grid="true" data-grid-num="10" data-grid-snap="false" data-prettify-separator="," data-prettify-enabled="true" data-keyboard="true" data-drag-interval="true" data-data-type="number"/>
+</div>
+</div>
+<div id="section-row" class="section level2" data-width="750">
 <h2>Row</h2>
 <div class="knitr-options" data-fig-width="576" data-fig-height="460">
 
 </div>
-<div class="plotly html-widget html-widget-output shiny-report-size shiny-report-theme html-fill-item-overflow-hidden html-fill-item" id="outac14ba2ad7288f9b" style="width:100%;height:400px;"></div>
+<div class="plotly html-widget html-widget-output shiny-report-size shiny-report-theme html-fill-item-overflow-hidden html-fill-item" id="out6d3106799e314b6b" style="width:100%;height:400px;"></div>
 </div>
 <div id="section-row-1" class="section level2 tabset tabset-fade">
 <h2 class="tabset tabset-fade">Row</h2>
@@ -1903,9 +1910,19 @@ window.FlexDashboardComponents.push({
 <p>This map shows how different depression levels spread among the
 world.</p>
  
-<p>For example, if selecting ‘normal’ level (also default level), the
-plot would show the percentage of responses with normal depression level
-for each country around the world.</p>
+<p>For example, if selecting “Normal” level (also default level),
+“Occurrences”, and the default occurrences range “100 - 6000”, the plot
+would show the occurrences of responses with normal depression level for
+countries with 100 - 6000 normal depression level responses.</p>
+ 
+<p>It could be observed that Malaysia and United States have the largest
+number of responses. Among all the depression levels, extremely severe
+depression takes up the largest proportion among most countries.</p>
+<p>However, the interactive graph also illustrates the imbalance of
+responses. If we limit the occurrences to be larger than 500, there will
+only be Malaysia and United States left. When interpreting the
+proportion of different depression level, the sample size must be
+considered.</p>
 </div>
 <div id="section-formula" class="section level3">
 <h3>Formula</h3>
@@ -1937,6 +1954,9 @@ $(document).ready(function() {
 title: "Depression among the World"
 output: 
   flexdashboard::flex_dashboard:
+    theme: 
+      version: 3
+      bootswatch: flatly
     orientation: rows
     source_code: embed
 runtime: shiny
@@ -1956,11 +1976,13 @@ country_df =
   dass_df |&gt; 
   count(country, depression_level) |&gt; 
   group_by(country) |&gt; 
-  mutate(per =  n / sum(n),
-         code = ifelse(country == "XK", "XKX", countrycode(country, origin = "iso2c", destination = "iso3c")),
-         country = ifelse(country == "XK", "Kosovo", countrycode(country, origin = "iso2c", destination = "country.name"))
-  )
-
+  mutate(
+    proportion =  n / sum(n),
+    code = ifelse(country == "XK", "XKX", countrycode(country, origin = "iso2c", destination = "iso3c")),
+    country = ifelse(country == "XK", "Kosovo", countrycode(country, origin = "iso2c", destination = "country.name")),
+    depression_level = factor(depression_level, levels = c("Normal", "Mild", "Moderate", "Severe", "Extremely severe"), ordered = T)
+  ) |&gt; 
+  rename(occurrences = n)
 ```
 
 ## Column {.sidebar}
@@ -1973,13 +1995,27 @@ dlevel =
 
 # selectInput widget
 selectInput(
-  inputId = "Depression Level", 
-  label = h3("Select Level"),
+  inputId = "Depression Level",
+  label = h3("Select Depression Level"),
   choices = dlevel,
   selected = "Normal")
+
+selectInput(
+  inputId = "Value Type",
+  label = h3("Occurrences / Proportion"),
+  choices = c("Occurrences", "Proportion"),
+  selected = "Normal")
+
+sliderInput(
+  inputId = "Occurrences Range",
+  label = h3("Select occurrences range"),
+  min = 0, max = 6000,
+  value = c(100, 6000)
+)
 ```
 
-## Row {data-width="650"}
+ 
+## Row {data-width="750"}
 
 ```{r}
 renderPlotly({
@@ -1995,14 +2031,24 @@ g &lt;- list(
 
 country_df |&gt; 
   filter(depression_level == input[["Depression Level"]]) |&gt; 
+  group_by(country, code) |&gt; 
+  summarise(
+    occurrences = sum(occurrences),
+    proportion = sum(proportion)
+  ) |&gt;
+  filter(
+    occurrences &gt;= input[["Occurrences Range"]][1],
+    occurrences &lt;= input[["Occurrences Range"]][2]
+  ) |&gt; 
+  select(country, code, val = tolower(input[["Value Type"]])) |&gt; 
   plot_geo() |&gt; 
   add_trace(
-  z = ~per, color = ~per, colors = 'Blues',
+  z = ~ val, color = ~ val, colors = 'Blues',
   text = ~ country, locations = ~ code, marker = list(line = l)
   ) |&gt; 
-  colorbar(title = "Percentage") |&gt; 
+  colorbar(title = input[["Value Type"]]) |&gt; 
   layout(
-    title = str_c("Percentage of ",input[["Depression Level"]], " depression among each country"),
+    title = str_c(input[["Value Type"]], " of ",input[["Depression Level"]], " Depression Among Each Country"),
     geo = g
   )
 })
@@ -2014,7 +2060,13 @@ This map shows how different depression levels spread among the world.
 
 \ \par
 
-For example, if selecting 'normal' level (also default level), the plot would show the percentage of responses with normal depression level for each country around the world.
+For example, if selecting "Normal" level (also default level), "Occurrences", and the default occurrences range "100 - 6000", the plot would show the occurrences of responses with normal depression level for countries with 100 - 6000 normal depression level responses.
+
+\ \par
+
+It could be observed that Malaysia and United States have the largest number of responses. Among all the depression levels, extremely severe depression takes up the largest proportion among most countries.
+
+However, the interactive graph also illustrates the imbalance of responses. If we limit the occurrences to be larger than 500, there will only be Malaysia and United States left. When interpreting the proportion of different depression level, the sample size must be considered.
 
 ### Formula
 

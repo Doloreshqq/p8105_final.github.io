@@ -389,6 +389,60 @@ Responses Report</h1>
 </div>
 
 
+<div id="motivation" class="section level2">
+<h2><em>Motivation</em></h2>
+<p>Observing that mental health issues appear at a younger and younger
+age, we would like to test if DASS can potentially provide a means to
+objectively evaluate the severity and the potential factors of
+depression among different population including races, ages, etc.</p>
+</div>
+<div id="related-work" class="section level2">
+<h2><em>Related Work</em></h2>
+<p><a href="https://doi.org/10.1037/1040-3590.10.2.176">Antony et.
+al</a></p>
+</div>
+<div id="initial-questions" class="section level2">
+<h2><em>Initial Questions</em></h2>
+<ul>
+<li><p>What factors have a significant impact on the level of
+depression?</p></li>
+<li><p>Do different countries exhibit significantly varied rates of
+depression at different levels of development?</p></li>
+<li><p>What factors account for the differences in the development of
+depression levels?</p></li>
+<li><p>What factors can be used to predict depression levels?</p></li>
+</ul>
+</div>
+<div id="introduction" class="section level2">
+<h2><em>Introduction</em></h2>
+<p>Depression, a pervasive mental health challenge, is becoming
+increasingly prevalent among younger demographics, necessitating a
+deeper understanding of its existence in diverse populations. This study
+seeks to harness the potential of the Depression, Anxiety, and Stress
+Scales (DASS) as a comprehensive tool to objectively assess the severity
+and underlying factors influencing or contributing to depression across
+demographic groups, including differences in race, age groups, and
+more.</p>
+<p>Our study utilizes an extensive dataset from the Depression, Anxiety,
+and Stress Scales (DASS) Responses accessible via Kaggle, to accomplish
+our objectives. This dataset includes 42 self-reported items, carefully
+created to evaluate emotional states associated with depression,
+anxiety, and stress. The objective of our project is to contribute to a
+more thorough comprehension of the determinants of depression, which
+could potentially inform customized support strategies and targeted
+interventions designed for specific population groups.</p>
+<p>Our methodology involves filtering data, performing validity checks,
+and eliminating unreliable data to bolster the integrity of our
+analysis. We will then stratify individuals’ depression levels and
+present their distributions across various variables using graphical
+representations, such as line charts. To compare factor distributions
+across different depression levels, we will employ statistical tools
+like the chi-squared test. Our study aims to employ logistic regression
+models to identify influential factors contributing to varying levels of
+depression, including age, gender, geographical location, and etc.
+Additionally, we plan to create data visualizations on coefficients and
+model fit after constructing the model.</p>
+</div>
 <div id="data" class="section level2">
 <h2><em>Data</em></h2>
 <div id="data-source" class="section level3">
@@ -668,23 +722,23 @@ participants according to the survey and scores.</p></li>
   )) %&gt;%
   bold_labels() %&gt;%
   as_gt()  # Display the table as a gt object</code></pre>
-<div id="ugfbjmdkth" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#ugfbjmdkth table {
+<div id="vqortvszih" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#vqortvszih table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#ugfbjmdkth thead, #ugfbjmdkth tbody, #ugfbjmdkth tfoot, #ugfbjmdkth tr, #ugfbjmdkth td, #ugfbjmdkth th {
+#vqortvszih thead, #vqortvszih tbody, #vqortvszih tfoot, #vqortvszih tr, #vqortvszih td, #vqortvszih th {
   border-style: none;
 }
 
-#ugfbjmdkth p {
+#vqortvszih p {
   margin: 0;
   padding: 0;
 }
 
-#ugfbjmdkth .gt_table {
+#vqortvszih .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -710,12 +764,12 @@ participants according to the survey and scores.</p></li>
   border-left-color: #D3D3D3;
 }
 
-#ugfbjmdkth .gt_caption {
+#vqortvszih .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ugfbjmdkth .gt_title {
+#vqortvszih .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -727,7 +781,7 @@ participants according to the survey and scores.</p></li>
   border-bottom-width: 0;
 }
 
-#ugfbjmdkth .gt_subtitle {
+#vqortvszih .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -739,7 +793,7 @@ participants according to the survey and scores.</p></li>
   border-top-width: 0;
 }
 
-#ugfbjmdkth .gt_heading {
+#vqortvszih .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -751,13 +805,13 @@ participants according to the survey and scores.</p></li>
   border-right-color: #D3D3D3;
 }
 
-#ugfbjmdkth .gt_bottom_border {
+#vqortvszih .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ugfbjmdkth .gt_col_headings {
+#vqortvszih .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -772,7 +826,7 @@ participants according to the survey and scores.</p></li>
   border-right-color: #D3D3D3;
 }
 
-#ugfbjmdkth .gt_col_heading {
+#vqortvszih .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -792,7 +846,7 @@ participants according to the survey and scores.</p></li>
   overflow-x: hidden;
 }
 
-#ugfbjmdkth .gt_column_spanner_outer {
+#vqortvszih .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -804,15 +858,15 @@ participants according to the survey and scores.</p></li>
   padding-right: 4px;
 }
 
-#ugfbjmdkth .gt_column_spanner_outer:first-child {
+#vqortvszih .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ugfbjmdkth .gt_column_spanner_outer:last-child {
+#vqortvszih .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ugfbjmdkth .gt_column_spanner {
+#vqortvszih .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -824,11 +878,11 @@ participants according to the survey and scores.</p></li>
   width: 100%;
 }
 
-#ugfbjmdkth .gt_spanner_row {
+#vqortvszih .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#ugfbjmdkth .gt_group_heading {
+#vqortvszih .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -854,7 +908,7 @@ participants according to the survey and scores.</p></li>
   text-align: left;
 }
 
-#ugfbjmdkth .gt_empty_group_heading {
+#vqortvszih .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -869,15 +923,15 @@ participants according to the survey and scores.</p></li>
   vertical-align: middle;
 }
 
-#ugfbjmdkth .gt_from_md > :first-child {
+#vqortvszih .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ugfbjmdkth .gt_from_md > :last-child {
+#vqortvszih .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ugfbjmdkth .gt_row {
+#vqortvszih .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -896,7 +950,7 @@ participants according to the survey and scores.</p></li>
   overflow-x: hidden;
 }
 
-#ugfbjmdkth .gt_stub {
+#vqortvszih .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -909,7 +963,7 @@ participants according to the survey and scores.</p></li>
   padding-right: 5px;
 }
 
-#ugfbjmdkth .gt_stub_row_group {
+#vqortvszih .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -923,15 +977,15 @@ participants according to the survey and scores.</p></li>
   vertical-align: top;
 }
 
-#ugfbjmdkth .gt_row_group_first td {
+#vqortvszih .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ugfbjmdkth .gt_row_group_first th {
+#vqortvszih .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#ugfbjmdkth .gt_summary_row {
+#vqortvszih .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -941,16 +995,16 @@ participants according to the survey and scores.</p></li>
   padding-right: 5px;
 }
 
-#ugfbjmdkth .gt_first_summary_row {
+#vqortvszih .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ugfbjmdkth .gt_first_summary_row.thick {
+#vqortvszih .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ugfbjmdkth .gt_last_summary_row {
+#vqortvszih .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -960,7 +1014,7 @@ participants according to the survey and scores.</p></li>
   border-bottom-color: #D3D3D3;
 }
 
-#ugfbjmdkth .gt_grand_summary_row {
+#vqortvszih .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -970,7 +1024,7 @@ participants according to the survey and scores.</p></li>
   padding-right: 5px;
 }
 
-#ugfbjmdkth .gt_first_grand_summary_row {
+#vqortvszih .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -980,7 +1034,7 @@ participants according to the survey and scores.</p></li>
   border-top-color: #D3D3D3;
 }
 
-#ugfbjmdkth .gt_last_grand_summary_row_top {
+#vqortvszih .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -990,11 +1044,11 @@ participants according to the survey and scores.</p></li>
   border-bottom-color: #D3D3D3;
 }
 
-#ugfbjmdkth .gt_striped {
+#vqortvszih .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ugfbjmdkth .gt_table_body {
+#vqortvszih .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1003,7 +1057,7 @@ participants according to the survey and scores.</p></li>
   border-bottom-color: #D3D3D3;
 }
 
-#ugfbjmdkth .gt_footnotes {
+#vqortvszih .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1017,7 +1071,7 @@ participants according to the survey and scores.</p></li>
   border-right-color: #D3D3D3;
 }
 
-#ugfbjmdkth .gt_footnote {
+#vqortvszih .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1026,7 +1080,7 @@ participants according to the survey and scores.</p></li>
   padding-right: 5px;
 }
 
-#ugfbjmdkth .gt_sourcenotes {
+#vqortvszih .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1040,7 +1094,7 @@ participants according to the survey and scores.</p></li>
   border-right-color: #D3D3D3;
 }
 
-#ugfbjmdkth .gt_sourcenote {
+#vqortvszih .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1048,63 +1102,63 @@ participants according to the survey and scores.</p></li>
   padding-right: 5px;
 }
 
-#ugfbjmdkth .gt_left {
+#vqortvszih .gt_left {
   text-align: left;
 }
 
-#ugfbjmdkth .gt_center {
+#vqortvszih .gt_center {
   text-align: center;
 }
 
-#ugfbjmdkth .gt_right {
+#vqortvszih .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ugfbjmdkth .gt_font_normal {
+#vqortvszih .gt_font_normal {
   font-weight: normal;
 }
 
-#ugfbjmdkth .gt_font_bold {
+#vqortvszih .gt_font_bold {
   font-weight: bold;
 }
 
-#ugfbjmdkth .gt_font_italic {
+#vqortvszih .gt_font_italic {
   font-style: italic;
 }
 
-#ugfbjmdkth .gt_super {
+#vqortvszih .gt_super {
   font-size: 65%;
 }
 
-#ugfbjmdkth .gt_footnote_marks {
+#vqortvszih .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#ugfbjmdkth .gt_asterisk {
+#vqortvszih .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ugfbjmdkth .gt_indent_1 {
+#vqortvszih .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ugfbjmdkth .gt_indent_2 {
+#vqortvszih .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ugfbjmdkth .gt_indent_3 {
+#vqortvszih .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ugfbjmdkth .gt_indent_4 {
+#vqortvszih .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ugfbjmdkth .gt_indent_5 {
+#vqortvszih .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1118,7 +1172,7 @@ participants according to the survey and scores.</p></li>
   </thead>
   <tbody class="gt_table_body">
     <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Education level</td>
-<td headers="stat_0" class="gt_row gt_center"></td></tr>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Less than high school</td>
 <td headers="stat_0" class="gt_row gt_center">2,997 (9.9%)</td></tr>
     <tr><td headers="label" class="gt_row gt_left">    High school</td>
@@ -1128,7 +1182,7 @@ participants according to the survey and scores.</p></li>
     <tr><td headers="label" class="gt_row gt_left">    Graduate degree</td>
 <td headers="stat_0" class="gt_row gt_center">3,981 (13%)</td></tr>
     <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Urban level</td>
-<td headers="stat_0" class="gt_row gt_center"></td></tr>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Rural</td>
 <td headers="stat_0" class="gt_row gt_center">6,295 (21%)</td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Suburban</td>
@@ -1136,7 +1190,7 @@ participants according to the survey and scores.</p></li>
     <tr><td headers="label" class="gt_row gt_left">    Urban</td>
 <td headers="stat_0" class="gt_row gt_center">13,731 (45%)</td></tr>
     <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Gender</td>
-<td headers="stat_0" class="gt_row gt_center"></td></tr>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Female</td>
 <td headers="stat_0" class="gt_row gt_center">23,137 (76%)</td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Male</td>
@@ -1146,7 +1200,7 @@ participants according to the survey and scores.</p></li>
     <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Age (Years)</td>
 <td headers="stat_0" class="gt_row gt_center">23.5 (8.4)</td></tr>
     <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Religion</td>
-<td headers="stat_0" class="gt_row gt_center"></td></tr>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Agnostic</td>
 <td headers="stat_0" class="gt_row gt_center">2,406 (7.9%)</td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Atheist</td>
@@ -1172,7 +1226,7 @@ participants according to the survey and scores.</p></li>
     <tr><td headers="label" class="gt_row gt_left">    Sikh</td>
 <td headers="stat_0" class="gt_row gt_center">44 (0.1%)</td></tr>
     <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Sexual orientation</td>
-<td headers="stat_0" class="gt_row gt_center"></td></tr>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Asexual</td>
 <td headers="stat_0" class="gt_row gt_center">1,649 (5.4%)</td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Bisexual</td>
@@ -1184,7 +1238,7 @@ participants according to the survey and scores.</p></li>
     <tr><td headers="label" class="gt_row gt_left">    Other</td>
 <td headers="stat_0" class="gt_row gt_center">2,932 (9.7%)</td></tr>
     <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Race</td>
-<td headers="stat_0" class="gt_row gt_center"></td></tr>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Arab</td>
 <td headers="stat_0" class="gt_row gt_center">228 (0.8%)</td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Asian</td>
@@ -1200,7 +1254,7 @@ participants according to the survey and scores.</p></li>
     <tr><td headers="label" class="gt_row gt_left">    White</td>
 <td headers="stat_0" class="gt_row gt_center">7,816 (26%)</td></tr>
     <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Marriage status</td>
-<td headers="stat_0" class="gt_row gt_center"></td></tr>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Previously married</td>
 <td headers="stat_0" class="gt_row gt_center">771 (2.5%)</td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Currently married</td>
@@ -1208,7 +1262,7 @@ participants according to the survey and scores.</p></li>
     <tr><td headers="label" class="gt_row gt_left">    Never married</td>
 <td headers="stat_0" class="gt_row gt_center">26,207 (86%)</td></tr>
     <tr><td headers="label" class="gt_row gt_left" style="font-weight: bold;">Depression level</td>
-<td headers="stat_0" class="gt_row gt_center"></td></tr>
+<td headers="stat_0" class="gt_row gt_center"><br /></td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Normal</td>
 <td headers="stat_0" class="gt_row gt_center">6,832 (23%)</td></tr>
     <tr><td headers="label" class="gt_row gt_left">    Mild</td>
@@ -1249,16 +1303,9 @@ model</em>.</p>
 sample size in some classes. Therefore, we first want to test the
 distribution of independent variables to avoid the imbalance of samples
 between different categories.</p>
-<pre class="r"><code>dass_new = read_csv(&quot;data/dass_new.csv&quot;)</code></pre>
-<pre><code>## Rows: 30309 Columns: 10
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr (9): country, education, urban, gender, religion, orientation, race, mar...
-## dbl (1): age
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>dass_new |&gt; 
+<pre class="r"><code>dass_new = read_csv(&quot;data/dass_new.csv&quot;)
+
+dass_new |&gt; 
   dplyr::select(age, everything()) |&gt; 
   mutate(across(country:depression_level, factor)) |&gt; 
   summary()</code></pre>
@@ -1693,16 +1740,11 @@ response &lt;- ifelse(dass_fit_df$depression_level == &quot;Moderate or Below&qu
                    ifelse(dass_fit_df$depression_level == &quot;Severe&quot;, 2, 3))
 
 # Calculating ROC curves for three responses
-roc_obj_1 &lt;- roc(as.numeric(response == 1), predicted_probs[, &quot;Moderate or Below&quot;])</code></pre>
-<pre><code>## Setting levels: control = 0, case = 1</code></pre>
-<pre><code>## Setting direction: controls &lt; cases</code></pre>
-<pre class="r"><code>roc_obj_2 &lt;- roc(as.numeric(response == 2), predicted_probs[, &quot;Severe&quot;])</code></pre>
-<pre><code>## Setting levels: control = 0, case = 1
-## Setting direction: controls &lt; cases</code></pre>
-<pre class="r"><code>roc_obj_3 &lt;- roc(as.numeric(response == 3), predicted_probs[, &quot;Extremely severe&quot;])</code></pre>
-<pre><code>## Setting levels: control = 0, case = 1
-## Setting direction: controls &lt; cases</code></pre>
-<pre class="r"><code># Plotting ROC curves for three responses on the same graph
+roc_obj_1 &lt;- roc(as.numeric(response == 1), predicted_probs[, &quot;Moderate or Below&quot;])
+roc_obj_2 &lt;- roc(as.numeric(response == 2), predicted_probs[, &quot;Severe&quot;])
+roc_obj_3 &lt;- roc(as.numeric(response == 3), predicted_probs[, &quot;Extremely severe&quot;])
+
+# Plotting ROC curves for three responses on the same graph
 plot(roc_obj_1, col = &quot;blue&quot;, main = &quot;ROC Curves for Three Responses&quot;)
 plot(roc_obj_2, col = &quot;red&quot;, add = TRUE)
 plot(roc_obj_3, col = &quot;green&quot;, add = TRUE)
@@ -1851,24 +1893,60 @@ holding constant all other variables.</li>
 </div>
 <div id="discussion" class="section level2">
 <h2><em>Discussion</em></h2>
+<div id="conclusion" class="section level3">
+<h3>Conclusion</h3>
+<p>In our project, we first cleaned and tidied the dataset based on
+code.txt and DASS-42-scoring.pdf.</p>
+<p>After exploratory analysis, we found out age, gender, orientation and
+race may contribute to the depression level most. We also realized a
+shiny app to show the distribution of responses for each depression
+level around the world.</p>
+<p>We conducted chi-square tests for age, gender, orientation and race.
+Based on all p-values&lt;0.05, we could conclude that at 0.05
+significance level, the null hypothesis are rejected and these factors
+are all associated with depression level.</p>
+<p>From the regression, we concluded that country, gender, orientation,
+age and race played important roles in the model. Specifically, we found
+out older people and male may have less risk to get depressed. Also,
+people live in Indonesia and Malaysia have less chance to severely
+depressed while in Canada, UK and Phillipines have more chance compared
+to US. The results also showed that white people and sexual minorities
+would be more likely to have more severe depression level. The p-value
+for our model is 0.067, which greater than 0.05, indicating a
+success.</p>
+</div>
 <div id="challenge" class="section level3">
 <h3>Challenge</h3>
+<p>The challenge we met was that there were some missing or meaningless
+values in our raw dataset. Missing values for some variables were not
+just an “N/A” and we needed to dig into the dataset to find out the true
+expression of missing for each variables. Meaningless data means there
+were possibilities that the responses were randomly answered by someone
+or without carefulness. Thus, these observations would not be
+representative then we should omit.</p>
+<p>Another challenge we thought was that there were too much variables
+in the raw data, we needed to figure out the parts for our project. For
+example, we didn’t need information of accuracy checking remain in the
+final dataset so we needed to delete these columns.</p>
 </div>
-<div id="limitation" class="section level3">
-<h3>Limitation</h3>
-</div>
-<div id="future-work" class="section level3">
-<h3>Future work</h3>
-<p>First, we would like to filter, check validity, and eliminate
-incompetent data; then, we would score each person’s depression levels.
-Our group plans to use box plots and/or scatter plots to show the
-distributions among different variables. We would apply chi-squared test
-to compare the distribution of different factors within depression
-levels. Based on the levels, we would also apply regression models to
-figure out the possible factors, including age, sex, location, etc,
-leading to depression. Understanding survey questions, as well as
-cleaning and tidying the dataset into a readable format is one of our
-current coding challenges.</p>
+<div id="limitation-and-future-improvements" class="section level3">
+<h3>Limitation and Future Improvements</h3>
+<ul>
+<li>The observations with missing values may affect the model but we
+deleted.</li>
+<li>Imbalance within samples (e.g. 76.3% female samples).</li>
+<li>Strong dependence between independent variables (e.g. race versus
+religion).</li>
+<li>Counter-intuitive results (e.g. Asian people have lower risk of
+getting severely depressed than white people).</li>
+<li>Future Improvements:
+<ul>
+<li>Try methods to impute the missing values instead of ignoring.</li>
+<li>Clustering to decrease dependence;</li>
+<li>Fit a separate model for each depression level to avoid parallel
+assumption.</li>
+</ul></li>
+</ul>
 </div>
 </div>
 <div id="reference" class="section level2">
