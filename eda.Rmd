@@ -82,7 +82,7 @@ dass_new|>
        title = "Depression level vs. orientation groups")
 ```
 
-This plot shows the relationship between depression levels and orientations. Given that heterosexual data is the most abundant, it naturally exhibits the highest case count. However, our primary emphasis in this analysis is on discerning the overarching trends across various depression levels.
+This plot shows the relationship between depression levels and orientations. Given that heterosexual data is the most abundant, it naturally exhibits the highest case count. However, our primary emphasis in this analysis is on discerning the overarching trends across various depression levels.Notably, we observe fluctuations in individuals identifying as Heterosexual across depression levels, while there is a conspicuous rise in count among Bisexual individuals as the severity of depression increases. Asexual and Homosexual individuals display a relatively even distribution across all levels. The "Other" category exhibits a low count for "Mild" but experiences an increase with severity, peaking at the "Extremely Severe" level.
 
 
 ## Depression level vs. Gender
