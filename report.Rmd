@@ -3,6 +3,7 @@ title: "Depression Factors Prediction based on DASS Responses Report"
 author: "Huanyu Chen (hc3451), Qin Huang (2284), Ou Sha (os2424), Lehan Zou (lz2950), Shaolei Ma (sm5592)"
 output: html_document
 ---
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
@@ -282,12 +283,64 @@ dass_new %>%
 
 ## *Exploratory Analysis*
 
-
 ## *Additional Analysis*
-
 
 ## *Regression*
 
+We want to investigate the relationship between demographic variables and depression levels. Because the dependent variable depression_level is an ordinal variable with five levels ("Normal", "Mild", "Moderate", "Severe", "Extremely severe"), we choose to fit an *ordered logit model*.
+
+### Independent Variables
+
+Imbalanced data may result in an inaccurate outcome due to a small sample size in some classes. Therefore, we first want to test the distribution of independent variables to avoid the imbalance of samples between different categories.
+
+```{r}
+dass_new = read_csv("data/dass_new.csv")
+
+dass_new |> 
+  dplyr::select(age, everything()) |> 
+  mutate(across(country:depression_level, factor)) |> 
+  summary()
+```
+
+Some categories contain few samples (e.g. countries other than the listed six countries have less than 500 samples). For the efficacy of the model and considering which class most interests us, we regroup the independent variables following the standards below:
+
+-   `country`: Group the country with less than 500 samples into "Other", and set "US" to be the reference level.
+-   `education`: Order the variable by the length of education.
+-   `race`: We follow [standards on race and ethnicity](https://www.govinfo.gov/content/pkg/FR-1997-10-30/pdf/97-28653.pdf) to include only "Asian", "Black", "Native American", "White", and make other categories "Other". We set "White" to be the reference level.
+-   `religion`: We conclude "Christian (Catholic)", "Christian (Mormon)", "Christian (Other)", "Christian (Protestant)" into "Christian", and set it as the reference level.
+-   `orientation`: Set the "Heterosexual" to be the reference level.
+-   `married`: Order the variable by marriage status.
+
+```{r}
+dass_fit_df =
+  dass_new |> 
+  mutate(
+    country = relevel(as.factor(ifelse(country %in% c("MY", "US", "GB", "CA", "ID", "PH"), country, "Other")), ref = "US"),
+    education = factor(education, levels = c("Less than high school", "High school", "University degree", "Graduate degree")),
+    race = relevel(as.factor(ifelse(race %in% c("Arab", "Indigenous Australian"), "Other", race)), ref = "White"),
+    religion = relevel(as.factor(ifelse(substr(religion, 1, 9) == "Christian", "Christian", religion)), "Christian"),
+    orientation = relevel(as.factor(orientation), "Heterosexual"),
+    married = factor(married, levels = c("Never married", "Currently married", "Previously married")),
+    depression_level = factor(depression_level, levels = c("Normal", "Mild", "Moderate", "Severe", "Extremely severe"))
+  )
+
+dass_fit_df |> summary()
+```
+
+### Model Fitting
+
+First fit a model without variables selection.
+
+```{dass_fit =}
+  dass_fit_df |> 
+  polr(depression_level ~ ., data = _)
+
+(fit_s = 
+  dass_fit |> 
+  summary())
+```
+
+When conducting an ordered logit model, the underlying assumption is that the coefficients that describe the relationship between, say, the lowest versus all higher categories of the response variable are the same as those that describe the relationship between the next lowest category and all higher categories, etc. This is called the proportional odds assumption or the parallel assumption.
 
 ## *Discussion*
 
@@ -298,6 +351,5 @@ dass_new %>%
 ### Future work
 
 First, we would like to filter, check validity, and eliminate incompetent data; then, we would score each person's depression levels. Our group plans to use box plots and/or scatter plots to show the distributions among different variables. We would apply chi-squared test to compare the distribution of different factors within depression levels. Based on the levels, we would also apply regression models to figure out the possible factors, including age, sex, location, etc, leading to depression. Understanding survey questions, as well as cleaning and tidying the dataset into a readable format is one of our current coding challenges.
-
 
 ## *Reference*
