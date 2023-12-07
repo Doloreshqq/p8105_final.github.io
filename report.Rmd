@@ -12,24 +12,6 @@ library(pheatmap)
 library(gtsummary)
 
 ```
-## *Introduction*
-
-
-
-## *Motivation*
-
-Observing that mental health issues appear at a younger and younger age, we would like to test if DASS can potentially provide a means to objectively evaluate the severity and the potential factors of depression among different population including races, ages, etc.
-
-
-## *Related Work*
-
-[Antony et. al](https://doi.org/10.1037/1040-3590.10.2.176)
-
-## *Initial Questions*
-
-* What factors have a significant impact on the level of depression?\
-* Do different countries exhibit significantly varied rates of depression at different levels of development?\
-* How do factors account for the differences in the development of depression levels?\
 
 ## *Data*
 

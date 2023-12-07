@@ -122,7 +122,26 @@ dass_fit1 |> poTest()
 
 The model meets the parallel assumption at $\alpha=0.05$ level (with an overall $p = 0.067 > 0.05$).
 
+## Depression Levels Distribution
+
+After selecting independent variables, we can further visualize the data based on the effective covariates as well as the good stratum of depression level.
+
+```{r, fig.width=20, fig.height=50, message = FALSE}
+# Create a data frame with the predictor values for visualization
+predictor_data <- model.matrix(depression_level ~ country + gender + age
+                               + orientation + race, data = dass_fit_df)
+
+# Compute the effects
+effects <- allEffects(dass_fit1, xlevels = list(predictor_data))
+
+# Plot the effects
+plot(effects, style = "stacked")
+```
+
+The accompanying graphs display the probability of depression levels across various categorical and continuous variables. For instance, the trend depicted in the graph indicates higher rates of extreme depression among young people.
+
 # Results
+
 ```{r}
 dass_fit1 |> summary()
 ```
@@ -148,6 +167,7 @@ The estimated model can be written as: \begin{align*}
 &- 0.10 \times I(\text{race} = \text{Other})
 \end{align*}
 
+```{=tex}
 \begin{align*}
 \text{logit}(\hat P(\text{Depression Level} \leq \text{Extremely Severe})) &= 0.01 \\
 &+ 0.18 \times I(\text{country} = \text{CA}) \\
@@ -168,7 +188,7 @@ The estimated model can be written as: \begin{align*}
 &+ 0.11 \times I(\text{race} = \text{Native American}) \\
 &- 0.10 \times I(\text{race} = \text{Other})
 \end{align*}
-
+```
 Calculate the odds ratio and CI for variables:
 
 ```{r}
@@ -176,113 +196,8 @@ exp(cbind(OR = coef(dass_fit1), confint(dass_fit1))) |>
   knitr::kable()
 ```
 
-# Interpretation
+## Receiver Operating Characteristic Curve for Depression Level
 
-
-## Continuous Variable
-
-### **Age**
-
--   For every one unit increase in participant's age, the odds of having a more severe depression level is multiplied 0.98 times, holding constant all other variables. It indicates that older people may have less risk to get depressed.
-
-## Categorical Variables
-
-### **Country**
-
--   For Canadian, Britain, and Philippines participants, the odds of having a more severe depression level is higher than that of US participants, holding constant all other variables.
--   For Indonesia and Malaysia participants, the odds of having a more severe depression level is lower than that of US participants, holding constant all other variables.
-
-```{r}
-# Extract coefficients for countries
-pos_country = str_starts(names(dass_fit1$coefficients), "country")
-
-country_coefficients =
-  tibble(
-    country = substr(names(dass_fit1$coefficients)[pos_country], 8, 20),
-    OR = exp(dass_fit1$coefficients[pos_country])
-  ) |> 
-  mutate(country = fct_reorder(country, OR))
-  
-
-# Plotting coefficients for countries
-ggplot(country_coefficients, aes(x = country, y = OR - 1)) +
-  geom_bar(stat = "identity", fill = "skyblue", color = "black") +
-  labs(title = "Effect of Countries on Depression Levels",
-       x = "Country", y = "OR - 1")
-```
-
-### **Gender**
-
--   For male participants, the odds of having a more severe depression level is 0.90 times that of female participants, holding constant all other variables.
--   For non-binary participants, the odds of having a more severe depression level is 1.47 times that of female participants, holding constant all other variables.
-
-```{r}
-# Extract coefficients for Gender
-pos_gender = str_starts(names(dass_fit1$coefficients), "gender")
-
-gender_coefficients =
-  tibble(
-    gender = substr(names(dass_fit1$coefficients)[pos_gender], 7, 20),
-    OR = exp(dass_fit1$coefficients[pos_gender])
-  ) |> 
-  mutate(gender = fct_reorder(gender, OR))
-
-# Plotting coefficients for Gender
-ggplot(gender_coefficients, aes(x = gender, y = OR - 1)) +
-  geom_bar(stat = "identity", fill = "#d8b4e2", color = "black") +
-  labs(title = "Effect of Countries on Depression Levels",
-       x = "Gender", y = "OR - 1")
-```
-
-### **Race**
-
--   For Native American, Asian, Black, and Other participants, the odds of having a more severe depression level is lower than that of White participants, holding constant all other variables.
-
-```{r}
-# Extract coefficients for races
-pos_race <- str_starts(names(dass_fit1$coefficients), "race")
-
-race_coefficients =
-  tibble(
-    race = substr(names(dass_fit1$coefficients)[pos_race], 5, 20),
-    OR = dass_fit1$coefficients[pos_race]
-  ) |> 
-  mutate(race = fct_reorder(race, OR))
-
-# Plotting coefficients for races
-ggplot(race_coefficients, aes(x = race, y = OR - 1)) +
-  geom_bar(stat = "identity", fill = "pink", color = "black") +
-  labs(
-    title = "Effect of Races on Depression Levels",
-    x = "Race",
-    y = "OR - 1"
-  )
-```
-
-### **Orientation**
-
--   For sexual minorities, the odds of having a more severe depression level is higher than that of heterosexual orientation participants, holding constant all other variables.
-
-```{r}
-# Extract coefficients for orientations
-pos_orientation <- str_starts(names(dass_fit1$coefficients), "orientation")
-
-orientation_coefficients <- data.frame(
-  orientation = substr(names(dass_fit1$coefficients)[pos_orientation], 12, 20),
-  OR = exp(dass_fit1$coefficients[pos_orientation])
-)
-
-# Plotting coefficients for orientations
-ggplot(orientation_coefficients, aes(x = orientation, y = OR - 1)) +
-  geom_bar(stat = "identity", fill = "palegreen", color = "black") +
-  labs(
-    title = "Effect of Orientations on Depression Levels",
-    x = "Orientation",
-    y = "OR - 1"
-  )
-```
-
-# Receiver Operating Characteristic Curve for Depression Level
 ```{r}
 
 # Predicting probabilities for all classes
@@ -306,28 +221,118 @@ legend("bottomright",
        col = c("blue", "red", "green"), lty = 1)
 ```
 
-Looking at the ROC curves, it is clear that both the "Moderate or Below" and "Extremely Severe" categories show good performance and are close to the upper left corner, indicating effective performance in discriminating between these categories. However, the performance of the "Severe" category suggests an avaliable but less significant trend compared to the above two categories. The positioning of this curve indicates room for improvement, implying a need for more data points representing individuals with a "severe" level of depression. Expanding the data set to include additional instances characterized by a "Severe" level of depression could improve the model's ability to discriminate and accurately predict within this specific category.
+Looking at the ROC curves, it is clear that both the "Moderate or Below" and "Extremely Severe" categories show good performance and are close to the upper left corner, indicating effective performance in discriminating between these categories. However, the performance of the "Severe" category suggests an available but less significant trend compared to the above two categories. The positioning of this curve indicates room for improvement, implying a need for more data points representing individuals with a "severe" level of depression. Expanding the data set to include additional instances characterized by a "Severe" level of depression could improve the model's ability to discriminate and accurately predict within this specific category.
 
-# Depression Levels Distribution
-After constructing the logistic regression model, we can further visualize the data based on the effective covariate as well as the good stratum of depression level. The accompanying graphs display the probability of depression levels across various categorical and continuous variables. For instance, the trend depicted in the graph indicates higher rates of extreme depression among young people.
+# Interpretation
 
-```{r, fig.width=20, fig.height=50, message = FALSE}
-# Create a data frame with the predictor values for visualization
-predictor_data <- model.matrix(depression_level ~ country + gender + age
-                               + orientation + race, data = dass_fit_df)
+## Continuous Variable
 
-# Compute the effects
-effects <- allEffects(dass_fit1, xlevels = list(predictor_data))
+### **Age**
 
-# Plot the effects
-plot(effects, style = "stacked")
+-   For every one unit increase in participant's age, the odds of having a more severe depression level is multiplied 0.98 times, holding constant all other variables. It indicates that older people may have less risk to get depressed.
+
+## Categorical Variables
+
+### **Country**
+
+```{r}
+# Extract coefficients for countries
+pos_country = str_starts(names(dass_fit1$coefficients), "country")
+
+country_coefficients =
+  tibble(
+    country = substr(names(dass_fit1$coefficients)[pos_country], 8, 20),
+    OR = exp(dass_fit1$coefficients[pos_country])
+  ) |> 
+  mutate(country = fct_reorder(country, OR))
+  
+
+# Plotting coefficients for countries
+ggplot(country_coefficients, aes(x = country, y = OR - 1)) +
+  geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+  labs(title = "Effect of Countries on Depression Levels",
+       x = "Country", y = "OR - 1")
 ```
+
+-   For Canadian, Britain, and Philippines participants, the odds of having a more severe depression level is higher than that of US participants, holding constant all other variables.
+-   For Indonesia and Malaysia participants, the odds of having a more severe depression level is lower than that of US participants, holding constant all other variables.
+
+### **Gender**
+
+```{r}
+# Extract coefficients for Gender
+pos_gender = str_starts(names(dass_fit1$coefficients), "gender")
+
+gender_coefficients =
+  tibble(
+    gender = substr(names(dass_fit1$coefficients)[pos_gender], 7, 20),
+    OR = exp(dass_fit1$coefficients[pos_gender])
+  ) |> 
+  mutate(gender = fct_reorder(gender, OR))
+
+# Plotting coefficients for Gender
+ggplot(gender_coefficients, aes(x = gender, y = OR - 1)) +
+  geom_bar(stat = "identity", fill = "#d8b4e2", color = "black") +
+  labs(title = "Effect of Gender on Depression Levels",
+       x = "Gender", y = "OR - 1")
+```
+
+-   For male participants, the odds of having a more severe depression level is 0.90 times that of female participants, holding constant all other variables.
+-   For non-binary participants, the odds of having a more severe depression level is 1.47 times that of female participants, holding constant all other variables.
+
+### **Race**
+
+```{r}
+# Extract coefficients for races
+pos_race <- str_starts(names(dass_fit1$coefficients), "race")
+
+race_coefficients =
+  tibble(
+    race = substr(names(dass_fit1$coefficients)[pos_race], 5, 20),
+    OR = dass_fit1$coefficients[pos_race]
+  ) |> 
+  mutate(race = fct_reorder(race, OR))
+
+# Plotting coefficients for races
+ggplot(race_coefficients, aes(x = race, y = OR - 1)) +
+  geom_bar(stat = "identity", fill = "pink", color = "black") +
+  labs(
+    title = "Effect of Races on Depression Levels",
+    x = "Race",
+    y = "OR - 1"
+  )
+```
+
+-   For Native American, Asian, Black, and Other participants, the odds of having a more severe depression level is lower than that of White participants, holding constant all other variables.
+
+### **Orientation**
+
+```{r}
+# Extract coefficients for orientations
+pos_orientation <- str_starts(names(dass_fit1$coefficients), "orientation")
+
+orientation_coefficients <- data.frame(
+  orientation = substr(names(dass_fit1$coefficients)[pos_orientation], 12, 20),
+  OR = exp(dass_fit1$coefficients[pos_orientation])
+)
+
+# Plotting coefficients for orientations
+ggplot(orientation_coefficients, aes(x = orientation, y = OR - 1)) +
+  geom_bar(stat = "identity", fill = "palegreen", color = "black") +
+  labs(
+    title = "Effect of Orientations on Depression Levels",
+    x = "Orientation",
+    y = "OR - 1"
+  )
+```
+
+-   For sexual minorities, the odds of having a more severe depression level is higher than that of heterosexual orientation participants, holding constant all other variables.
 
 # Limitations
 
 -   Imbalance within samples (e.g. 76.3% female samples).
 -   Strong dependence between independent variables (e.g. race versus religion).
--   Counterintuitive results (e.g. Asian people have lower risk of getting severely depressed than white people).
+-   Counter-intuitive results (e.g. Asian people have lower risk of getting severely depressed than white people).
 -   Future Improvements:
     -   Clustering to decrease dependence;
     -   Fit a separate model for each depression level to avoid parallel assumption.

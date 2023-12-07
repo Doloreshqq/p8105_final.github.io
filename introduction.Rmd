@@ -3,12 +3,6 @@ title: "Introduction"
 output: html_document
 ---
 
-Depression, a pervasive mental health challenge, is becoming increasingly prevalent among younger demographics, necessitating a deeper understanding of its existence in diverse populations. This study seeks to harness the potential of the Depression, Anxiety, and Stress Scales (DASS) as a comprehensive tool to objectively assess the severity and underlying factors influencing or contributing to depression across demographic groups, including differences in race, age groups, and more.
-
-Our study utilizes an extensive dataset from the Depression, Anxiety, and Stress Scales (DASS) Responses accessible via Kaggle, to accomplish our objectives. This dataset includes 42 self-reported items, carefully created to evaluate emotional states associated with depression, anxiety, and stress. The objective of our project is to contribute to a more thorough comprehension of the determinants of depression, which could potentially inform customized support strategies and targeted interventions designed for specific population groups.
-
-Our methodology involves filtering data, performing validity checks, and eliminating unreliable data to bolster the integrity of our analysis. We will then stratify individuals' depression levels and present their distributions across various variables using graphical representations, such as line charts. To compare factor distributions across different depression levels, we will employ statistical tools like the chi-squared test. Our study aims to employ logistic regression models to identify influential factors contributing to varying levels of depression, including age, gender, geographical location, and etc. Additionally, we plan to create data visualizations on coefficients and model fit after constructing the model.
-
 # Motivation
 
 Observing that mental health issues appear at a younger and younger age, we would like to test if DASS can potentially provide a means to objectively evaluate the severity and the potential factors of depression among different population including races, ages, etc.
@@ -26,3 +20,10 @@ Observing that mental health issues appear at a younger and younger age, we woul
 -   What factors account for the differences in the development of depression levels?
 
 -   What factors can be used to predict depression levels?
+
+# Introduction
+Depression, a pervasive mental health challenge, is becoming increasingly prevalent among younger demographics, necessitating a deeper understanding of its existence in diverse populations. This study seeks to harness the potential of the Depression, Anxiety, and Stress Scales (DASS) as a comprehensive tool to objectively assess the severity and underlying factors influencing or contributing to depression across demographic groups, including differences in race, age groups, and more.
+
+Our study utilizes an extensive dataset from the Depression, Anxiety, and Stress Scales (DASS) Responses accessible via Kaggle, to accomplish our objectives. This dataset includes 42 self-reported items, carefully created to evaluate emotional states associated with depression, anxiety, and stress. The objective of our project is to contribute to a more thorough comprehension of the determinants of depression, which could potentially inform customized support strategies and targeted interventions designed for specific population groups.
+
+Our methodology involves filtering data, performing validity checks, and eliminating unreliable data to bolster the integrity of our analysis. We will then stratify individuals' depression levels and present their distributions across various variables using graphical representations, such as line charts. To compare factor distributions across different depression levels, we will employ statistical tools like the chi-squared test. Our study aims to employ logistic regression models to identify influential factors contributing to varying levels of depression, including age, gender, geographical location, and etc. Additionally, we plan to create data visualizations on coefficients and model fit after constructing the model.
