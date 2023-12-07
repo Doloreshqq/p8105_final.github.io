@@ -143,6 +143,8 @@ dass_new|>
        title = "Depression level vs. race groups")
 ```
 
+The fourth plot examines depression levels across various races. The Asian group demonstrates the most fluctuating trend, with notable values at "Normal" and "Extremely Severe." The White group and other racial categories exhibit similar trends, showing a slight decrease at "Mild" and a substantial increase at "Extremely Severe." In contrast, Black individuals maintain a consistent count across all levels of depression.
+ 
 ## Age Distribution for Each Depression Level
 
 ```{r}
