@@ -25,7 +25,8 @@ With our existence data, we need to evaluate the depression level with respect t
 
 ## Depression Level vs. Orientation vs. Gender
 
-First, we would like to observe the distribution of depression levels according to orientation and gender.
+Our first plot gives an overall view of the relationship with gender, orientation and depression level. The x axis illustrates depression levels categorized by various orientations, while the y axis denotes the count of cases. Additionally, the bar plot's proportional filling conveys the gender distribution within a particular depression level under each orientation. From this plot, we found that depression level has significant differences between distinct orientation groups and genders. So we would like to further investigate the correlation between depression levels and each factor individually.
+
 The plot below shows the number of different depression level cases in each gender groups among orientation. 
 
 ```{r}
