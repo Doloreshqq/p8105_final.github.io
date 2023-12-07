@@ -189,6 +189,8 @@ dass_new|>
        title = "Depression level vs. age groups")
 ```
 
+This plot reveals that young adults consistently exhibit the highest counts of depression at all levels, experiencing a significant increase at the "Extremely Severe" level. The teenage group has a lower case count at the "Normal" level compared to the adult group but surpasses it at the "Moderate" level. Older individuals maintain a relatively stable count across all levels, with a slight increase at the "Extremely Severe" level.
+
 
 # Chi-squared Test
 
