@@ -11,6 +11,13 @@ library(ggplot2)
 library(dplyr)
 library(pheatmap)
 library(gtsummary)
+library(foreign)
+library(MASS)
+library(Hmisc)
+library(reshape2)
+library(car)
+library(pROC)
+library(effects)
 
 ```
 
@@ -331,7 +338,8 @@ dass_fit_df |> summary()
 
 First fit a model without variables selection.
 
-```{dass_fit =}
+```{r}
+dass_fit =
   dass_fit_df |> 
   polr(depression_level ~ ., data = _)
 
@@ -341,6 +349,84 @@ First fit a model without variables selection.
 ```
 
 When conducting an ordered logit model, the underlying assumption is that the coefficients that describe the relationship between, say, the lowest versus all higher categories of the response variable are the same as those that describe the relationship between the next lowest category and all higher categories, etc. This is called the proportional odds assumption or the parallel assumption.
+
+Now, we want to test if the model conducted meets the parallel assumption.
+
+```{r}
+car::poTest(dass_fit)
+```
+
+Because the overall $p-value < 0.001$, we reject the null hypothesis and conclude that the parallel assumption is not met.
+
+To meet the parallel assumption, considering the variables of interest in EDA, we try the following two methods:
+
+-   **Select independent variables**: Because we think `religion` and `race`, `married` and `orientation`, `country` and `urban` are strongly correlated with each other, and we care more about `race`, `orientation`, and `country`, first delete `religion`, `married`, and `urban`. We also delete `education` to meet the parallel assumption.
+-   **Regroup dependent variable**: Regroup `depression_level` into "Moderate or Below", "Severe", "Extremely severe".
+
+```{r}
+dass_fit_df =
+  dass_fit_df |> 
+  mutate(depression_level = factor(case_match(
+    depression_level,
+    "Normal" ~ "Moderate or Below",
+    "Mild" ~ "Moderate or Below","Moderate" ~ "Moderate or Below",
+    "Severe" ~ "Severe",
+    "Extremely severe" ~ "Extremely severe"
+   ), level = c("Moderate or Below", "Severe", "Extremely severe")))
+
+dass_fit1 =
+  dass_fit_df |> 
+  polr(depression_level ~ country + gender + age + orientation + race, data = _)
+
+dass_fit1 |> poTest()
+```
+
+The model meets the parallel assumption at $\alpha=0.05$ level (with an overall $p = 0.067 > 0.05$).
+
+#### Depression Levels Distribution
+
+After selecting independent variables, we can further visualize the data based on the effective covariates as well as the good stratum of depression level.
+
+```{r, fig.width=20, fig.height=50, message = FALSE}
+# Create a data frame with the predictor values for visualization
+predictor_data <- model.matrix(depression_level ~ country + gender + age
+                               + orientation + race, data = dass_fit_df)
+
+# Compute the effects
+effects <- allEffects(dass_fit1, xlevels = list(predictor_data))
+
+# Plot the effects
+plot(effects, style = "stacked")
+```
+
+The accompanying graphs display the probability of depression levels across various categorical and continuous variables. For instance, the trend depicted in the graph indicates higher rates of extreme depression among young people.
+
+### Results
+
+```{r}
+dass_fit1 |> summary()
+```
+
+The estimated model can be written as: \begin{align*}
+\text{logit}(\hat P(\text{Depression Level} \leq \text{Severe})) &= -0.69 \\
+&+ 0.18 \times I(\text{country} = \text{CA}) \\
+&+ 0.20 \times I(\text{country} = \text{GB}) \\
+&- 0.04 \times I(\text{country} = \text{ID}) \\
+&- 0.19 \times I(\text{country} = \text{MY}) \\
+&+ 0.13 \times I(\text{country} = \text{PH}) \\
+&+ 0.11 \times I(\text{country} = \text{Other}) \\
+&- 0.10 \times I(\text{gender} = \text{Male}) \\
+&+ 0.38 \times I(\text{gender} = \text{Other}) \\
+&- 0.03 \times \text{age} \\
+&+ 0.23 \times I(\text{orientation} = \text{Asexual}) \\
+&+ 0.40 \times I(\text{orientation} = \text{Bisexual}) \\
+&+ 0.30 \times I(\text{orientation} = \text{Homosexual}) \\
+&+ 0.22 \times I(\text{orientation} = \text{Other}) \\
+&- 0.16 \times I(\text{race} = \text{Asian}) \\
+&- 0.09 \times I(\text{race} = \text{Black}) \\
+&+ 0.11 \times I(\text{race} = \text{Native American}) \\
+&- 0.10 \times I(\text{race} = \text{Other})
+\end{align*}
 
 ## *Discussion*
 
