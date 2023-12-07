@@ -405,10 +405,10 @@ variables in our regression model.</p>
 <div id="depression-level-vs.-orientation-vs.-gender"
 class="section level2">
 <h2>Depression Level vs. Orientation vs. Gender</h2>
-<p>First, we would like to observe the distribution of depression levels
-according to orientation and gender. The plot below shows the number of
-different depression level cases in each gender groups among
-orientation.</p>
+<p>Our first plot gives an overall view of the relationship with gender,
+orientation and depression level.</p>
+<p>The plot below shows the number of different depression level cases
+in each gender groups among orientation.</p>
 <pre class="r"><code>dass_new|&gt;
   group_by(gender, orientation)|&gt;
   summarise(Normal = sum(depression_level==&quot;Normal&quot;),
@@ -430,10 +430,17 @@ orientation.</p>
   labs(x = &quot;Depression level&quot;, 
        y = &quot;count of cases&quot;, 
        title = &quot;Depression level vs. orientation vs. gender&quot;)</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
-<p>From the plot, we observed that the female gender group in all
-orientation categories tends to exhibit a higher number of depression
-cases compared to other gender groups.</p>
+<p><img src="eda_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+The x axis illustrates depression levels categorized by various
+orientations, while the y axis denotes the count of cases. Additionally,
+the bar plot’s proportional filling conveys the gender distribution
+within a particular depression level under each orientation. From the
+plot, we observed that the female gender group in all orientation
+categories tends to exhibit a higher number of depression cases compared
+to other gender groups. Also, we found that depression level has
+significant differences between distinct orientation groups and genders.
+So we would like to further investigate the correlation between
+depression levels and each factor individually.</p>
 </div>
 <div id="depression-level-vs.-orientation" class="section level2">
 <h2>Depression level vs. Orientation</h2>
@@ -458,7 +465,12 @@ between the level of depression and orientation.</p>
   labs(x = &quot;Depression level&quot;, 
        y = &quot;count of cases&quot;, 
        title = &quot;Depression level vs. orientation groups&quot;)</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p><img src="eda_files/figure-html/unnamed-chunk-2-1.png" width="672" />
+This plot shows the relationship between depression levels and
+orientations. Given that heterosexual data is the most abundant, it
+naturally exhibits the highest case count. However, our primary emphasis
+in this analysis is on discerning the overarching trends across various
+depression levels.</p>
 </div>
 <div id="depression-level-vs.-gender" class="section level2">
 <h2>Depression level vs. Gender</h2>
@@ -525,7 +537,13 @@ class="section level2">
         xlab = &quot;Depression Level&quot;,
         ylab = &quot;Age&quot;)+
   theme_minimal()</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="eda_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+Regarding the age variable, we examined the box plot representing the
+general distribution of age and depression level. Our observation
+revealed the presence of numerous outliers. Across all depression
+levels, the data predominantly centered on the teenage age groups around
+18~25. Thus we divided age into four groups(under 18, 18 ~ 25, 25 ~ 50
+and 50+) in next step.</p>
 </div>
 <div id="depression-level-vs.-age-groups" class="section level2">
 <h2>Depression Level vs. Age groups</h2>
