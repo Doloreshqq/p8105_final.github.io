@@ -109,7 +109,7 @@ dass_new|>
        y = "count of cases", 
        title = "Depression level vs. gender groups")
 ```
-
+In our third plot, it becomes evident that females consistently exhibit a notably higher count of depression cases across all levels, especially in the "Normal" and "Extremely Severe" levels. Conversely, males display a lower case count at all levels, with a slight decrease at "Mild" followed by an increase at "Moderate." The case count for the "Other" gender category remains relatively stable across all levels of depression.
 
 ## Depression Level vs. Race groups
 
