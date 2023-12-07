@@ -52,6 +52,7 @@ dass_new|>
        y = "count of cases", 
        title = "Depression level vs. orientation vs. gender")
 ```
+
 The x axis illustrates depression levels categorized by various orientations, while the y axis denotes the count of cases. Additionally, the bar plot's proportional filling conveys the gender distribution within a particular depression level under each orientation. From the plot, we observed that the female gender group in all orientation categories tends to exhibit a higher number of depression cases compared to other gender groups. Also, we found that depression level has significant differences between distinct orientation groups and genders. So we would like to further investigate the correlation between depression levels and each factor individually. 
 
 
@@ -80,6 +81,7 @@ dass_new|>
        y = "count of cases", 
        title = "Depression level vs. orientation groups")
 ```
+
 This plot shows the relationship between depression levels and orientations. Given that heterosexual data is the most abundant, it naturally exhibits the highest case count. However, our primary emphasis in this analysis is on discerning the overarching trends across various depression levels.
 
 
@@ -153,6 +155,7 @@ dass_new %>%
   theme_minimal()
 
 ```
+
 Regarding the age variable, we examined the box plot representing the general distribution of age and depression level. Our observation revealed the presence of numerous outliers. Across all depression levels, the data predominantly centered on the teenage age groups around 18~25. Thus we divided age into four groups(under 18, 18 ~ 25, 25 ~ 50 and 50+) in next step.
 
 ## Depression Level vs. Age groups
