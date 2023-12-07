@@ -932,6 +932,9 @@ Severe})) &amp;= 0.01 \\
 <div id="receiver-operating-characteristic-curve-for-depression-level"
 class="section level2">
 <h2>Receiver Operating Characteristic Curve for Depression Level</h2>
+<p>At this stage, we would like to draw a receiver operating
+characteristic (ROC) curve for depression level to check the model
+fit.</p>
 <pre class="r"><code># Predicting probabilities for all classes
 predicted_probs &lt;- predict(dass_fit1, type = &quot;probs&quot;)
 
@@ -970,7 +973,7 @@ and accurately predict within this specific category.</p>
 <div id="continuous-variable" class="section level2">
 <h2>Continuous Variable</h2>
 <div id="age" class="section level3">
-<h3><strong>Age</strong></h3>
+<h3>Age</h3>
 <ul>
 <li>For every one unit increase in participant’s age, the odds of having
 a more severe depression level is multiplied 0.98 times, holding
@@ -982,7 +985,7 @@ less risk to get depressed.</li>
 <div id="categorical-variables" class="section level2">
 <h2>Categorical Variables</h2>
 <div id="country" class="section level3">
-<h3><strong>Country</strong></h3>
+<h3>Country</h3>
 <pre class="r"><code># Extract coefficients for countries
 pos_country = str_starts(names(dass_fit1$coefficients), &quot;country&quot;)
 
@@ -1010,7 +1013,7 @@ constant all other variables.</li>
 </ul>
 </div>
 <div id="gender" class="section level3">
-<h3><strong>Gender</strong></h3>
+<h3>Gender</h3>
 <pre class="r"><code># Extract coefficients for Gender
 pos_gender = str_starts(names(dass_fit1$coefficients), &quot;gender&quot;)
 
@@ -1037,7 +1040,7 @@ constant all other variables.</li>
 </ul>
 </div>
 <div id="race" class="section level3">
-<h3><strong>Race</strong></h3>
+<h3>Race</h3>
 <pre class="r"><code># Extract coefficients for races
 pos_race &lt;- str_starts(names(dass_fit1$coefficients), &quot;race&quot;)
 
@@ -1064,7 +1067,7 @@ participants, holding constant all other variables.</li>
 </ul>
 </div>
 <div id="orientation" class="section level3">
-<h3><strong>Orientation</strong></h3>
+<h3>Orientation</h3>
 <pre class="r"><code># Extract coefficients for orientations
 pos_orientation &lt;- str_starts(names(dass_fit1$coefficients), &quot;orientation&quot;)
 

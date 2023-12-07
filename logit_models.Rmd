@@ -198,6 +198,8 @@ exp(cbind(OR = coef(dass_fit1), confint(dass_fit1))) |>
 
 ## Receiver Operating Characteristic Curve for Depression Level
 
+At this stage, we would like to draw a receiver operating characteristic (ROC) curve for depression level to check the model fit.
+
 ```{r}
 
 # Predicting probabilities for all classes
@@ -227,13 +229,13 @@ Looking at the ROC curves, it is clear that both the "Moderate or Below" and "Ex
 
 ## Continuous Variable
 
-### **Age**
+### Age
 
 -   For every one unit increase in participant's age, the odds of having a more severe depression level is multiplied 0.98 times, holding constant all other variables. It indicates that older people may have less risk to get depressed.
 
 ## Categorical Variables
 
-### **Country**
+### Country
 
 ```{r}
 # Extract coefficients for countries
@@ -257,7 +259,7 @@ ggplot(country_coefficients, aes(x = country, y = OR - 1)) +
 -   For Canadian, Britain, and Philippines participants, the odds of having a more severe depression level is higher than that of US participants, holding constant all other variables.
 -   For Indonesia and Malaysia participants, the odds of having a more severe depression level is lower than that of US participants, holding constant all other variables.
 
-### **Gender**
+### Gender
 
 ```{r}
 # Extract coefficients for Gender
@@ -280,7 +282,7 @@ ggplot(gender_coefficients, aes(x = gender, y = OR - 1)) +
 -   For male participants, the odds of having a more severe depression level is 0.90 times that of female participants, holding constant all other variables.
 -   For non-binary participants, the odds of having a more severe depression level is 1.47 times that of female participants, holding constant all other variables.
 
-### **Race**
+### Race
 
 ```{r}
 # Extract coefficients for races
@@ -305,7 +307,7 @@ ggplot(race_coefficients, aes(x = race, y = OR - 1)) +
 
 -   For Native American, Asian, Black, and Other participants, the odds of having a more severe depression level is lower than that of White participants, holding constant all other variables.
 
-### **Orientation**
+### Orientation
 
 ```{r}
 # Extract coefficients for orientations
