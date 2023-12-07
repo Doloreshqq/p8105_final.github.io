@@ -142,6 +142,7 @@ dass_new|>
 ```
 
 ## Age Distribution for Each Depression Level
+
 ```{r}
 dass_new %>%
   ggplot(aes(x=depression_level, y=age)) +
@@ -152,6 +153,7 @@ dass_new %>%
   theme_minimal()
 
 ```
+Regarding the age variable, we examined the box plot representing the general distribution of age and depression level. Our observation revealed the presence of numerous outliers. Across all depression levels, the data predominantly centered on the teenage age groups around 18~25. Thus we divided age into four groups(under 18, 18 ~ 25, 25 ~ 50 and 50+) in next step.
 
 ## Depression Level vs. Age groups
 
