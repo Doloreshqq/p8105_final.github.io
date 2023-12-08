@@ -20,7 +20,7 @@ navbar:
     - icon: fa-github fa-lg
       href: https://github.com/Doloreshqq/p8105_final.github.io
     - icon: fa-brands fa-youtube
-      href: 
+      href: https://www.youtube.com/watch?v=zBNo_XI2sDQ
 output:
   html_document:
     theme: flatly
