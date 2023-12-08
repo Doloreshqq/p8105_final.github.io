@@ -775,8 +775,8 @@ The estimated model can be written as: \begin{align*}
 Calculate the odds ratio and CI for variables:
 
 ```{r}
-# exp(cbind(OR = coef(dass_fit1), confint(dass_fit1))) |> 
-#   knitr::kable()
+exp(cbind(OR = coef(dass_fit1), confint(dass_fit1))) |> 
+  knitr::kable()
 ```
 
 #### Receiver Operating Characteristic Curve for Depression Level
