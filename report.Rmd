@@ -944,6 +944,9 @@ Another challenge we thought was that there were too much variables in the raw d
 
 ## *Reference*
 [1] Melissa et. al, doi: 10.1016/j.chiabu.2017.03.016 
+
 [2] Virginia et. al, doi: 10.1016/j.wombi.2020.12.014
+
 [3] Postmes et. al, https://doi.org/10.1002/ejsp.2508
+
 [4] Data source: https://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses
