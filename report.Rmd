@@ -40,6 +40,7 @@ Observing that mental health issues appear at a younger and younger age, we woul
 -   What factors can be used to predict depression levels?
 
 ## *Introduction*
+
 Depression, a pervasive mental health challenge, is becoming increasingly prevalent among younger demographics, necessitating a deeper understanding of its existence in diverse populations. This study seeks to harness the potential of the Depression, Anxiety, and Stress Scales (DASS) as a comprehensive tool to objectively assess the severity and underlying factors influencing or contributing to depression across demographic groups, including differences in race, age groups, and more.
 
 Our study utilizes an extensive dataset from the Depression, Anxiety, and Stress Scales (DASS) Responses accessible via Kaggle, to accomplish our objectives. This dataset includes 42 self-reported items, carefully created to evaluate emotional states associated with depression, anxiety, and stress. The objective of our project is to contribute to a more thorough comprehension of the determinants of depression, which could potentially inform customized support strategies and targeted interventions designed for specific population groups.
@@ -315,7 +316,303 @@ dass_new %>%
 
 ## *Exploratory Analysis*
 
+The data we used to analyze potential factors of depression levels comes from a worldwide survey. The raw data includes 9 potential factors:`country`, `education`, `urban`, `gender`, `religion`, `orientation`, `race`, `married`, and `age`. We would like to focus on `country`, `orientation`, `gender`, `age`, and `race` to analyze the relationship between these factors and depression level.
+
+### Interactive World Map
+
+We designed a [shiny app](https://doloreshqq.shinyapps.io/r_shiny_for_p8105/) to provide visualizations of depression levels for individual countries on a global scale.
+
+The sidebar can be used to select different depression levels, and for the analysis of survey answers based on proportion or occurrence.
+
+A screenshot is shown below:
+
+<img src="shiny_scr.jpg" style="width:85%"/>
+
+This interactive graph also illustrates the imbalance of responses. If we limit the occurrences to be larger than 500, there will only be Malaysia and United States left. When interpreting the proportion of different depression level, the sample size must be considered.
+
+### Plots of Potential Factors across Depression Levels
+
+With our existence data, we need to evaluate the depression level with respect to different populations. After some preliminary research and plotting, we identified a potential correlation between four variables including `gender`, `orientation`, `age` ,`race` and our predictor Depression Level. Subsequently, we proceeded with following exploratory data analysis to identify pertinent variables that could function as independent variables in our regression model.
+
+#### Overall view of gender, orientation & depression
+
+Our first plot gives an overall view of the relationship with gender, orientation and depression level.
+
+The plot below shows the number of different depression level cases in each gender groups among orientation.
+
+```{r}
+dass_new|>
+  group_by(gender, orientation)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+          Mild = sum(depression_level=="Mild"),
+          Moderate = sum(depression_level=="Moderate"),
+          Severe = sum(depression_level=="Severe"),
+          Extremely_Severe = sum(depression_level=="Extremely severe"),
+          .groups = "keep")|>
+  pivot_longer(
+    Normal:Extremely_Severe,
+    names_to = "Level",
+    values_to = "count")|>
+  mutate(Level = factor(Level, levels = unique(Level)))|>
+  ggplot(aes(x = Level, y = count, fill= gender)) +
+  geom_col()+
+  theme_minimal()+
+  facet_grid(~orientation)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(x = "Depression level", 
+       y = "count of cases", 
+       title = "Depression level vs. orientation vs. gender")
+```
+
+The x axis illustrates depression levels categorized by various orientations, while the y axis denotes the count of cases. Additionally, the bar plot's proportional filling conveys the gender distribution within a particular depression level under each orientation. From the plot, we observed that the female gender group in all orientation categories tends to exhibit a higher number of depression cases compared to other gender groups. Also, we found that depression level has significant differences between distinct orientation groups and genders. So we would like to further investigate the correlation between depression levels and each factor individually.
+
+#### Orientation
+
+Next, we would like to delve deeper into studying the relationship between the level of depression and orientation.
+
+```{r}
+dass_new|>
+  group_by(orientation)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+            Mild = sum(depression_level=="Mild"),
+            Moderate = sum(depression_level=="Moderate"),
+            Severe = sum(depression_level=="Severe"),
+            Extremely_Severe = sum(depression_level=="Extremely severe"))|>
+  pivot_longer(
+    Normal:Extremely_Severe,
+    names_to = "Level",
+    values_to = "Count")|>
+  mutate(Level = factor(Level, levels = unique(Level)))|>
+  ggplot(aes(x = Level, y = Count, group = orientation, color = orientation)) +
+  geom_point()+
+  geom_line()+
+  theme_minimal()+
+  labs(x = "Depression level", 
+       y = "count of cases", 
+       title = "Depression level vs. orientation groups")
+```
+
+This plot shows the relationship between depression levels and orientations. Given that heterosexual data is the most abundant, it naturally exhibits the highest case count. However, our primary emphasis in this analysis is on discerning the overarching trends across various depression levels.Notably, we observe fluctuations in individuals identifying as Heterosexual across depression levels, while there is a conspicuous rise in count among Bisexual individuals as the severity of depression increases. Asexual and Homosexual individuals display a relatively even distribution across all levels. The "Other" category exhibits a low count for "Mild" but experiences an increase with severity, peaking at the "Extremely Severe" level.
+
+#### Gender
+
+```{r}
+# distribution histogram of gender
+dass_new|>
+  group_by(gender)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+            Mild = sum(depression_level=="Mild"),
+            Moderate = sum(depression_level=="Moderate"),
+            Severe = sum(depression_level=="Severe"),
+            Extremely_Severe = sum(depression_level=="Extremely severe"))|>
+  pivot_longer(
+    Normal:Extremely_Severe,
+    names_to = "Level",
+    values_to = "Count")|>
+  mutate(Level = factor(Level, levels = unique(Level)))|>
+  ggplot(aes(x = Level, y = Count, group = gender, color = gender)) +
+  geom_point()+
+  geom_line()+
+  theme_minimal()+
+  labs(x = "Depression level", 
+       y = "count of cases", 
+       title = "Depression level vs. gender groups")
+```
+
+In our third plot, it becomes evident that females consistently exhibit a notably higher count of depression cases across all levels, especially in the "Normal" and "Extremely Severe" levels. Conversely, males display a lower case count at all levels, with a slight decrease at "Mild" followed by an increase at "Moderate." The case count for the "Other" gender category remains relatively stable across all levels of depression.
+
+#### Race
+
+```{r}
+dass_new|>
+  # form new race groups
+  mutate(race = case_when(race == "Native American" ~ "Other",
+                          race=="Arab"~ "Other", 
+                          race == "Indigenous Australian" ~ "Other",
+                          race == "Other" ~ "Other",
+                          race == "Black" ~ "Black",
+                          race == "White" ~ "White",
+                          race == "Asian" ~ "Asian"))|>
+  group_by(race)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+            Mild = sum(depression_level=="Mild"),
+            Moderate = sum(depression_level=="Moderate"),
+            Severe = sum(depression_level=="Severe"),
+            Extremely_Severe = sum(depression_level=="Extremely severe"))|>
+  pivot_longer(
+    Normal:Extremely_Severe,
+    names_to = "Level",
+    values_to = "Count")|>
+  mutate(Level = factor(Level, levels = unique(Level)))|>
+  ggplot(aes(x = Level, y = Count, group = race, color = race)) +
+  geom_point()+
+  geom_line()+
+  theme_minimal()+
+  labs(x = "Depression level", 
+       y = "count of cases", 
+       title = "Depression level vs. race groups")
+```
+
+The fourth plot examines depression levels across various races. The Asian group demonstrates the most fluctuating trend, with notable values at "Normal" and "Extremely Severe." The White group and other racial categories exhibit similar trends, showing a slight decrease at "Mild" and a substantial increase at "Extremely Severe." In contrast, Black individuals maintain a consistent count across all levels of depression.
+
+#### Age
+
+```{r}
+dass_new %>%
+  ggplot(aes(x=depression_level, y=age)) +
+  geom_boxplot(aes(fill=depression_level)) +
+  labs(title = "Age Distribution for Each Depression Level",
+        xlab = "Depression Level",
+        ylab = "Age")+
+  theme_minimal()
+
+```
+
+Regarding the age variable, we examined the box plot representing the general distribution of age and depression level. Our observation revealed the presence of numerous outliers. Across all depression levels, the data predominantly centered on the teenage age groups around 18\~25. Thus we divided age into four groups(under 18, 18 \~ 25, 25 \~ 50 and 50+) in next step.
+
+```{r}
+dass_new|>
+  # form age groups
+  mutate(age = case_when(age <= 18 ~ "teenage", 
+                         age <= 25 & age >18 ~ "young adult",
+                         age <= 50 & age >25 ~ "adult", 
+                         age >50 ~ "older"))|>
+  group_by(age)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+            Mild = sum(depression_level=="Mild"),
+            Moderate = sum(depression_level=="Moderate"),
+            Severe = sum(depression_level=="Severe"),
+            Extremely_Severe = sum(depression_level=="Extremely severe"))|>
+  pivot_longer(
+    Normal:Extremely_Severe,
+    names_to = "Level",
+    values_to = "Count")|>
+  mutate(Level = factor(Level, levels = unique(Level)))|>
+  ggplot(aes(x = Level, y = Count, group = age, color = age)) +
+  geom_line()+
+  geom_point()+
+  theme_minimal()+
+  labs(x = "Depression level", 
+       y = "count of cases", 
+       title = "Depression level vs. age groups")
+```
+
+This plot reveals that young adults consistently exhibit the highest counts of depression at all levels, experiencing a significant increase at the "Extremely Severe" level. The teenage group has a lower case count at the "Normal" level compared to the adult group but surpasses it at the "Moderate" level. Older individuals maintain a relatively stable count across all levels, with a slight increase at the "Extremely Severe" level.
+
 ## *Additional Analysis*
+
+From the plots regarding the depression levels and factors, we observed that the distribution of cases of different depression levels among different orientation groups, the distribution of cases of different depression levels among different gender groups, the distribution of cases of different depression levels among different age groups, and the distribution of cases of different depression levels among different race groups follow a similar pattern. Thus, we would like to perform a chi-squared test to study if these factors and depression levels are associated.\
+
+### Chi-squared Test
+
+#### 1: Orientation & Depression Level
+
+$H_0$: The depression levels and orientation are independent.\
+$H_1$: The depression levels and orientation are associated.
+
+```{r}
+# show result table to perform chi-squared test
+dass_new|>
+  group_by(orientation)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+            Mild = sum(depression_level=="Mild"),
+            Moderate = sum(depression_level=="Moderate"),
+            Severe = sum(depression_level=="Severe"),
+            Extremely_Severe = sum(depression_level=="Extremely severe"))
+# perform chi-squared test
+chisq.test(pull(dass_new, orientation), pull(dass_new, depression_level))|>
+  broom::tidy()|>
+  knitr::kable()
+```
+
+The null hypothesis for the chi-squared test is that the depression levels and orientation are independent. Since the p-value is smaller than 0.05, the null hypothesis is rejected.\
+We may conclude that orientation is associated with depression levels.
+
+#### 2: Gender & Depression Level
+
+$H_0$: The depression levels and gender are independent.\
+$H_1$: The depression levels and gender are associated.
+
+```{r}
+# show result table to perform chi-squared test
+dass_new|>
+  group_by(gender)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+            Mild = sum(depression_level=="Mild"),
+            Moderate = sum(depression_level=="Moderate"),
+            Severe = sum(depression_level=="Severe"),
+            Extremely_Severe = sum(depression_level=="Extremely severe"))
+# perform chi-squared test
+chisq.test(pull(dass_new, gender), pull(dass_new, depression_level))|>
+  broom::tidy()|>
+  knitr::kable()
+```
+
+The null hypothesis for the chi-squared test is that the depression levels and gender are independent. Since the p-value is smaller than 0.05, the null hypothesis is rejected.\
+We may conclude that gender is associated with depression levels.
+
+#### 3: Age & Depression Level
+
+$H_0$: The depression levels and age are independent.\
+$H_1$: The depression levels and age are associated.
+
+```{r}
+dass_chi <- dass_new|>
+  # form age groups
+  mutate(age = case_when(age <= 18 ~ "teenage", 
+                         age <= 25 & age >18 ~ "young adult",
+                         age <= 50 & age >25 ~ "adult", 
+                         age >50 ~ "older"))
+# show result table to perform chi-squared test
+dass_chi|>
+  group_by(age)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+            Mild = sum(depression_level=="Mild"),
+            Moderate = sum(depression_level=="Moderate"),
+            Severe = sum(depression_level=="Severe"),
+            Extremely_Severe = sum(depression_level=="Extremely severe"))
+# perform chi-squared test
+chisq.test(pull(dass_chi, age), pull(dass_chi, depression_level))|>
+  broom::tidy()|>
+  knitr::kable()
+```
+
+The null hypothesis for the chi-squared test is that depression levels and age are independent. Since the p-value is smaller than 0.05, the null hypothesis is rejected.\
+We may conclude that age is associated with depression levels.
+
+#### 4: Race & Depression Level
+
+$H_0$: The depression levels and race groups are independent.\
+$H_1$: The depression levels and race groups are associated.
+
+```{r}
+dass_chi <- dass_new|>
+  # form new race groups
+  mutate(race = case_when(race == "Native American" ~ "Other",
+                          race=="Arab"~ "Other", 
+                          race == "Indigenous Australian" ~ "Other",
+                          race == "Other" ~ "Other",
+                          race == "Black" ~ "Black",
+                          race == "White" ~ "White",
+                          race == "Asian" ~ "Asian"))
+# show result table to perform chi-squared test
+dass_chi|>
+  group_by(race)|>
+  summarise(Normal = sum(depression_level=="Normal"),
+            Mild = sum(depression_level=="Mild"),
+            Moderate = sum(depression_level=="Moderate"),
+            Severe = sum(depression_level=="Severe"),
+            Extremely_Severe = sum(depression_level=="Extremely severe"))
+# perform chi-squared test
+chisq.test(pull(dass_chi, race), pull(dass_chi, depression_level))|>
+  broom::tidy()|>
+  knitr::kable()
+```
+
+The null hypothesis for the chi-squared test is that depression levels and race groups are independent. Since the p-value is smaller than 0.05, the null hypothesis is rejected.\
+We may conclude that race is associated with depression levels.
+
+Based on the performed tests, orientation, gender, age, and race are strongly associated with depression levels.
 
 ## *Regression*
 
@@ -624,7 +921,7 @@ In our project, we first cleaned and tidied the dataset based on code.txt and DA
 
 After exploratory analysis, we found out age, gender, orientation and race may contribute to the depression level most. We also realized a shiny app to show the distribution of responses for each depression level around the world.
 
-We conducted chi-square tests for age, gender, orientation and race. Based on all p-values<0.05, we could conclude that at 0.05 significance level, the null hypothesis are rejected and these factors are all associated with depression level.
+We conducted chi-square tests for age, gender, orientation and race. Based on all p-values\<0.05, we could conclude that at 0.05 significance level, the null hypothesis are rejected and these factors are all associated with depression level.
 
 From the regression, we concluded that country, gender, orientation, age and race played important roles in the model. Specifically, we found out older people and male may have less risk to get depressed. Also, people live in Indonesia and Malaysia have less chance to severely depressed while in Canada, UK and Phillipines have more chance compared to US. The results also showed that white people and sexual minorities would be more likely to have more severe depression level. The p-value for our model is 0.067, which greater than 0.05, indicating a success.
 
@@ -632,7 +929,7 @@ From the regression, we concluded that country, gender, orientation, age and rac
 
 The challenge we met was that there were some missing or meaningless values in our raw dataset. Missing values for some variables were not just an "N/A" and we needed to dig into the dataset to find out the true expression of missing for each variables. Meaningless data means there were possibilities that the responses were randomly answered by someone or without carefulness. Thus, these observations would not be representative then we should omit.
 
-Another challenge we thought was that there were too much variables in the raw data, we needed to figure out the parts for our project. For example, we didn't need information of accuracy checking remain in the final dataset so we needed to delete these columns. 
+Another challenge we thought was that there were too much variables in the raw data, we needed to figure out the parts for our project. For example, we didn't need information of accuracy checking remain in the final dataset so we needed to delete these columns.
 
 ### Limitation and Future Improvements
 
