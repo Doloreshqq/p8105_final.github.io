@@ -1,6 +1,6 @@
 ---
 title: "Depression Factors Prediction based on DASS Responses Report"
-author: "Huanyu Chen (hc3451), Qin Huang (2284), Ou Sha (os2424), Lehan Zou (lz2950), Shaolei Ma (sm5592)"
+author: "Qin Huang (2284), Shaolei Ma (sm5592), Huanyu Chen (hc3451), Ou Sha (os2424), Lehan Zou (lz2950)"
 output: html_document
 ---
 
@@ -943,3 +943,7 @@ Another challenge we thought was that there were too much variables in the raw d
     -   Fit a separate model for each depression level to avoid parallel assumption.
 
 ## *Reference*
+[1] Melissa et. al, doi: 10.1016/j.chiabu.2017.03.016 
+[2] Virginia et. al, doi: 10.1016/j.wombi.2020.12.014
+[3] Postmes et. al, https://doi.org/10.1002/ejsp.2508
+[4] Data source: https://www.kaggle.com/datasets/lucasgreenwell/depression-anxiety-stress-scales-responses

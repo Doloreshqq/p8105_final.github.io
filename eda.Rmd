@@ -109,6 +109,7 @@ dass_new|>
        y = "count of cases", 
        title = "Depression level vs. gender groups")
 ```
+
 In our third plot, it becomes evident that females consistently exhibit a notably higher count of depression cases across all levels, especially in the "Normal" and "Extremely Severe" levels. Conversely, males display a lower case count at all levels, with a slight decrease at "Mild" followed by an increase at "Moderate." The case count for the "Other" gender category remains relatively stable across all levels of depression.
 
 ## Depression Level vs. Race groups
@@ -145,7 +146,7 @@ dass_new|>
 
 The fourth plot examines depression levels across various races. The Asian group demonstrates the most fluctuating trend, with notable values at "Normal" and "Extremely Severe." The White group and other racial categories exhibit similar trends, showing a slight decrease at "Mild" and a substantial increase at "Extremely Severe." In contrast, Black individuals maintain a consistent count across all levels of depression.
  
-## Age Distribution for Each Depression Level
+## Depression Level vs. Age groups
 
 ```{r}
 dass_new %>%
@@ -160,7 +161,6 @@ dass_new %>%
 
 Regarding the age variable, we examined the box plot representing the general distribution of age and depression level. Our observation revealed the presence of numerous outliers. Across all depression levels, the data predominantly centered on the teenage age groups around 18~25. Thus we divided age into four groups(under 18, 18 ~ 25, 25 ~ 50 and 50+) in next step.
 
-## Depression Level vs. Age groups
 
 ```{r}
 dass_new|>

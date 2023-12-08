@@ -13,7 +13,7 @@
 
 <title>Exploratory Data Analysis</title>
 
-<script src="site_libs/header-attrs-2.18/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.24/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
@@ -29,15 +29,15 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
-<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -509,13 +509,13 @@ dass_new|&gt;
   labs(x = &quot;Depression level&quot;, 
        y = &quot;count of cases&quot;, 
        title = &quot;Depression level vs. gender groups&quot;)</code></pre>
-<p><img src="eda_files/figure-html/unnamed-chunk-3-1.png" width="672" />
-In our third plot, it becomes evident that females consistently exhibit
-a notably higher count of depression cases across all levels, especially
-in the “Normal” and “Extremely Severe” levels. Conversely, males display
-a lower case count at all levels, with a slight decrease at “Mild”
-followed by an increase at “Moderate.” The case count for the “Other”
-gender category remains relatively stable across all levels of
+<p><img src="eda_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>In our third plot, it becomes evident that females consistently
+exhibit a notably higher count of depression cases across all levels,
+especially in the “Normal” and “Extremely Severe” levels. Conversely,
+males display a lower case count at all levels, with a slight decrease
+at “Mild” followed by an increase at “Moderate.” The case count for the
+“Other” gender category remains relatively stable across all levels of
 depression.</p>
 </div>
 <div id="depression-level-vs.-race-groups" class="section level2">
@@ -556,9 +556,8 @@ and a substantial increase at “Extremely Severe.” In contrast, Black
 individuals maintain a consistent count across all levels of
 depression.</p>
 </div>
-<div id="age-distribution-for-each-depression-level"
-class="section level2">
-<h2>Age Distribution for Each Depression Level</h2>
+<div id="depression-level-vs.-age-groups" class="section level2">
+<h2>Depression Level vs. Age groups</h2>
 <pre class="r"><code>dass_new %&gt;%
   ggplot(aes(x=depression_level, y=age)) +
   geom_boxplot(aes(fill=depression_level)) +
@@ -573,9 +572,6 @@ revealed the presence of numerous outliers. Across all depression
 levels, the data predominantly centered on the teenage age groups around
 18~25. Thus we divided age into four groups(under 18, 18 ~ 25, 25 ~ 50
 and 50+) in next step.</p>
-</div>
-<div id="depression-level-vs.-age-groups" class="section level2">
-<h2>Depression Level vs. Age groups</h2>
 <pre class="r"><code>dass_new|&gt;
   # form age groups
   mutate(age = case_when(age &lt;= 18 ~ &quot;teenage&quot;, 
