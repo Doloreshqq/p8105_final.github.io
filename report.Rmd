@@ -27,7 +27,7 @@ Observing that mental health issues appear at a younger and younger age, we woul
 
 ## *Related Work*
 
-In the realm of depression level research, the exploration of psychosocial determinants has been a prominent focus. [Melissa et. al](doi: 10.1016/j.chiabu.2017.03.016) delved into the impact of adverse childhood experiences on the prevalence of depression in adulthood, elucidating the long-term consequences of early-life stressors. Concurrently, the work of [Virginia et. al](doi: 10.1016/j.wombi.2020.12.014) the relationship between perceived social support and anxiety/depression in UK-based pregnant women during the COVID-19 pandemic. Furthermore, a meta-analysis by [Postmes et. al]( https://doi.org/10.1002/ejsp.2508) has systematically review and quantitatively analyze existing studies to examine the relationship between social identification and depression. Such interdisciplinary approaches contribute to a more comprehensive and nuanced comprehension of the factors influencing mental health and provide a foundation for tailored interventions and support mechanisms.
+In the realm of depression level research, the exploration of psychosocial determinants has been a prominent focus. [Merrick et. al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6007802/pdf/nihms971388.pdf) delved into the impact of adverse childhood experiences on the prevalence of depression in adulthood, elucidating the long-term consequences of early-life stressors. Concurrently, the work of [Harrison et. al](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9051127/pdf/main.pdf) the relationship between perceived social support and anxiety/depression in UK-based pregnant women during the COVID-19 pandemic. Furthermore, a meta-analysis by [Postmes et. al]( https://doi.org/10.1002/ejsp.2508) has systematically review and quantitatively analyze existing studies to examine the relationship between social identification and depression. Such interdisciplinary approaches contribute to a more comprehensive and nuanced comprehension of the factors influencing mental health and provide a foundation for tailored interventions and support mechanisms.
 
 ## *Initial Questions*
 
@@ -943,9 +943,9 @@ Another challenge we thought was that there were too much variables in the raw d
     -   Fit a separate model for each depression level to avoid parallel assumption.
 
 ## *Reference*
-[1] Melissa et. al, doi: 10.1016/j.chiabu.2017.03.016 
+[1] Merrick et. al, doi: 10.1016/j.chiabu.2017.03.016 
 
-[2] Virginia et. al, doi: 10.1016/j.wombi.2020.12.014
+[2] Harrison et. al, doi: 10.1016/j.wombi.2020.12.014
 
 [3] Postmes et. al, https://doi.org/10.1002/ejsp.2508
 
